@@ -1,0 +1,3112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0a0a0a;
+      color: #e0e0e0;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 220px;
+      min-width: 220px;
+      background: #111111;
+      border-right: 1px solid #1e1e1e;
+      display: flex;
+      flex-direction: column;
+      padding: 32px 0;
+    }
+
+    .sidebar-logo {
+      padding: 0 24px 32px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #888;
+    }
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 0 12px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 400;
+      color: #999;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      user-select: none;
+    }
+
+    .nav-item:hover { background: #1a1a1a; color: #ccc; }
+
+    .nav-item.active {
+      background: #1e1e1e;
+      color: #f0f0f0;
+      font-weight: 500;
+    }
+
+    .nav-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #333;
+      flex-shrink: 0;
+    }
+
+    .nav-item.active .nav-dot { background: #666; }
+
+    /* ── Main ── */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .topbar {
+      height: 64px;
+      min-height: 64px;
+      background: #0a0a0a;
+      border-bottom: 1px solid #1a1a1a;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+    }
+
+    .topbar-greeting {
+      font-size: 16px;
+      font-weight: 500;
+      color: #e0e0e0;
+    }
+
+    .topbar-date {
+      font-size: 13px;
+      color: #777;
+      font-weight: 400;
+    }
+
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 40px 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .content::-webkit-scrollbar { width: 4px; }
+    .content::-webkit-scrollbar-track { background: transparent; }
+    .content::-webkit-scrollbar-thumb { background: #222; border-radius: 2px; }
+
+    /* ── Section switching ── */
+    .section { display: none; width: 100%; }
+    .section.active { display: flex; flex-direction: column; }
+
+    /* ── Placeholder (used by non-built sections) ── */
+    .placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      margin: auto;
+      padding: 80px 0;
+    }
+
+    .placeholder-icon {
+      width: 48px;
+      height: 48px;
+      border: 2px solid #1e1e1e;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .placeholder-icon svg { opacity: 0.4; }
+    .placeholder-text { font-size: 14px; color: #2e2e2e; }
+
+    /* ══════════════════════════════
+       TIME OS
+    ══════════════════════════════ */
+    .section-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #666;
+      margin-bottom: 16px;
+    }
+
+    /* Stat cards */
+    .stat-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: #111;
+      border: 1px solid #1e1e1e;
+      border-radius: 10px;
+      padding: 18px 18px 14px;
+    }
+
+    .sc-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .sc-hours {
+      font-size: 34px;
+      font-weight: 600;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .sc-sub {
+      font-size: 11px;
+      color: #888;
+      margin-bottom: 14px;
+    }
+
+    .sc-track {
+      height: 2px;
+      background: #1a1a1a;
+      border-radius: 1px;
+    }
+
+    .sc-fill { height: 2px; border-radius: 1px; }
+
+    .stat-card.red  .sc-label,
+    .stat-card.red  .sc-hours  { color: #c94f4f; }
+    .stat-card.red  .sc-fill   { background: #c94f4f; width: 57%; }
+
+    .stat-card.blue .sc-label,
+    .stat-card.blue .sc-hours  { color: #4f7ec9; }
+    .stat-card.blue .sc-fill   { background: #4f7ec9; width: 80%; }
+
+    .stat-card.green .sc-label,
+    .stat-card.green .sc-hours { color: #4daa7d; }
+    .stat-card.green .sc-fill  { background: #4daa7d; width: 68%; }
+
+    .stat-card.muted .sc-label,
+    .stat-card.muted .sc-hours { color: #555; }
+    .stat-card.muted .sc-fill  { background: #333; width: 35%; }
+
+    /* ── Weekly grid ── */
+    .week-grid-wrap {
+      background: #111;
+      border: 1px solid #1e1e1e;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .week-header {
+      display: grid;
+      grid-template-columns: 48px repeat(7, 1fr);
+      border-bottom: 1px solid #1a1a1a;
+    }
+
+    .wh-spacer { border-right: 1px solid #1a1a1a; }
+
+    .wh-day {
+      padding: 11px 6px;
+      font-size: 10px;
+      font-weight: 500;
+      color: #777;
+      text-align: center;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border-right: 1px solid #1a1a1a;
+    }
+
+    .wh-day:last-child { border-right: none; }
+    .wh-day.today { color: #e0e0e0; }
+
+    /* 18 hours × 34px = 612px */
+    .week-body {
+      display: grid;
+      grid-template-columns: 48px repeat(7, 1fr);
+      height: 612px;
+    }
+
+    .time-labels { border-right: 1px solid #1a1a1a; }
+
+    .tl-hour {
+      height: 34px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-end;
+      padding: 3px 8px 0 0;
+      font-size: 9px;
+      color: #555;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .day-col {
+      position: relative;
+      border-right: 1px solid #1a1a1a;
+      overflow: hidden;
+    }
+
+    .day-col:last-child { border-right: none; }
+
+    .hour-lines {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent 33px,
+        #161616 33px,
+        #161616 34px
+      );
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Time blocks — top/height set inline, anchored to 06:00 baseline at 34px/hr */
+    .tb {
+      position: absolute;
+      left: 3px;
+      right: 3px;
+      border-radius: 5px;
+      padding: 6px 7px 5px;
+      overflow: hidden;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .tb-label {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tb-time {
+      font-size: 8px;
+      opacity: 0.45;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .tb-chips {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-top: 4px;
+    }
+
+    .chip {
+      display: inline-flex;
+      width: fit-content;
+      padding: 2px 5px;
+      border-radius: 3px;
+      background: rgba(255,255,255,0.06);
+      font-size: 7.5px;
+      font-weight: 500;
+      color: #888;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+
+    .tb.red  { background: rgba(201,79,79,0.12);  border-left: 2px solid rgba(201,79,79,0.55); }
+    .tb.red  .tb-label { color: #c94f4f; }
+
+    .tb.blue { background: rgba(79,126,201,0.12); border-left: 2px solid rgba(79,126,201,0.55); }
+    .tb.blue .tb-label { color: #4f7ec9; }
+
+    .tb.green { background: rgba(77,170,125,0.1); border-left: 2px solid rgba(77,170,125,0.5); }
+    .tb.green .tb-label { color: #4daa7d; }
+
+    .tb.gray  { background: rgba(255,255,255,0.015); border-left: 2px solid #1e1e1e; }
+    .tb.gray  .tb-label { color: #666; }
+
+    /* ══════════════════════════════
+       MOVEMENT
+    ══════════════════════════════ */
+
+    /* Streak */
+    .streak-row {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 32px;
+    }
+    .streak-icon { font-size: 32px; line-height: 1; align-self: center; }
+    .streak-number { font-size: 52px; font-weight: 600; color: #e0e0e0; line-height: 1; }
+    .streak-meta { display: flex; flex-direction: column; padding-bottom: 4px; }
+    .streak-label { font-size: 12px; color: #999; font-weight: 400; }
+    .streak-sub   { font-size: 10px; color: #666; margin-top: 2px; }
+
+    /* Skill grid */
+    .skill-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .skill-card {
+      background: #111;
+      border: 1px solid #1e1e1e;
+      border-radius: 10px;
+      padding: 14px 14px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .skill-card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .skill-name-wrap { display: flex; flex-direction: column; gap: 4px; }
+    .skill-name { font-size: 13px; font-weight: 500; color: #bbb; line-height: 1.2; }
+
+    .skill-scary-row { display: flex; align-items: center; gap: 4px; }
+    .skill-scary {
+      font-size: 9px;
+      color: #555;
+      background: #1a1a1a;
+      padding: 1px 5px;
+      border-radius: 3px;
+      letter-spacing: 0.04em;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      padding: 3px 7px;
+      border-radius: 4px;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: opacity 0.15s;
+    }
+    .status-badge:hover { opacity: 0.75; }
+    .status-badge.not-started { background: #1e1e1e; color: #777; }
+    .status-badge.drilling    { background: rgba(79,126,201,0.14); color: #4f7ec9; }
+    .status-badge.almost      { background: rgba(201,160,50,0.14); color: #c9a032; }
+    .status-badge.unlocked    { background: rgba(77,170,125,0.14); color: #4daa7d; }
+
+    .skill-bar-track { height: 3px; background: #1a1a1a; border-radius: 2px; overflow: hidden; }
+    .skill-bar-fill  { height: 3px; border-radius: 2px; transition: width 0.35s ease; }
+
+    .skill-card[data-status="not-started"] .skill-bar-fill { width: 0%;   background: #2a2a2a; }
+    .skill-card[data-status="drilling"]    .skill-bar-fill { width: 33%;  background: #4f7ec9; }
+    .skill-card[data-status="almost"]      .skill-bar-fill { width: 66%;  background: #c9a032; }
+    .skill-card[data-status="unlocked"]    .skill-bar-fill { width: 100%; background: #4daa7d; }
+
+    .skill-notes {
+      background: #0d0d0d;
+      border: 1px solid #1a1a1a;
+      border-radius: 5px;
+      color: #666;
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      line-height: 1.5;
+      padding: 7px 9px;
+      resize: none;
+      outline: none;
+      height: 56px;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .skill-notes::placeholder { color: #444; }
+    .skill-notes:focus { border-color: #333; color: #aaa; }
+
+    /* Log section */
+    .log-section {
+      background: #111;
+      border: 1px solid #1e1e1e;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .log-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 16px;
+    }
+
+    .log-title { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #666; }
+
+    .log-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 12px;
+      border-radius: 5px;
+      border: 1px solid #222;
+      background: transparent;
+      color: #555;
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .log-btn:hover { border-color: #333; color: #aaa; }
+
+    .log-form {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      padding: 14px 16px 16px;
+      border-top: 1px solid #181818;
+    }
+    .log-form.open { display: flex; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .form-field { display: flex; flex-direction: column; gap: 4px; }
+
+    .form-label {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #777;
+    }
+
+    .form-input, .form-select {
+      background: #0d0d0d;
+      border: 1px solid #1a1a1a;
+      border-radius: 5px;
+      color: #bbb;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      padding: 7px 9px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .form-input:focus, .form-select:focus { border-color: #333; }
+    .form-select option { background: #111; }
+
+    .feel-row { display: flex; gap: 5px; }
+    .feel-btn {
+      flex: 1;
+      padding: 6px 0;
+      border-radius: 4px;
+      border: 1px solid #252525;
+      background: transparent;
+      color: #888;
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .feel-btn:hover { border-color: #333; color: #bbb; }
+    .feel-btn.sel { border-color: #444; background: #1e1e1e; color: #e0e0e0; }
+
+    .form-submit {
+      align-self: flex-end;
+      padding: 7px 18px;
+      border-radius: 5px;
+      border: none;
+      background: #1e1e1e;
+      color: #aaa;
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .form-submit:hover { background: #2a2a2a; color: #e0e0e0; }
+
+    /* Session list */
+    .session-list { display: flex; flex-direction: column; }
+
+    .no-sessions-msg {
+      padding: 14px 16px;
+      font-size: 11px;
+      color: #666;
+    }
+
+    .session-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 16px;
+      border-top: 1px solid #141414;
+      font-size: 12px;
+    }
+    .si-date  { color: #777; width: 72px; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+    .si-skill { color: #aaa; flex: 1; }
+    .si-dur   { color: #777; width: 50px; flex-shrink: 0; text-align: right; font-variant-numeric: tabular-nums; }
+    .si-feel  {
+      width: 68px;
+      flex-shrink: 0;
+      text-align: right;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .si-feel.bad       { color: #c94f4f; }
+    .si-feel.ok        { color: #888; }
+    .si-feel.good      { color: #4daa7d; }
+    .si-feel.locked-in { color: #4f7ec9; }
+
+    /* Habits tracker */
+    .habits-wrap {
+      background: #111;
+      border: 1px solid #1e1e1e;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .habits-head {
+      padding: 13px 16px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #666;
+      border-bottom: 1px solid #181818;
+    }
+
+    .habits-table { width: 100%; border-collapse: collapse; }
+
+    .habits-table th,
+    .habits-table td {
+      padding: 10px 8px;
+      text-align: center;
+      border-bottom: 1px solid #141414;
+    }
+    .habits-table tr:last-child td { border-bottom: none; }
+
+    .habits-table th {
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #666;
+    }
+
+    .ht-name {
+      text-align: left !important;
+      padding-left: 16px !important;
+      font-size: 12px;
+      color: #aaa;
+      width: 190px;
+    }
+
+    .ht-pct {
+      text-align: right !important;
+      padding-right: 16px !important;
+      font-size: 10px;
+      color: #666;
+      font-variant-numeric: tabular-nums;
+      width: 48px;
+    }
+
+    .habits-table th.amber-th { color: #c9a032 !important; }
+    .habits-table td.amber-td { background: rgba(201,160,50,0.04); }
+
+    .habit-cb {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 13px;
+      height: 13px;
+      border: 1px solid #333;
+      border-radius: 3px;
+      cursor: pointer;
+      position: relative;
+      vertical-align: middle;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .habit-cb:hover { border-color: #555; }
+    .habit-cb:checked { background: #252525; border-color: #555; }
+    .habit-cb:checked::after {
+      content: '';
+      position: absolute;
+      left: 3px; top: 1px;
+      width: 4px; height: 7px;
+      border: 1.5px solid #aaa;
+      border-top: none; border-left: none;
+      transform: rotate(45deg);
+    }
+
+    /* ══════════════════════════════
+       SCHOOL
+    ══════════════════════════════ */
+
+    .school-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .school-stat {
+      background: #111;
+      border: 1px solid #1e1e1e;
+      border-radius: 10px;
+      padding: 18px 18px 14px;
+    }
+
+    .ss-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #666;
+      margin-bottom: 8px;
+    }
+
+    .ss-number {
+      font-size: 40px;
+      font-weight: 600;
+      line-height: 1;
+      color: #ccc;
+      margin-bottom: 4px;
+    }
+
+    .ss-sub { font-size: 11px; color: #777; }
+
+    /* Assignment list */
+    .assignments-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .no-assignments {
+      padding: 18px 0 10px;
+      font-size: 12px;
+      color: #666;
+      text-align: center;
+    }
+
+    .assign-card {
+      background: #111;
+      border: 1px solid #1e1e1e;
+      border-left: 3px solid #1e1e1e;
+      border-radius: 8px;
+      padding: 11px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: opacity 0.2s;
+    }
+
+    .assign-card.urgent { border-left-color: #c94f4f; }
+    .assign-card.done   { opacity: 0.32; }
+
+    .assign-subject {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      flex-shrink: 0;
+      max-width: 148px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .assign-title {
+      flex: 1;
+      font-size: 13px;
+      color: #d0d0d0;
+      font-weight: 400;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
+    }
+
+    .assign-card.done .assign-title { text-decoration: line-through; color: #555; }
+
+    .assign-due {
+      font-size: 11px;
+      color: #777;
+      white-space: nowrap;
+      flex-shrink: 0;
+      font-variant-numeric: tabular-nums;
+      width: 76px;
+      text-align: right;
+    }
+
+    .assign-card.urgent:not(.done) .assign-due { color: #c94f4f; }
+
+    .assign-status-sel {
+      background: #0d0d0d;
+      border: 1px solid #222;
+      border-radius: 4px;
+      color: #888;
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      font-weight: 500;
+      padding: 4px 6px;
+      outline: none;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: border-color 0.15s, color 0.15s;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .assign-status-sel:focus { border-color: #333; color: #bbb; }
+    .assign-status-sel option { background: #111; }
+
+    /* Add assignment panel */
+    .add-assign-wrap {
+      background: #111;
+      border: 1px solid #1e1e1e;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .add-assign-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+    }
+
+    .add-assign-lbl {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #666;
+    }
+
+    .add-assign-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 12px;
+      border-radius: 5px;
+      border: 1px solid #222;
+      background: transparent;
+      color: #555;
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .add-assign-btn:hover { border-color: #333; color: #aaa; }
+
+    .add-assign-form {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      padding: 14px 16px 16px;
+      border-top: 1px solid #181818;
+    }
+
+    .add-assign-form.open { display: flex; }
+
+    /* ══════════════════════════════
+       @2.CHICOS
+    ══════════════════════════════ */
+
+    /* Stat cards — 6-up */
+    .chicos-stats {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .chicos-stat {
+      background: #111;
+      border: 1px solid #1e1e1e;
+      border-radius: 10px;
+      padding: 15px 14px 12px;
+    }
+
+    .cs-label {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: #666;
+      margin-bottom: 7px;
+    }
+
+    .cs-value {
+      display: block;
+      font-size: 26px;
+      font-weight: 600;
+      color: #bbb;
+      line-height: 1;
+      margin-bottom: 2px;
+      border-radius: 3px;
+      outline: none;
+      cursor: text;
+      transition: background 0.15s;
+    }
+
+    .cs-value:hover  { background: #181818; }
+    .cs-value:focus  { background: #181818; color: #e0e0e0; }
+
+    .cs-unit { font-size: 10px; color: #777; }
+
+    /* Follower chart */
+    .chicos-chart-wrap {
+      background: #111;
+      border: 1px solid #1e1e1e;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .chart-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid #181818;
+    }
+
+    .chart-title {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #666;
+    }
+
+    .add-snap-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 12px;
+      border-radius: 5px;
+      border: 1px solid #222;
+      background: transparent;
+      color: #555;
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .add-snap-btn:hover { border-color: #333; color: #aaa; }
+
+    .snapshot-form {
+      display: none;
+      flex-direction: row;
+      align-items: flex-end;
+      gap: 10px;
+      padding: 12px 16px 12px;
+      border-bottom: 1px solid #181818;
+    }
+
+    .snapshot-form.open { display: flex; }
+
+    .chart-canvas-wrap { padding: 16px 12px 12px; height: 210px; }
+
+    /* Kanban */
+    .kanban-board {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .kanban-col {
+      background: #0e0e0e;
+      border: 1px solid #1a1a1a;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .kanban-col-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 10px 10px 12px;
+      border-bottom: 1px solid #181818;
+      flex-shrink: 0;
+    }
+
+    .kc-col-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    .kc-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 17px;
+      height: 17px;
+      border-radius: 4px;
+      background: #1e1e1e;
+      font-size: 9px;
+      color: #777;
+      font-weight: 600;
+      padding: 0 4px;
+    }
+
+    .kc-add-btn {
+      width: 22px;
+      height: 22px;
+      border-radius: 4px;
+      border: none;
+      background: transparent;
+      color: #666;
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, color 0.15s;
+      flex-shrink: 0;
+    }
+
+    .kc-add-btn:hover { background: #1a1a1a; color: #888; }
+
+    .kanban-cards {
+      flex: 1;
+      padding: 7px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      overflow-y: auto;
+      min-height: 60px;
+      transition: background 0.15s;
+    }
+
+    .kanban-cards.drag-over {
+      background: rgba(255,255,255,0.012);
+      outline: 1px dashed #2a2a2a;
+      outline-offset: -3px;
+    }
+
+    .kanban-card {
+      background: #141414;
+      border: 1px solid #1e1e1e;
+      border-radius: 6px;
+      padding: 9px 9px 7px;
+      cursor: grab;
+      position: relative;
+      user-select: none;
+      transition: border-color 0.15s, opacity 0.2s;
+    }
+
+    .kanban-card:hover { border-color: #272727; }
+    .kanban-card.dragging { opacity: 0.35; cursor: grabbing; }
+
+    .kc-title {
+      font-size: 12px;
+      font-weight: 500;
+      color: #999;
+      line-height: 1.35;
+      margin-bottom: 4px;
+      padding-right: 14px;
+    }
+
+    .kc-note {
+      font-size: 10px;
+      color: #777;
+      line-height: 1.45;
+    }
+
+    .kc-del {
+      position: absolute;
+      top: 6px; right: 6px;
+      width: 15px; height: 15px;
+      border-radius: 3px;
+      border: none;
+      background: transparent;
+      color: #555;
+      font-size: 13px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: background 0.12s, color 0.12s, opacity 0.12s;
+    }
+
+    .kanban-card:hover .kc-del { opacity: 1; }
+    .kc-del:hover { background: #2a2a2a; color: #ccc; }
+
+    .kc-add-form {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      padding: 7px;
+      border-top: 1px solid #181818;
+      flex-shrink: 0;
+    }
+
+    .kc-add-form.open { display: flex; }
+
+    .kc-input {
+      background: #0d0d0d;
+      border: 1px solid #1a1a1a;
+      border-radius: 4px;
+      color: #aaa;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      padding: 6px 8px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .kc-input:focus { border-color: #333; }
+    .kc-input::placeholder { color: #444; }
+
+    .kc-note-input {
+      background: #0d0d0d;
+      border: 1px solid #1a1a1a;
+      border-radius: 4px;
+      color: #999;
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      padding: 5px 8px;
+      outline: none;
+      resize: none;
+      height: 40px;
+      transition: border-color 0.15s;
+    }
+
+    .kc-note-input:focus { border-color: #333; }
+    .kc-note-input::placeholder { color: #444; }
+
+    .kc-save-btn {
+      align-self: flex-end;
+      padding: 5px 11px;
+      border-radius: 4px;
+      border: none;
+      background: #1e1e1e;
+      color: #aaa;
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .kc-save-btn:hover { background: #2a2a2a; color: #e0e0e0; }
+
+    /* Column accent colours */
+    .kanban-col[data-col="idea"]      .kc-col-label { color: #888; }
+    .kanban-col[data-col="filming"]   .kc-col-label { color: #4f7ec9; }
+    .kanban-col[data-col="editing"]   .kc-col-label { color: #c9a032; }
+    .kanban-col[data-col="published"] .kc-col-label { color: #4daa7d; }
+
+    .kanban-col[data-col="filming"]   .kc-count { background: rgba(79,126,201,0.1);  color: #4f7ec9; }
+    .kanban-col[data-col="editing"]   .kc-count { background: rgba(201,160,50,0.1);  color: #c9a032; }
+    .kanban-col[data-col="published"] .kc-count { background: rgba(77,170,125,0.1);  color: #4daa7d; }
+
+    /* ══════════════════════════════
+       SIDE PROJECTS
+    ══════════════════════════════ */
+
+    .sp-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .sp-card {
+      background: #111;
+      border: 1px solid #1e1e1e;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sp-card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 18px 18px 14px;
+    }
+
+    .sp-meta { flex: 1; min-width: 0; }
+
+    .sp-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #ccc;
+      margin-bottom: 6px;
+      line-height: 1.25;
+    }
+
+    .sp-concept {
+      font-size: 11px;
+      color: #999;
+      line-height: 1.5;
+    }
+
+    .sp-score-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+      padding-top: 2px;
+    }
+
+    .sp-score {
+      font-size: 40px;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    .sp-score.green { color: #4daa7d; }
+    .sp-score.amber { color: #c9a032; }
+    .sp-score.red   { color: #c94f4f; }
+
+    .sp-score-denom {
+      font-size: 9px;
+      color: #666;
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    .sp-divider {
+      height: 1px;
+      background: #191919;
+      margin: 0 18px;
+    }
+
+    .sp-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px 16px;
+      padding: 14px 18px;
+      flex: 1;
+    }
+
+    .sp-detail-label {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: #777;
+      margin-bottom: 4px;
+    }
+
+    .sp-detail-value {
+      font-size: 12px;
+      color: #bbb;
+      line-height: 1.35;
+    }
+
+    .sp-card-footer {
+      display: flex;
+      justify-content: flex-end;
+      padding: 0 14px 12px;
+      border-top: 1px solid #161616;
+      padding-top: 10px;
+    }
+
+    .sp-del {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #555;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 3px 6px;
+      border-radius: 3px;
+      font-family: 'Inter', sans-serif;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .sp-del:hover { color: #c94f4f; background: rgba(201,79,79,0.07); }
+
+    /* Add project panel */
+    .sp-add-wrap {
+      background: #111;
+      border: 1px solid #1e1e1e;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .sp-add-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+    }
+
+    .sp-add-lbl {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #666;
+    }
+
+    .sp-add-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 12px;
+      border-radius: 5px;
+      border: 1px solid #222;
+      background: transparent;
+      color: #555;
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .sp-add-btn:hover { border-color: #333; color: #aaa; }
+
+    .sp-form {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      padding: 14px 16px 16px;
+      border-top: 1px solid #181818;
+    }
+
+    .sp-form.open { display: flex; }
+
+    .sp-score-input {
+      width: 80px;
+    }
+
+    /* ══════════════════════════════
+       LIFE GOALS
+    ══════════════════════════════ */
+
+    .goals-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .goal-card {
+      background: #111;
+      border: 1px solid #1e1e1e;
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+
+    .goal-title-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .goal-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #ccc;
+      line-height: 1.3;
+      flex: 1;
+    }
+
+    .goal-del {
+      width: 18px;
+      height: 18px;
+      border-radius: 3px;
+      border: none;
+      background: transparent;
+      color: #555;
+      font-size: 14px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.12s, color 0.12s;
+    }
+
+    .goal-del:hover { background: rgba(201,79,79,0.08); color: #c94f4f; }
+
+    .goal-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .goal-cat {
+      display: inline-flex;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .goal-due { font-size: 11px; color: #777; }
+
+    .goal-days { font-size: 10px; font-weight: 500; }
+    .goal-days-red   { color: #c94f4f; }
+    .goal-days-amber { color: #c9a032; }
+    .goal-days-muted { color: #666; }
+
+    /* Slider */
+    .goal-slider-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .goal-progress {
+      flex: 1;
+      height: 4px;
+      -webkit-appearance: none;
+      appearance: none;
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+      border: none;
+    }
+
+    .goal-progress::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #4daa7d;
+      cursor: pointer;
+      border: 2px solid #111;
+      transition: transform 0.12s;
+    }
+
+    .goal-progress::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+    .goal-progress::-moz-range-thumb {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #4daa7d;
+      cursor: pointer;
+      border: 2px solid #111;
+    }
+
+    .goal-pct {
+      font-size: 12px;
+      font-weight: 600;
+      color: #4daa7d;
+      width: 36px;
+      text-align: right;
+      flex-shrink: 0;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Notes */
+    .goal-notes {
+      background: #0d0d0d;
+      border: 1px solid #1a1a1a;
+      border-radius: 5px;
+      color: #999;
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      line-height: 1.5;
+      padding: 7px 9px;
+      resize: none;
+      outline: none;
+      height: 50px;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .goal-notes::placeholder { color: #444; }
+    .goal-notes:focus { border-color: #333; color: #bbb; }
+
+    /* Add goal panel */
+    .lg-add-wrap {
+      background: #111;
+      border: 1px solid #1e1e1e;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .lg-add-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+    }
+
+    .lg-add-lbl {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #666;
+    }
+
+    .lg-add-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 12px;
+      border-radius: 5px;
+      border: 1px solid #222;
+      background: transparent;
+      color: #555;
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .lg-add-btn:hover { border-color: #333; color: #aaa; }
+
+    .lg-form {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      padding: 14px 16px 16px;
+      border-top: 1px solid #181818;
+    }
+
+    .lg-form.open { display: flex; }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">Leon OS</div>
+    <nav class="nav">
+      <div class="nav-item active" data-section="time-os">
+        <span class="nav-dot"></span>Time OS
+      </div>
+      <div class="nav-item" data-section="movement">
+        <span class="nav-dot"></span>Movement
+      </div>
+      <div class="nav-item" data-section="school">
+        <span class="nav-dot"></span>School
+      </div>
+      <div class="nav-item" data-section="chicos">
+        <span class="nav-dot"></span>@2.chicos
+      </div>
+      <div class="nav-item" data-section="side-projects">
+        <span class="nav-dot"></span>Side Projects
+      </div>
+      <div class="nav-item" data-section="life-goals">
+        <span class="nav-dot"></span>Life Goals
+      </div>
+    </nav>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <span class="topbar-greeting" id="greeting"></span>
+      <span class="topbar-date" id="topbar-date"></span>
+    </header>
+
+    <main class="content">
+
+      <!-- ══ TIME OS ══ -->
+      <div id="section-time-os" class="section active">
+        <div class="section-label">This week</div>
+
+        <div class="stat-cards">
+          <div class="stat-card red">
+            <div class="sc-label">Gaby's Shifts</div>
+            <div class="sc-hours">16h</div>
+            <div class="sc-sub">Tue · Thu · Fri · Sat</div>
+            <div class="sc-track"><div class="sc-fill"></div></div>
+          </div>
+          <div class="stat-card blue">
+            <div class="sc-label">Euroaula</div>
+            <div class="sc-hours">25h</div>
+            <div class="sc-sub">Mon – Fri · 09–14</div>
+            <div class="sc-track"><div class="sc-fill"></div></div>
+          </div>
+          <div class="stat-card green">
+            <div class="sc-label">@2.chicos</div>
+            <div class="sc-hours">20h</div>
+            <div class="sc-sub">Afternoons, Mon – Fri</div>
+            <div class="sc-track"><div class="sc-fill"></div></div>
+          </div>
+          <div class="stat-card muted">
+            <div class="sc-label">Free Time</div>
+            <div class="sc-hours">28h</div>
+            <div class="sc-sub">Available this week</div>
+            <div class="sc-track"><div class="sc-fill"></div></div>
+          </div>
+        </div>
+
+        <!-- Weekly grid: 06:00–00:00 = 18 h × 34px = 612px -->
+        <!-- top = (hour − 6) × 34   |   height = duration × 34 -->
+        <div class="week-grid-wrap">
+          <div class="week-header">
+            <div class="wh-spacer"></div>
+            <div class="wh-day" id="hd-0">Mon</div>
+            <div class="wh-day" id="hd-1">Tue</div>
+            <div class="wh-day" id="hd-2">Wed</div>
+            <div class="wh-day" id="hd-3">Thu</div>
+            <div class="wh-day" id="hd-4">Fri</div>
+            <div class="wh-day" id="hd-5">Sat</div>
+            <div class="wh-day" id="hd-6">Sun</div>
+          </div>
+
+          <div class="week-body">
+
+            <!-- Time labels 06–23 -->
+            <div class="time-labels">
+              <div class="tl-hour">06</div><div class="tl-hour">07</div>
+              <div class="tl-hour">08</div><div class="tl-hour">09</div>
+              <div class="tl-hour">10</div><div class="tl-hour">11</div>
+              <div class="tl-hour">12</div><div class="tl-hour">13</div>
+              <div class="tl-hour">14</div><div class="tl-hour">15</div>
+              <div class="tl-hour">16</div><div class="tl-hour">17</div>
+              <div class="tl-hour">18</div><div class="tl-hour">19</div>
+              <div class="tl-hour">20</div><div class="tl-hour">21</div>
+              <div class="tl-hour">22</div><div class="tl-hour">23</div>
+            </div>
+
+            <!-- Monday: free 06-09 · school 09-14 · 2chicos 15-19 · free 19-00 -->
+            <div class="day-col">
+              <div class="hour-lines"></div>
+              <div class="tb gray" style="top:0;height:102px">
+                <span class="tb-label">Free</span>
+                <span class="tb-time">06–09</span>
+                <div class="tb-chips"><span class="chip">Calisthenics</span></div>
+              </div>
+              <div class="tb blue" style="top:102px;height:170px">
+                <span class="tb-label">Euroaula</span>
+                <span class="tb-time">09–14</span>
+              </div>
+              <div class="tb green" style="top:306px;height:136px">
+                <span class="tb-label">@2.chicos</span>
+                <span class="tb-time">15–19</span>
+              </div>
+              <div class="tb gray" style="top:442px;height:170px">
+                <span class="tb-label">Free</span>
+                <span class="tb-time">19–00</span>
+                <div class="tb-chips">
+                  <span class="chip">Film content</span>
+                  <span class="chip">Brand outreach</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tuesday: free 06-09 · school 09-14 · 2chicos 15-19 · Gaby 20-00 -->
+            <div class="day-col">
+              <div class="hour-lines"></div>
+              <div class="tb gray" style="top:0;height:102px">
+                <span class="tb-label">Free</span>
+                <span class="tb-time">06–09</span>
+              </div>
+              <div class="tb blue" style="top:102px;height:170px">
+                <span class="tb-label">Euroaula</span>
+                <span class="tb-time">09–14</span>
+              </div>
+              <div class="tb green" style="top:306px;height:136px">
+                <span class="tb-label">@2.chicos</span>
+                <span class="tb-time">15–19</span>
+              </div>
+              <div class="tb red" style="top:476px;height:136px">
+                <span class="tb-label">Gaby's shift</span>
+                <span class="tb-time">20–00</span>
+              </div>
+            </div>
+
+            <!-- Wednesday: free 06-09 · school 09-14 · 2chicos 15-19 · free 19-00 -->
+            <div class="day-col">
+              <div class="hour-lines"></div>
+              <div class="tb gray" style="top:0;height:102px">
+                <span class="tb-label">Free</span>
+                <span class="tb-time">06–09</span>
+              </div>
+              <div class="tb blue" style="top:102px;height:170px">
+                <span class="tb-label">Euroaula</span>
+                <span class="tb-time">09–14</span>
+              </div>
+              <div class="tb green" style="top:306px;height:136px">
+                <span class="tb-label">@2.chicos</span>
+                <span class="tb-time">15–19</span>
+              </div>
+              <div class="tb gray" style="top:442px;height:170px">
+                <span class="tb-label">Free</span>
+                <span class="tb-time">19–00</span>
+                <div class="tb-chips">
+                  <span class="chip">Calisthenics</span>
+                  <span class="chip">Brand outreach</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Thursday: free 06-09 · school 09-14 · 2chicos 15-19 · Gaby 20-00 -->
+            <div class="day-col">
+              <div class="hour-lines"></div>
+              <div class="tb gray" style="top:0;height:102px">
+                <span class="tb-label">Free</span>
+                <span class="tb-time">06–09</span>
+              </div>
+              <div class="tb blue" style="top:102px;height:170px">
+                <span class="tb-label">Euroaula</span>
+                <span class="tb-time">09–14</span>
+              </div>
+              <div class="tb green" style="top:306px;height:136px">
+                <span class="tb-label">@2.chicos</span>
+                <span class="tb-time">15–19</span>
+              </div>
+              <div class="tb red" style="top:476px;height:136px">
+                <span class="tb-label">Gaby's shift</span>
+                <span class="tb-time">20–00</span>
+              </div>
+            </div>
+
+            <!-- Friday: free 06-09 · school 09-14 · 2chicos 15-19 · Gaby 20-00 -->
+            <div class="day-col">
+              <div class="hour-lines"></div>
+              <div class="tb gray" style="top:0;height:102px">
+                <span class="tb-label">Free</span>
+                <span class="tb-time">06–09</span>
+              </div>
+              <div class="tb blue" style="top:102px;height:170px">
+                <span class="tb-label">Euroaula</span>
+                <span class="tb-time">09–14</span>
+              </div>
+              <div class="tb green" style="top:306px;height:136px">
+                <span class="tb-label">@2.chicos</span>
+                <span class="tb-time">15–19</span>
+              </div>
+              <div class="tb red" style="top:476px;height:136px">
+                <span class="tb-label">Gaby's shift</span>
+                <span class="tb-time">20–00</span>
+              </div>
+            </div>
+
+            <!-- Saturday: free 06-10 · 2chicos 10-19 · Gaby 20-00 -->
+            <div class="day-col">
+              <div class="hour-lines"></div>
+              <div class="tb gray" style="top:0;height:136px">
+                <span class="tb-label">Free</span>
+                <span class="tb-time">06–10</span>
+                <div class="tb-chips"><span class="chip">Film content</span></div>
+              </div>
+              <div class="tb green" style="top:136px;height:306px">
+                <span class="tb-label">@2.chicos</span>
+                <span class="tb-time">10–19</span>
+              </div>
+              <div class="tb red" style="top:476px;height:136px">
+                <span class="tb-label">Gaby's shift</span>
+                <span class="tb-time">20–00</span>
+              </div>
+            </div>
+
+            <!-- Sunday: free all day -->
+            <div class="day-col">
+              <div class="hour-lines"></div>
+              <div class="tb gray" style="top:0;height:612px">
+                <span class="tb-label">Free day</span>
+                <span class="tb-time">All day</span>
+                <div class="tb-chips">
+                  <span class="chip">Film content</span>
+                  <span class="chip">Calisthenics</span>
+                  <span class="chip">Brand outreach</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ OTHER SECTIONS (placeholder) ══ -->
+
+      <!-- ══ MOVEMENT ══ -->
+      <div id="section-movement" class="section">
+
+        <!-- Streak -->
+        <div class="streak-row">
+          <span class="streak-icon">🔥</span>
+          <span class="streak-number">12</span>
+          <div class="streak-meta">
+            <span class="streak-label">days consecutive training</span>
+            <span class="streak-sub">Keep it going</span>
+          </div>
+        </div>
+
+        <!-- Skill cards -->
+        <div class="section-label">Calisthenics skills</div>
+        <div class="skill-grid">
+
+          <div class="skill-card" data-status="drilling">
+            <div class="skill-card-top">
+              <div class="skill-name-wrap">
+                <span class="skill-name">Frog Stand</span>
+              </div>
+              <span class="status-badge drilling">Drilling</span>
+            </div>
+            <div class="skill-bar-track"><div class="skill-bar-fill"></div></div>
+            <textarea class="skill-notes" placeholder="Notes…"></textarea>
+          </div>
+
+          <div class="skill-card" data-status="not-started">
+            <div class="skill-card-top">
+              <div class="skill-name-wrap">
+                <span class="skill-name">Frog Stand → HS</span>
+              </div>
+              <span class="status-badge not-started">Not started</span>
+            </div>
+            <div class="skill-bar-track"><div class="skill-bar-fill"></div></div>
+            <textarea class="skill-notes" placeholder="Notes…"></textarea>
+          </div>
+
+          <div class="skill-card" data-status="almost">
+            <div class="skill-card-top">
+              <div class="skill-name-wrap">
+                <span class="skill-name">Handstand Hold</span>
+              </div>
+              <span class="status-badge almost">Almost</span>
+            </div>
+            <div class="skill-bar-track"><div class="skill-bar-fill"></div></div>
+            <textarea class="skill-notes" placeholder="Notes…"></textarea>
+          </div>
+
+          <div class="skill-card" data-status="not-started">
+            <div class="skill-card-top">
+              <div class="skill-name-wrap">
+                <span class="skill-name">Backflip</span>
+                <div class="skill-scary-row">
+                  <span style="font-size:11px;line-height:1">🔥</span>
+                  <span class="skill-scary">scary</span>
+                </div>
+              </div>
+              <span class="status-badge not-started">Not started</span>
+            </div>
+            <div class="skill-bar-track"><div class="skill-bar-fill"></div></div>
+            <textarea class="skill-notes" placeholder="Notes…"></textarea>
+          </div>
+
+        </div>
+
+        <!-- Log session -->
+        <div class="log-section">
+          <div class="log-header">
+            <span class="log-title">Training log</span>
+            <button class="log-btn" id="toggle-log">+ Log session</button>
+          </div>
+          <div class="log-form" id="log-form">
+            <div class="form-row">
+              <div class="form-field">
+                <label class="form-label">Date</label>
+                <input type="date" class="form-input" id="log-date">
+              </div>
+              <div class="form-field">
+                <label class="form-label">Skill practiced</label>
+                <select class="form-select" id="log-skill">
+                  <option value="">Select skill</option>
+                  <option>Frog Stand</option>
+                  <option>Frog Stand → HS</option>
+                  <option>Handstand Hold</option>
+                  <option>Backflip</option>
+                  <option>General training</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-field">
+                <label class="form-label">Duration (min)</label>
+                <input type="number" class="form-input" id="log-dur" placeholder="e.g. 45" min="1" max="300">
+              </div>
+              <div class="form-field">
+                <label class="form-label">Feel</label>
+                <div class="feel-row" id="feel-row">
+                  <button class="feel-btn" data-feel="Bad">Bad</button>
+                  <button class="feel-btn" data-feel="OK">OK</button>
+                  <button class="feel-btn" data-feel="Good">Good</button>
+                  <button class="feel-btn" data-feel="Locked in">Locked in</button>
+                </div>
+              </div>
+            </div>
+            <button class="form-submit" id="log-submit">Save session</button>
+          </div>
+          <div class="session-list" id="session-list">
+            <div class="no-sessions-msg" id="no-sessions-msg">No sessions logged yet.</div>
+          </div>
+        </div>
+
+        <!-- Weekly habits -->
+        <div class="habits-wrap">
+          <div class="habits-head">Weekly habits</div>
+          <table class="habits-table">
+            <thead>
+              <tr>
+                <th class="ht-name"></th>
+                <th id="hh-0">Mon</th><th id="hh-1">Tue</th><th id="hh-2">Wed</th>
+                <th id="hh-3">Thu</th><th id="hh-4">Fri</th><th id="hh-5">Sat</th><th id="hh-6">Sun</th>
+                <th class="ht-pct">Week</th>
+              </tr>
+            </thead>
+            <tbody id="habits-body"></tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <!-- ══ SCHOOL ══ -->
+      <div id="section-school" class="section">
+
+        <!-- Stat cards -->
+        <div class="school-stats">
+          <div class="school-stat">
+            <div class="ss-label">Total</div>
+            <div class="ss-number" id="sc-total">—</div>
+            <div class="ss-sub">assignments</div>
+          </div>
+          <div class="school-stat">
+            <div class="ss-label">Due this week</div>
+            <div class="ss-number" id="sc-week">—</div>
+            <div class="ss-sub">next 7 days</div>
+          </div>
+          <div class="school-stat">
+            <div class="ss-label">Completed</div>
+            <div class="ss-number" id="sc-done">—</div>
+            <div class="ss-sub">turned in</div>
+          </div>
+        </div>
+
+        <!-- Assignment list (rendered by JS) -->
+        <div class="assignments-wrap" id="assignments-wrap"></div>
+
+        <!-- Add assignment panel -->
+        <div class="add-assign-wrap">
+          <div class="add-assign-header">
+            <span class="add-assign-lbl">Add assignment</span>
+            <button class="add-assign-btn" id="toggle-assign">+ Add assignment</button>
+          </div>
+          <div class="add-assign-form" id="assign-form">
+            <div class="form-row">
+              <div class="form-field">
+                <label class="form-label">Subject</label>
+                <input type="text" class="form-input" id="as-subject"
+                  placeholder="e.g. Comunicación Publicitaria"
+                  list="subject-list" autocomplete="off">
+                <datalist id="subject-list">
+                  <option>Investigación de Mercados</option>
+                  <option>Gestión de Medios Digitales</option>
+                  <option>Comunicación Publicitaria</option>
+                  <option>Planificación de Medios</option>
+                  <option>Diseño Gráfico y Creatividad</option>
+                </datalist>
+              </div>
+              <div class="form-field">
+                <label class="form-label">Title</label>
+                <input type="text" class="form-input" id="as-title" placeholder="Assignment title">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-field">
+                <label class="form-label">Due date</label>
+                <input type="date" class="form-input" id="as-due">
+              </div>
+              <div class="form-field">
+                <label class="form-label">Status</label>
+                <select class="form-select" id="as-status">
+                  <option value="not-started">Not started</option>
+                  <option value="in-progress">In progress</option>
+                  <option value="done">Done</option>
+                </select>
+              </div>
+            </div>
+            <button class="form-submit" id="as-submit">Add assignment</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ══ @2.CHICOS ══ -->
+      <div id="section-chicos" class="section">
+
+        <!-- 6 editable stat cards -->
+        <div class="chicos-stats" id="chicos-stats-grid"></div>
+
+        <!-- Follower growth chart -->
+        <div class="chicos-chart-wrap">
+          <div class="chart-top">
+            <span class="chart-title">Follower growth</span>
+            <button class="add-snap-btn" id="add-snap-btn">+ Add snapshot</button>
+          </div>
+          <div class="snapshot-form" id="snapshot-form">
+            <div class="form-field">
+              <label class="form-label">Date</label>
+              <input type="date" class="form-input" id="snap-date" style="width:138px">
+            </div>
+            <div class="form-field">
+              <label class="form-label">Followers</label>
+              <input type="number" class="form-input" id="snap-count" placeholder="e.g. 8500" style="width:120px">
+            </div>
+            <button class="form-submit" id="snap-submit">Save</button>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="followers-chart"></canvas>
+          </div>
+        </div>
+
+        <!-- Content pipeline kanban -->
+        <div class="section-label">Content pipeline</div>
+        <div class="kanban-board">
+
+          <div class="kanban-col" data-col="idea">
+            <div class="kanban-col-head">
+              <div class="kc-col-label">Idea <span class="kc-count" id="cnt-idea">0</span></div>
+              <button class="kc-add-btn" id="kc-add-idea">+</button>
+            </div>
+            <div class="kanban-cards" id="kc-idea"></div>
+            <div class="kc-add-form" id="kc-form-idea">
+              <input class="kc-input" placeholder="Card title">
+              <textarea class="kc-note-input" placeholder="Note (optional)"></textarea>
+              <button class="kc-save-btn">Add</button>
+            </div>
+          </div>
+
+          <div class="kanban-col" data-col="filming">
+            <div class="kanban-col-head">
+              <div class="kc-col-label">Filming <span class="kc-count" id="cnt-filming">0</span></div>
+              <button class="kc-add-btn" id="kc-add-filming">+</button>
+            </div>
+            <div class="kanban-cards" id="kc-filming"></div>
+            <div class="kc-add-form" id="kc-form-filming">
+              <input class="kc-input" placeholder="Card title">
+              <textarea class="kc-note-input" placeholder="Note (optional)"></textarea>
+              <button class="kc-save-btn">Add</button>
+            </div>
+          </div>
+
+          <div class="kanban-col" data-col="editing">
+            <div class="kanban-col-head">
+              <div class="kc-col-label">Editing <span class="kc-count" id="cnt-editing">0</span></div>
+              <button class="kc-add-btn" id="kc-add-editing">+</button>
+            </div>
+            <div class="kanban-cards" id="kc-editing"></div>
+            <div class="kc-add-form" id="kc-form-editing">
+              <input class="kc-input" placeholder="Card title">
+              <textarea class="kc-note-input" placeholder="Note (optional)"></textarea>
+              <button class="kc-save-btn">Add</button>
+            </div>
+          </div>
+
+          <div class="kanban-col" data-col="published">
+            <div class="kanban-col-head">
+              <div class="kc-col-label">Published <span class="kc-count" id="cnt-published">0</span></div>
+              <button class="kc-add-btn" id="kc-add-published">+</button>
+            </div>
+            <div class="kanban-cards" id="kc-published"></div>
+            <div class="kc-add-form" id="kc-form-published">
+              <input class="kc-input" placeholder="Card title">
+              <textarea class="kc-note-input" placeholder="Note (optional)"></textarea>
+              <button class="kc-save-btn">Add</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══ SIDE PROJECTS ══ -->
+      <div id="section-side-projects" class="section">
+
+        <!-- Project cards (rendered by JS) -->
+        <div class="sp-grid" id="sp-grid"></div>
+
+        <!-- Add project panel -->
+        <div class="sp-add-wrap">
+          <div class="sp-add-header">
+            <span class="sp-add-lbl">Project ideas</span>
+            <button class="sp-add-btn" id="sp-toggle">+ New project idea</button>
+          </div>
+          <div class="sp-form" id="sp-form">
+            <div class="form-row">
+              <div class="form-field">
+                <label class="form-label">Project name</label>
+                <input type="text" class="form-input" id="sp-name" placeholder="e.g. Clothing Brand">
+              </div>
+              <div class="form-field">
+                <label class="form-label">Concept (one line)</label>
+                <input type="text" class="form-input" id="sp-concept" placeholder="Brief description">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-field">
+                <label class="form-label">Startup cost</label>
+                <input type="text" class="form-input" id="sp-cost" placeholder="e.g. €500 – 1,000">
+              </div>
+              <div class="form-field">
+                <label class="form-label">Revenue model</label>
+                <input type="text" class="form-input" id="sp-model" placeholder="e.g. Freemium subscription">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-field">
+                <label class="form-label">Monthly potential</label>
+                <input type="text" class="form-input" id="sp-revenue" placeholder="e.g. €1,000 – 4,000">
+              </div>
+              <div class="form-field">
+                <label class="form-label">Time to first profit</label>
+                <input type="text" class="form-input" id="sp-time" placeholder="e.g. 3 – 6 months">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-field">
+                <label class="form-label">Viability score (1–10)</label>
+                <input type="number" class="form-input sp-score-input" id="sp-viability"
+                  min="1" max="10" placeholder="7">
+              </div>
+              <div class="form-field" style="justify-content:flex-end;flex-direction:row;align-items:flex-end">
+                <button class="form-submit" id="sp-submit">Add project</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ══ LIFE GOALS ══ -->
+      <div id="section-life-goals" class="section">
+
+        <!-- Streak (reuses Movement streak classes) -->
+        <div class="streak-row">
+          <span class="streak-icon">📅</span>
+          <span class="streak-number" id="lg-streak">0</span>
+          <div class="streak-meta">
+            <span class="streak-label">days since you started tracking</span>
+            <span class="streak-sub">Keep showing up</span>
+          </div>
+        </div>
+
+        <!-- Goal cards (rendered by JS) -->
+        <div class="goals-grid" id="goals-grid"></div>
+
+        <!-- Add goal panel -->
+        <div class="lg-add-wrap">
+          <div class="lg-add-header">
+            <span class="lg-add-lbl">Goals</span>
+            <button class="lg-add-btn" id="lg-toggle">+ Add goal</button>
+          </div>
+          <div class="lg-form" id="lg-form">
+            <div class="form-row">
+              <div class="form-field">
+                <label class="form-label">Goal title</label>
+                <input type="text" class="form-input" id="lg-title" placeholder="e.g. Run a marathon">
+              </div>
+              <div class="form-field">
+                <label class="form-label">Category</label>
+                <select class="form-select" id="lg-category">
+                  <option value="Money">Money</option>
+                  <option value="Health">Health</option>
+                  <option value="Career">Career</option>
+                  <option value="Personal">Personal</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-field">
+                <label class="form-label">Target date</label>
+                <input type="date" class="form-input" id="lg-date">
+              </div>
+              <div class="form-field">
+                <label class="form-label">Starting progress (%)</label>
+                <input type="number" class="form-input" id="lg-progress"
+                  min="0" max="100" placeholder="0">
+              </div>
+            </div>
+            <button class="form-submit" id="lg-submit">Add goal</button>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    // Greeting based on time of day
+    const now = new Date();
+    const hour = now.getHours();
+    const greet = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+    document.getElementById('greeting').textContent = `${greet}, Leon`;
+    document.getElementById('topbar-date').textContent = now.toLocaleDateString('en-US', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    });
+
+    // Highlight today's column (Mon=0 … Sun=6)
+    const colMap = { 1:0, 2:1, 3:2, 4:3, 5:4, 6:5, 0:6 };
+    const todayCol = colMap[now.getDay()];
+    if (todayCol !== undefined) {
+      document.getElementById(`hd-${todayCol}`).classList.add('today');
+    }
+
+    // Section switching
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', () => {
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        const target = document.getElementById(`section-${item.dataset.section}`);
+        if (target) target.classList.add('active');
+      });
+    });
+
+    /* ══════════════════════════════
+       MOVEMENT — skill badges
+    ══════════════════════════════ */
+    const statusCycle  = ['not-started', 'drilling', 'almost', 'unlocked'];
+    const statusLabels = { 'not-started': 'Not started', drilling: 'Drilling', almost: 'Almost', unlocked: 'Unlocked' };
+
+    document.querySelectorAll('.status-badge').forEach(badge => {
+      badge.addEventListener('click', () => {
+        const card = badge.closest('.skill-card');
+        const cur  = card.dataset.status;
+        const next = statusCycle[(statusCycle.indexOf(cur) + 1) % statusCycle.length];
+        card.dataset.status    = next;
+        badge.className        = `status-badge ${next}`;
+        badge.textContent      = statusLabels[next];
+      });
+    });
+
+    /* ── Log session ── */
+    const toggleLogBtn = document.getElementById('toggle-log');
+    const logForm      = document.getElementById('log-form');
+    const logDateEl    = document.getElementById('log-date');
+    const sessions     = [];
+
+    logDateEl.value = new Date().toISOString().slice(0, 10);
+
+    toggleLogBtn.addEventListener('click', () => {
+      const open = logForm.classList.toggle('open');
+      toggleLogBtn.textContent = open ? '✕ Cancel' : '+ Log session';
+    });
+
+    let selectedFeel = '';
+    document.querySelectorAll('.feel-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.feel-btn').forEach(b => b.classList.remove('sel'));
+        btn.classList.add('sel');
+        selectedFeel = btn.dataset.feel;
+      });
+    });
+
+    document.getElementById('log-submit').addEventListener('click', () => {
+      const date  = logDateEl.value;
+      const skill = document.getElementById('log-skill').value;
+      const dur   = document.getElementById('log-dur').value;
+      if (!date || !skill || !dur) return;
+
+      sessions.unshift({ date, skill, dur: +dur, feel: selectedFeel || 'OK' });
+      renderSessions();
+
+      document.getElementById('log-skill').value = '';
+      document.getElementById('log-dur').value   = '';
+      document.querySelectorAll('.feel-btn').forEach(b => b.classList.remove('sel'));
+      selectedFeel = '';
+      logForm.classList.remove('open');
+      toggleLogBtn.textContent = '+ Log session';
+    });
+
+    function renderSessions() {
+      const list  = document.getElementById('session-list');
+      const noMsg = document.getElementById('no-sessions-msg');
+      list.querySelectorAll('.session-item').forEach(el => el.remove());
+      noMsg.style.display = sessions.length ? 'none' : '';
+
+      sessions.forEach(s => {
+        const d    = new Date(s.date + 'T00:00:00');
+        const dStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const fc   = s.feel.toLowerCase().replace(/\s+/g, '-');
+        const el   = document.createElement('div');
+        el.className = 'session-item';
+        el.innerHTML = `
+          <span class="si-date">${dStr}</span>
+          <span class="si-skill">${s.skill}</span>
+          <span class="si-dur">${s.dur} min</span>
+          <span class="si-feel ${fc}">${s.feel}</span>`;
+        list.appendChild(el);
+      });
+    }
+
+    /* ── Habits tracker ── */
+    const habitNames = ['Room clean', 'No late scrolling', 'Kept smoke to one', 'Studied something'];
+    const habitState = habitNames.map(() => Array(7).fill(false));
+
+    function renderHabits() {
+      const tbody = document.getElementById('habits-body');
+
+      // Count unchecked per day
+      const unchecked = Array(7).fill(0);
+      habitState.forEach(row => row.forEach((v, di) => { if (!v) unchecked[di]++; }));
+      const amber = unchecked.map(c => c >= 2);
+
+      // Update column headers
+      for (let di = 0; di < 7; di++) {
+        const th = document.getElementById(`hh-${di}`);
+        if (th) th.className = amber[di] ? 'amber-th' : '';
+      }
+
+      tbody.innerHTML = '';
+      habitNames.forEach((name, hi) => {
+        const checked = habitState[hi].filter(Boolean).length;
+        const pct     = Math.round((checked / 7) * 100);
+        const tr      = document.createElement('tr');
+
+        let html = `<td class="ht-name">${name}</td>`;
+        habitState[hi].forEach((isOn, di) => {
+          html += `<td class="${amber[di] ? 'amber-td' : ''}">
+            <input type="checkbox" class="habit-cb" data-hi="${hi}" data-di="${di}"${isOn ? ' checked' : ''}>
+          </td>`;
+        });
+        html += `<td class="ht-pct">${pct}%</td>`;
+        tr.innerHTML = html;
+        tbody.appendChild(tr);
+      });
+
+      tbody.querySelectorAll('.habit-cb').forEach(cb => {
+        cb.addEventListener('change', () => {
+          habitState[+cb.dataset.hi][+cb.dataset.di] = cb.checked;
+          renderHabits();
+        });
+      });
+    }
+
+    renderHabits();
+
+    /* ══════════════════════════════
+       SCHOOL
+    ══════════════════════════════ */
+    (function () {
+      const LS_KEY = 'leon-school-assignments';
+
+      const DEFAULTS = [
+        {
+          id: 'def1',
+          subject: 'Investigación de Mercados',
+          title: 'Análisis competitivo — Sector Moda',
+          due: '2026-05-19',
+          status: 'not-started'
+        },
+        {
+          id: 'def2',
+          subject: 'Gestión de Medios Digitales',
+          title: 'Campaña en RRSS — Caso práctico',
+          due: '2026-05-21',
+          status: 'in-progress'
+        },
+        {
+          id: 'def3',
+          subject: 'Comunicación Publicitaria',
+          title: 'Brief creativo: lanzamiento de producto',
+          due: '2026-05-30',
+          status: 'not-started'
+        }
+      ];
+
+      let assignments;
+      try {
+        const raw = localStorage.getItem(LS_KEY);
+        assignments = raw ? JSON.parse(raw) : DEFAULTS.slice();
+      } catch (_) {
+        assignments = DEFAULTS.slice();
+      }
+
+      function save() {
+        try { localStorage.setItem(LS_KEY, JSON.stringify(assignments)); } catch (_) {}
+      }
+
+      // Hash-based subject colour from a fixed palette
+      const PALETTE = [
+        { bg: 'rgba(201,160,50,0.14)',  fg: '#c9a032' },
+        { bg: 'rgba(79,126,201,0.14)',  fg: '#4f7ec9' },
+        { bg: 'rgba(150,110,201,0.14)', fg: '#9b7ac9' },
+        { bg: 'rgba(77,170,125,0.14)',  fg: '#4daa7d' },
+        { bg: 'rgba(201,96,79,0.14)',   fg: '#c9604f' },
+        { bg: 'rgba(79,170,201,0.14)',  fg: '#4faac9' },
+      ];
+
+      function subjectColor(name) {
+        let h = 0;
+        for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) & 0xffff;
+        return PALETTE[h % PALETTE.length];
+      }
+
+      function daysUntil(due) {
+        const today = new Date(); today.setHours(0, 0, 0, 0);
+        return (new Date(due + 'T00:00:00') - today) / 86400000;
+      }
+
+      function isUrgent(a)      { return a.status !== 'done' && daysUntil(a.due) <= 3; }
+      function isDueThisWeek(a) { const d = daysUntil(a.due); return a.status !== 'done' && d >= 0 && d <= 7; }
+
+      function fmtDue(due) {
+        return new Date(due + 'T00:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+      }
+
+      function sortedAssignments() {
+        const active = assignments.filter(a => a.status !== 'done').sort((a, b) => a.due < b.due ? -1 : 1);
+        const done   = assignments.filter(a => a.status === 'done').sort((a, b) => a.due < b.due ? -1 : 1);
+        return [...active, ...done];
+      }
+
+      const STATUS_LABELS = { 'not-started': 'Not started', 'in-progress': 'In progress', 'done': 'Done' };
+
+      function render() {
+        document.getElementById('sc-total').textContent = assignments.length;
+        document.getElementById('sc-week').textContent  = assignments.filter(isDueThisWeek).length;
+        document.getElementById('sc-done').textContent  = assignments.filter(a => a.status === 'done').length;
+
+        const wrap = document.getElementById('assignments-wrap');
+        wrap.innerHTML = '';
+
+        if (!assignments.length) {
+          wrap.innerHTML = '<div class="no-assignments">No assignments yet.</div>';
+          return;
+        }
+
+        sortedAssignments().forEach(a => {
+          const col   = subjectColor(a.subject);
+          const card  = document.createElement('div');
+          const urgent = isUrgent(a);
+          const isDone = a.status === 'done';
+
+          card.className = `assign-card${urgent ? ' urgent' : ''}${isDone ? ' done' : ''}`;
+
+          const opts = ['not-started', 'in-progress', 'done']
+            .map(s => `<option value="${s}"${a.status === s ? ' selected' : ''}>${STATUS_LABELS[s]}</option>`)
+            .join('');
+
+          card.innerHTML = `
+            <span class="assign-subject" style="background:${col.bg};color:${col.fg}">${a.subject}</span>
+            <span class="assign-title">${a.title}</span>
+            <span class="assign-due">${fmtDue(a.due)}</span>
+            <select class="assign-status-sel" data-id="${a.id}">${opts}</select>`;
+
+          wrap.appendChild(card);
+        });
+
+        wrap.querySelectorAll('.assign-status-sel').forEach(sel => {
+          sel.addEventListener('change', () => {
+            const a = assignments.find(x => x.id === sel.dataset.id);
+            if (a) { a.status = sel.value; save(); render(); }
+          });
+        });
+      }
+
+      // Add assignment form
+      const toggleBtn  = document.getElementById('toggle-assign');
+      const assignForm = document.getElementById('assign-form');
+
+      toggleBtn.addEventListener('click', () => {
+        const open = assignForm.classList.toggle('open');
+        toggleBtn.textContent = open ? '✕ Cancel' : '+ Add assignment';
+        if (open) document.getElementById('as-due').value = new Date().toISOString().slice(0, 10);
+      });
+
+      document.getElementById('as-submit').addEventListener('click', () => {
+        const subject = document.getElementById('as-subject').value.trim();
+        const title   = document.getElementById('as-title').value.trim();
+        const due     = document.getElementById('as-due').value;
+        const status  = document.getElementById('as-status').value;
+        if (!subject || !title || !due) return;
+
+        assignments.push({ id: Date.now().toString(), subject, title, due, status });
+        save();
+        render();
+
+        document.getElementById('as-subject').value = '';
+        document.getElementById('as-title').value   = '';
+        document.getElementById('as-due').value     = '';
+        document.getElementById('as-status').value  = 'not-started';
+        assignForm.classList.remove('open');
+        toggleBtn.textContent = '+ Add assignment';
+      });
+
+      render();
+    })();
+
+    /* ══════════════════════════════
+       @2.CHICOS
+    ══════════════════════════════ */
+    (function () {
+      const LS_STATS   = 'leon-chicos-stats';
+      const LS_FOLLOW  = 'leon-chicos-followers';
+      const LS_KANBAN  = 'leon-chicos-kanban';
+
+      const DEF_STATS = {
+        followers: 8420, posts: 12, engagement: 4.8,
+        dmsSent: 23, dmsReplied: 7, episodes: 2
+      };
+
+      const DEF_FOLLOWERS = [
+        { date: '2026-03-23', count: 7200 },
+        { date: '2026-03-30', count: 7450 },
+        { date: '2026-04-06', count: 7680 },
+        { date: '2026-04-13', count: 7890 },
+        { date: '2026-04-20', count: 8050 },
+        { date: '2026-04-27', count: 8180 },
+        { date: '2026-05-04', count: 8310 },
+        { date: '2026-05-11', count: 8420 },
+      ];
+
+      const DEF_KANBAN = {
+        idea: [
+          { id: 'k1', title: 'Backrooms Ep.4 — La Sala Roja',     note: 'Sonido ambiente + efecto estático' },
+          { id: 'k2', title: 'Spot cinematic — Joyería oscura',    note: 'Planos detalle, luz de vela' },
+        ],
+        filming: [
+          { id: 'k3', title: 'Comercial cinematic — Perfumería',   note: 'Rodar al atardecer, luz dorada' },
+          { id: 'k4', title: 'Backrooms Ep.3 — El Pasillo',        note: 'Locación confirmada, fin de semana' },
+        ],
+        editing: [
+          { id: 'k5', title: 'Spot — Estudio de Arquitectura',     note: 'Color grading en proceso' },
+          { id: 'k6', title: 'Backrooms Ep.2 — La Piscina',        note: 'VFX y foley pendientes' },
+        ],
+        published: [
+          { id: 'k7', title: 'Intro cinematic — Marca de ropa',    note: '2.4K views · 4.1% engagement' },
+          { id: 'k8', title: 'Backrooms Ep.1 — La Oficina',        note: '12K views · viral en TikTok' },
+        ],
+      };
+
+      function ls(key, def) {
+        try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : JSON.parse(JSON.stringify(def)); }
+        catch (_) { return JSON.parse(JSON.stringify(def)); }
+      }
+      function lsSave(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch (_) {} }
+
+      let chicosStats     = ls(LS_STATS,  DEF_STATS);
+      let chicosFollowers = ls(LS_FOLLOW, DEF_FOLLOWERS);
+      let chicosKanban    = ls(LS_KANBAN, DEF_KANBAN);
+
+      /* ── Stat cards ── */
+      const STAT_DEFS = [
+        { key: 'followers',  label: 'Followers',         unit: '' },
+        { key: 'posts',      label: 'Posts this month',  unit: '' },
+        { key: 'engagement', label: 'Avg engagement',    unit: '%' },
+        { key: 'dmsSent',    label: 'Brand DMs sent',    unit: '' },
+        { key: 'dmsReplied', label: 'Brand DMs replied', unit: '' },
+        { key: 'episodes',   label: 'Episodes published', unit: '' },
+      ];
+
+      function fmtStat(val, key) {
+        if (key === 'engagement') return (+val).toFixed(1);
+        if (key === 'followers')  return val >= 1000 ? (val / 1000).toFixed(1) + 'k' : String(val);
+        return String(val);
+      }
+
+      function initStatCards() {
+        const grid = document.getElementById('chicos-stats-grid');
+        if (!grid) return;
+        grid.innerHTML = '';
+        STAT_DEFS.forEach(def => {
+          const card = document.createElement('div');
+          card.className = 'chicos-stat';
+          card.innerHTML = `
+            <div class="cs-label">${def.label}</div>
+            <div class="cs-value" id="cv-${def.key}" contenteditable="true" spellcheck="false">${fmtStat(chicosStats[def.key], def.key)}</div>
+            ${def.unit ? `<div class="cs-unit">${def.unit}</div>` : ''}`;
+          grid.appendChild(card);
+
+          const el = card.querySelector('.cs-value');
+          el.addEventListener('focus', () => {
+            el.textContent = chicosStats[def.key];
+            const r = document.createRange(); r.selectNodeContents(el);
+            const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+          });
+          el.addEventListener('blur', () => {
+            const n = parseFloat(el.textContent.replace(/[^0-9.]/g, ''));
+            if (!isNaN(n)) { chicosStats[def.key] = n; lsSave(LS_STATS, chicosStats); }
+            el.textContent = fmtStat(chicosStats[def.key], def.key);
+          });
+          el.addEventListener('keydown', e => {
+            if (e.key === 'Enter')  { e.preventDefault(); el.blur(); }
+            if (e.key === 'Escape') { el.textContent = fmtStat(chicosStats[def.key], def.key); el.blur(); }
+          });
+        });
+      }
+
+      /* ── Chart ── */
+      let followersChart = null;
+
+      function buildChart() {
+        if (!window.Chart) return;
+        const canvas = document.getElementById('followers-chart');
+        if (!canvas) return;
+        if (followersChart) { followersChart.destroy(); followersChart = null; }
+
+        const ctx   = canvas.getContext('2d');
+        const grad  = ctx.createLinearGradient(0, 0, 0, 180);
+        grad.addColorStop(0, 'rgba(77,170,125,0.22)');
+        grad.addColorStop(1, 'rgba(77,170,125,0)');
+
+        const sorted = [...chicosFollowers].sort((a, b) => a.date < b.date ? -1 : 1);
+        const labels = sorted.map(p =>
+          new Date(p.date + 'T00:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })
+        );
+        const data = sorted.map(p => p.count);
+
+        followersChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels,
+            datasets: [{
+              data,
+              borderColor: '#4daa7d',
+              backgroundColor: grad,
+              borderWidth: 1.5,
+              pointRadius: 3,
+              pointHoverRadius: 5,
+              pointBackgroundColor: '#4daa7d',
+              pointBorderColor: 'transparent',
+              tension: 0.4,
+              fill: true,
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 300 },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: '#111',
+                borderColor: '#2a2a2a',
+                borderWidth: 1,
+                titleColor: '#555',
+                bodyColor: '#ddd',
+                padding: 8,
+                callbacks: { label: c => c.raw.toLocaleString() + ' followers' }
+              }
+            },
+            scales: {
+              x: {
+                grid:   { color: '#161616' },
+                border: { color: '#1e1e1e' },
+                ticks:  { color: '#2a2a2a', font: { family: 'Inter', size: 9 }, maxRotation: 0 }
+              },
+              y: {
+                grid:   { color: '#161616' },
+                border: { color: '#1e1e1e' },
+                ticks:  { color: '#2a2a2a', font: { family: 'Inter', size: 9 } }
+              }
+            }
+          }
+        });
+      }
+
+      function loadChartJS(cb) {
+        if (window.Chart) { cb(); return; }
+        const s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
+        s.onload = cb;
+        document.head.appendChild(s);
+      }
+
+      function initSnapshotForm() {
+        const btn  = document.getElementById('add-snap-btn');
+        const form = document.getElementById('snapshot-form');
+        if (!btn || !form) return;
+
+        btn.addEventListener('click', () => {
+          const open = form.classList.toggle('open');
+          btn.textContent = open ? '✕ Cancel' : '+ Add snapshot';
+          if (open) document.getElementById('snap-date').value = new Date().toISOString().slice(0, 10);
+        });
+
+        document.getElementById('snap-submit').addEventListener('click', () => {
+          const date  = document.getElementById('snap-date').value;
+          const count = parseInt(document.getElementById('snap-count').value, 10);
+          if (!date || isNaN(count)) return;
+          chicosFollowers.push({ date, count });
+          lsSave(LS_FOLLOW, chicosFollowers);
+          buildChart();
+          document.getElementById('snap-date').value  = '';
+          document.getElementById('snap-count').value = '';
+          form.classList.remove('open');
+          btn.textContent = '+ Add snapshot';
+        });
+      }
+
+      /* ── Kanban ── */
+      const COLS = ['idea', 'filming', 'editing', 'published'];
+      let dragId = null, dragFrom = null;
+
+      function renderKanban() {
+        COLS.forEach(col => {
+          const cards     = chicosKanban[col];
+          const container = document.getElementById(`kc-${col}`);
+          const countEl   = document.getElementById(`cnt-${col}`);
+          if (!container) return;
+          if (countEl) countEl.textContent = cards.length;
+
+          container.innerHTML = '';
+          cards.forEach(card => {
+            const el = document.createElement('div');
+            el.className = 'kanban-card';
+            el.draggable = true;
+            el.dataset.id  = card.id;
+            el.dataset.col = col;
+            el.innerHTML = `
+              <div class="kc-title">${card.title}</div>
+              ${card.note ? `<div class="kc-note">${card.note}</div>` : ''}
+              <button class="kc-del">×</button>`;
+            container.appendChild(el);
+
+            el.querySelector('.kc-del').addEventListener('click', () => {
+              chicosKanban[col] = chicosKanban[col].filter(c => c.id !== card.id);
+              lsSave(LS_KANBAN, chicosKanban);
+              renderKanban();
+            });
+
+            el.addEventListener('dragstart', e => {
+              dragId = card.id; dragFrom = col;
+              el.classList.add('dragging');
+              e.dataTransfer.effectAllowed = 'move';
+            });
+            el.addEventListener('dragend', () => el.classList.remove('dragging'));
+          });
+
+          container.addEventListener('dragover',  e => { e.preventDefault(); container.classList.add('drag-over'); });
+          container.addEventListener('dragleave', () => container.classList.remove('drag-over'));
+          container.addEventListener('drop', e => {
+            e.preventDefault();
+            container.classList.remove('drag-over');
+            if (!dragId || dragFrom === col) return;
+            const card = chicosKanban[dragFrom].find(c => c.id === dragId);
+            if (!card) return;
+            chicosKanban[dragFrom] = chicosKanban[dragFrom].filter(c => c.id !== dragId);
+            chicosKanban[col].push(card);
+            lsSave(LS_KANBAN, chicosKanban);
+            dragId = dragFrom = null;
+            renderKanban();
+          });
+        });
+      }
+
+      function initAddButtons() {
+        COLS.forEach(col => {
+          const btn  = document.getElementById(`kc-add-${col}`);
+          const form = document.getElementById(`kc-form-${col}`);
+          if (!btn || !form) return;
+
+          btn.addEventListener('click', () => {
+            const open = form.classList.toggle('open');
+            btn.textContent = open ? '✕' : '+';
+            if (open) form.querySelector('.kc-input').focus();
+          });
+
+          const doAdd = () => {
+            const title = form.querySelector('.kc-input').value.trim();
+            const note  = form.querySelector('.kc-note-input').value.trim();
+            if (!title) return;
+            chicosKanban[col].unshift({ id: Date.now().toString(), title, note });
+            lsSave(LS_KANBAN, chicosKanban);
+            renderKanban();
+            form.querySelector('.kc-input').value      = '';
+            form.querySelector('.kc-note-input').value = '';
+            form.classList.remove('open');
+            btn.textContent = '+';
+          };
+
+          form.querySelector('.kc-save-btn').addEventListener('click', doAdd);
+          form.querySelector('.kc-input').addEventListener('keydown', e => { if (e.key === 'Enter') doAdd(); });
+        });
+      }
+
+      /* ── Init (lazy — only when section first becomes active) ── */
+      let inited = false;
+      function initChicos() {
+        if (inited) return;
+        inited = true;
+        initStatCards();
+        initSnapshotForm();
+        renderKanban();
+        initAddButtons();
+        loadChartJS(buildChart);
+      }
+
+      const sec = document.getElementById('section-chicos');
+      if (sec) {
+        new MutationObserver(() => {
+          if (sec.classList.contains('active')) initChicos();
+        }).observe(sec, { attributes: true, attributeFilter: ['class'] });
+        if (sec.classList.contains('active')) initChicos();
+      }
+    })();
+
+    /* ══════════════════════════════
+       SIDE PROJECTS
+    ══════════════════════════════ */
+    (function () {
+      const LS_KEY = 'leon-side-projects';
+
+      const DEFAULTS = [
+        {
+          id: 'sp1',
+          name: 'Clothing Brand',
+          concept: 'Streetwear basics line leveraging the @2.chicos audience',
+          cost: '€2,000 – 5,000',
+          model: 'D2C dropshipping + limited drops',
+          revenue: '€800 – 3,000 / mo',
+          time: '6 – 12 months',
+          viability: 7,
+        },
+        {
+          id: 'sp2',
+          name: 'Content Creator App',
+          concept: 'Niche mobile tool for short-form video planning & caption generation',
+          cost: '€5,000 – 15,000',
+          model: 'Freemium subscription',
+          revenue: '€1,500 – 8,000 / mo',
+          time: '12 – 18 months',
+          viability: 6,
+        },
+        {
+          id: 'sp3',
+          name: 'Creative Agency BCN',
+          concept: 'Paid video & social campaigns for local brands via @2.chicos',
+          cost: '€500 – 1,000',
+          model: 'Project-based retainer',
+          revenue: '€2,000 – 6,000 / mo',
+          time: '2 – 4 months',
+          viability: 9,
+        },
+      ];
+
+      function ls()     { try { const v = localStorage.getItem(LS_KEY); return v ? JSON.parse(v) : JSON.parse(JSON.stringify(DEFAULTS)); } catch (_) { return JSON.parse(JSON.stringify(DEFAULTS)); } }
+      function lsSave(v){ try { localStorage.setItem(LS_KEY, JSON.stringify(v)); } catch (_) {} }
+
+      let projects = ls();
+
+      function scoreClass(n) { return n >= 8 ? 'green' : n >= 5 ? 'amber' : 'red'; }
+
+      function render() {
+        const grid = document.getElementById('sp-grid');
+        if (!grid) return;
+        grid.innerHTML = '';
+
+        projects.forEach(p => {
+          const cls  = scoreClass(p.viability);
+          const card = document.createElement('div');
+          card.className = 'sp-card';
+          card.innerHTML = `
+            <div class="sp-card-top">
+              <div class="sp-meta">
+                <div class="sp-title">${p.name}</div>
+                <div class="sp-concept">${p.concept}</div>
+              </div>
+              <div class="sp-score-wrap">
+                <div class="sp-score ${cls}">${p.viability}</div>
+                <div class="sp-score-denom">/ 10</div>
+              </div>
+            </div>
+            <div class="sp-divider"></div>
+            <div class="sp-details">
+              <div>
+                <div class="sp-detail-label">Startup cost</div>
+                <div class="sp-detail-value">${p.cost}</div>
+              </div>
+              <div>
+                <div class="sp-detail-label">Revenue model</div>
+                <div class="sp-detail-value">${p.model}</div>
+              </div>
+              <div>
+                <div class="sp-detail-label">Monthly potential</div>
+                <div class="sp-detail-value">${p.revenue}</div>
+              </div>
+              <div>
+                <div class="sp-detail-label">Time to profit</div>
+                <div class="sp-detail-value">${p.time}</div>
+              </div>
+            </div>
+            <div class="sp-card-footer">
+              <button class="sp-del" data-id="${p.id}">Remove</button>
+            </div>`;
+          grid.appendChild(card);
+        });
+
+        grid.querySelectorAll('.sp-del').forEach(btn => {
+          btn.addEventListener('click', () => {
+            projects = projects.filter(p => p.id !== btn.dataset.id);
+            lsSave(projects);
+            render();
+          });
+        });
+      }
+
+      /* ── Add form ── */
+      const toggleBtn = document.getElementById('sp-toggle');
+      const form      = document.getElementById('sp-form');
+
+      toggleBtn.addEventListener('click', () => {
+        const open = form.classList.toggle('open');
+        toggleBtn.textContent = open ? '✕ Cancel' : '+ New project idea';
+      });
+
+      document.getElementById('sp-submit').addEventListener('click', () => {
+        const name      = document.getElementById('sp-name').value.trim();
+        const concept   = document.getElementById('sp-concept').value.trim();
+        const cost      = document.getElementById('sp-cost').value.trim();
+        const model     = document.getElementById('sp-model').value.trim();
+        const revenue   = document.getElementById('sp-revenue').value.trim();
+        const time      = document.getElementById('sp-time').value.trim();
+        const viability = parseInt(document.getElementById('sp-viability').value, 10);
+
+        if (!name || !concept) return;
+
+        projects.push({
+          id: Date.now().toString(),
+          name, concept,
+          cost:     cost     || '—',
+          model:    model    || '—',
+          revenue:  revenue  || '—',
+          time:     time     || '—',
+          viability: isNaN(viability) ? 5 : Math.min(10, Math.max(1, viability)),
+        });
+
+        lsSave(projects);
+        render();
+
+        ['sp-name','sp-concept','sp-cost','sp-model','sp-revenue','sp-time','sp-viability']
+          .forEach(id => { document.getElementById(id).value = ''; });
+        form.classList.remove('open');
+        toggleBtn.textContent = '+ New project idea';
+      });
+
+      /* ── Lazy init ── */
+      const sec = document.getElementById('section-side-projects');
+      let inited = false;
+      if (sec) {
+        new MutationObserver(() => {
+          if (sec.classList.contains('active') && !inited) { inited = true; render(); }
+        }).observe(sec, { attributes: true, attributeFilter: ['class'] });
+        if (sec.classList.contains('active')) { inited = true; render(); }
+      }
+    })();
+
+    /* ══════════════════════════════
+       LIFE GOALS
+    ══════════════════════════════ */
+    (function () {
+      const LS_KEY    = 'leon-life-goals';
+      const LS_STREAK = 'leon-first-opened';
+
+      /* ── Streak: days since first open ── */
+      const todayStr = new Date().toISOString().slice(0, 10);
+      let firstOpened = localStorage.getItem(LS_STREAK);
+      if (!firstOpened) { firstOpened = todayStr; localStorage.setItem(LS_STREAK, todayStr); }
+      const streakDays = Math.max(0, Math.floor(
+        (new Date(todayStr) - new Date(firstOpened)) / 86400000
+      ));
+
+      /* ── Defaults ── */
+      const DEFAULTS = [
+        { id: 'lg1', title: 'Finish Ciclo Superior at Euroaula',    category: 'Career',   due: '2026-06-30', progress: 75, notes: '' },
+        { id: 'lg2', title: 'Grow @2.chicos to 15k followers',      category: 'Career',   due: '2026-12-31', progress: 56, notes: '' },
+        { id: 'lg3', title: 'Land first paid brand deal',           category: 'Money',    due: '2026-08-31', progress: 20, notes: '' },
+        { id: 'lg4', title: 'Master Frog Stand to Handstand',       category: 'Health',   due: '2026-09-30', progress: 15, notes: '' },
+        { id: 'lg5', title: 'Save €1,000',                          category: 'Money',    due: '2026-10-31', progress: 30, notes: '' },
+      ];
+
+      function ls()      { try { const v = localStorage.getItem(LS_KEY); return v ? JSON.parse(v) : JSON.parse(JSON.stringify(DEFAULTS)); } catch (_) { return JSON.parse(JSON.stringify(DEFAULTS)); } }
+      function lsSave(v) { try { localStorage.setItem(LS_KEY, JSON.stringify(v)); } catch (_) {} }
+
+      let goals = ls();
+
+      const CAT = {
+        Money:    { bg: 'rgba(77,170,125,0.14)',  fg: '#4daa7d' },
+        Health:   { bg: 'rgba(201,96,79,0.14)',   fg: '#c9604f' },
+        Career:   { bg: 'rgba(79,126,201,0.14)',  fg: '#4f7ec9' },
+        Personal: { bg: 'rgba(150,110,201,0.14)', fg: '#9b7ac9' },
+      };
+
+      function catColor(c) { return CAT[c] || { bg: '#1a1a1a', fg: '#555' }; }
+
+      function daysLeft(due) {
+        const t = new Date(); t.setHours(0,0,0,0);
+        return Math.round((new Date(due + 'T00:00:00') - t) / 86400000);
+      }
+
+      function fmtDue(due) {
+        return new Date(due + 'T00:00:00').toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+      }
+
+      function daysTag(n) {
+        if (n < 0)  return { text: Math.abs(n) + 'd overdue', cls: 'red' };
+        if (n === 0) return { text: 'Due today', cls: 'red' };
+        if (n <= 14) return { text: n + 'd left', cls: 'amber' };
+        return { text: n + 'd left', cls: 'muted' };
+      }
+
+      function setSliderBg(el, val) {
+        el.style.background =
+          `linear-gradient(to right,#4daa7d 0%,#4daa7d ${val}%,#1e1e1e ${val}%)`;
+      }
+
+      function render() {
+        /* streak counter */
+        const streakEl = document.getElementById('lg-streak');
+        if (streakEl) streakEl.textContent = streakDays;
+
+        const grid = document.getElementById('goals-grid');
+        if (!grid) return;
+        grid.innerHTML = '';
+
+        /* sort by due date asc */
+        [...goals]
+          .sort((a, b) => a.due < b.due ? -1 : 1)
+          .forEach(g => {
+            const col = catColor(g.category);
+            const dl  = daysLeft(g.due);
+            const tag = daysTag(dl);
+
+            const card = document.createElement('div');
+            card.className = 'goal-card';
+            card.innerHTML = `
+              <div>
+                <div class="goal-title-row">
+                  <span class="goal-title">${g.title}</span>
+                  <button class="goal-del" data-id="${g.id}">×</button>
+                </div>
+                <div class="goal-meta-row" style="margin-top:6px">
+                  <span class="goal-cat" style="background:${col.bg};color:${col.fg}">${g.category}</span>
+                  <span class="goal-due">${fmtDue(g.due)}</span>
+                  <span class="goal-days goal-days-${tag.cls}">${tag.text}</span>
+                </div>
+              </div>
+              <div class="goal-slider-row">
+                <input type="range" class="goal-progress" min="0" max="100" value="${g.progress}" data-id="${g.id}">
+                <span class="goal-pct" id="pct-${g.id}">${g.progress}%</span>
+              </div>
+              <textarea class="goal-notes" data-id="${g.id}" placeholder="Notes…">${g.notes || ''}</textarea>`;
+
+            grid.appendChild(card);
+
+            const slider = card.querySelector('.goal-progress');
+            setSliderBg(slider, g.progress);
+
+            slider.addEventListener('input', () => {
+              const v = +slider.value;
+              setSliderBg(slider, v);
+              const pctEl = document.getElementById(`pct-${g.id}`);
+              if (pctEl) pctEl.textContent = v + '%';
+              const goal = goals.find(x => x.id === g.id);
+              if (goal) { goal.progress = v; lsSave(goals); }
+            });
+
+            card.querySelector('.goal-notes').addEventListener('blur', e => {
+              const goal = goals.find(x => x.id === g.id);
+              if (goal) { goal.notes = e.target.value; lsSave(goals); }
+            });
+
+            card.querySelector('.goal-del').addEventListener('click', () => {
+              goals = goals.filter(x => x.id !== g.id);
+              lsSave(goals);
+              render();
+            });
+          });
+      }
+
+      /* ── Add form ── */
+      const toggleBtn = document.getElementById('lg-toggle');
+      const lgForm    = document.getElementById('lg-form');
+
+      toggleBtn.addEventListener('click', () => {
+        const open = lgForm.classList.toggle('open');
+        toggleBtn.textContent = open ? '✕ Cancel' : '+ Add goal';
+      });
+
+      document.getElementById('lg-submit').addEventListener('click', () => {
+        const title    = document.getElementById('lg-title').value.trim();
+        const category = document.getElementById('lg-category').value;
+        const due      = document.getElementById('lg-date').value;
+        const progress = Math.min(100, Math.max(0,
+          parseInt(document.getElementById('lg-progress').value, 10) || 0
+        ));
+        if (!title || !due) return;
+
+        goals.push({ id: Date.now().toString(), title, category, due, progress, notes: '' });
+        lsSave(goals);
+        render();
+
+        document.getElementById('lg-title').value    = '';
+        document.getElementById('lg-date').value     = '';
+        document.getElementById('lg-progress').value = '';
+        lgForm.classList.remove('open');
+        toggleBtn.textContent = '+ Add goal';
+      });
+
+      /* ── Lazy init ── */
+      const sec = document.getElementById('section-life-goals');
+      let inited = false;
+      if (sec) {
+        new MutationObserver(() => {
+          if (sec.classList.contains('active') && !inited) { inited = true; render(); }
+        }).observe(sec, { attributes: true, attributeFilter: ['class'] });
+        if (sec.classList.contains('active')) { inited = true; render(); }
+      }
+    })();
+  </script>
+
+</body>
+</html>
