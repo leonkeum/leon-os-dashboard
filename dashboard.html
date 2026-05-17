@@ -1789,7 +1789,7 @@
         <!-- Weekly grid — JS rendered -->
         <div class="week-grid-wrap">
           <div class="week-header" id="cal-header" style="display:grid;grid-template-columns:48px repeat(7,1fr);border-bottom:1px solid #1a1a1a"></div>
-          <div class="week-body" id="cal-body" style="display:grid;grid-template-columns:48px repeat(7,1fr);height:612px">
+          <div class="week-body" id="cal-body" style="display:grid;grid-template-columns:48px repeat(7,1fr);height:714px">
             <!-- JS fills this -->
           </div>
           <div class="add-block-row" id="add-block-row"></div>
@@ -2270,16 +2270,21 @@
         saveCal(calBlocks);
       }
 
+      function localDateStr(d) {
+        return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+      }
+
       function getWeekDates() {
         const t = new Date(); const d = t.getDay();
-        const mon = new Date(t); mon.setDate(t.getDate() + (d === 0 ? -6 : 1 - d)); mon.setHours(0,0,0,0);
-        return Array.from({length:7}, (_,i) => { const x = new Date(mon); x.setDate(mon.getDate()+i); return x.toISOString().slice(0,10); });
+        // Sunday (0) → go to NEXT Monday (+1). Other days → back to Monday.
+        const mon = new Date(t); mon.setDate(t.getDate() + (d === 0 ? 1 : 1 - d)); mon.setHours(0,0,0,0);
+        return Array.from({length:7}, (_,i) => { const x = new Date(mon); x.setDate(mon.getDate()+i); return localDateStr(x); });
       }
 
       // top in px from 06:00 baseline (34px/hr)
-      function tpx(t, asEnd) {
+      function tpx(t) {
         const [h,m] = t.split(':').map(Number);
-        const hr = (asEnd && h === 0) ? 24 : h;
+        const hr = h < 6 ? h + 24 : h; // 00–05 treated as post-midnight (24–29)
         return (hr - 6) * 34 + (m / 60) * 34;
       }
 
@@ -2296,14 +2301,14 @@
         if (!line) return;
         const n = new Date();
         const top = (n.getHours() - 6) * 34 + (n.getMinutes() / 60) * 34;
-        if (top < 0 || top > 612) { line.style.display = 'none'; return; }
+        if (top < 0 || top > 714) { line.style.display = 'none'; return; }
         line.style.display = 'block';
         line.style.top = top + 'px';
       }
 
       function renderCalendar() {
         const weekDates = getWeekDates();
-        const todayStr  = new Date().toISOString().slice(0,10);
+        const todayStr  = localDateStr(new Date());
 
         /* ── Header ── */
         const hdr = document.getElementById('cal-header');
@@ -2325,7 +2330,9 @@
 
         // Time labels column
         let html = '<div class="time-labels">';
-        for (let h = 6; h < 24; h++) html += `<div class="tl-hour">${String(h).padStart(2,'0')}</div>`;
+        [6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,0,1,2,3].forEach(h =>
+          html += `<div class="tl-hour">${String(h).padStart(2,'0')}</div>`
+        );
         html += '</div>';
 
         // Day columns
