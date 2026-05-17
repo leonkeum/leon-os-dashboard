@@ -1678,6 +1678,24 @@
     .gaby-result.err { color: #c94f4f; }
     .gaby-result pre { font-size: 9px; max-height: 100px; overflow: auto; margin-top: 4px; color: #666; white-space: pre-wrap; }
 
+    /* Current-time indicator line */
+    .time-now-line {
+      position: absolute;
+      left: 0; right: 0;
+      height: 1px;
+      background: #e05252;
+      z-index: 5;
+      pointer-events: none;
+    }
+    .time-now-line::before {
+      content: '';
+      position: absolute;
+      left: -1px; top: -3px;
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #e05252;
+    }
+
     /* Sidebar priority dot */
     .nav-priority-dot {
       width: 6px; height: 6px; border-radius: 50%;
@@ -2232,6 +2250,7 @@
         // ── Gaby shifts — week May 18-24 ──
         { id:'gb-0522', date:'2026-05-22', label:"Gaby · sala",  start:'10:00', end:'16:00', color:'red', style:'solid' },
         { id:'gb-0523', date:'2026-05-23', label:"Gaby's shift", start:'18:00', end:'00:00', color:'red', style:'solid' },
+        { id:'gb-0524', date:'2026-05-24', label:"Gaby's shift", start:'18:00', end:'00:00', color:'red', style:'solid' },
         // ── Gaby shifts — week May 25-31 ──
         { id:'gb-0529', date:'2026-05-29', label:"Gaby · sala",  start:'10:00', end:'16:00', color:'red', style:'solid' },
         { id:'gb-0530', date:'2026-05-30', label:"Gaby · sala",  start:'18:30', end:'23:30', color:'red', style:'solid' },
@@ -2244,6 +2263,12 @@
       function saveCal(b) { try { localStorage.setItem(CAL_KEY, JSON.stringify(b)); } catch(_) {} }
 
       let calBlocks = loadCal();
+
+      // Migration: ensure gb-0524 exists
+      if (!calBlocks.find(b => b.id === 'gb-0524')) {
+        calBlocks.push({ id:'gb-0524', date:'2026-05-24', label:"Gaby's shift", start:'18:00', end:'00:00', color:'red', style:'solid' });
+        saveCal(calBlocks);
+      }
 
       function getWeekDates() {
         const t = new Date(); const d = t.getDay();
@@ -2265,6 +2290,16 @@
         gray:   { bg:'rgba(255,255,255,0.02)', bl:'#2a2a2a',               tx:'#666' },
         purple: { bg:'rgba(150,110,201,0.12)', bl:'rgba(150,110,201,0.6)', tx:'#9b7ac9' },
       };
+
+      function positionNowLine() {
+        const line = document.getElementById('time-now-line');
+        if (!line) return;
+        const n = new Date();
+        const top = (n.getHours() - 6) * 34 + (n.getMinutes() / 60) * 34;
+        if (top < 0 || top > 612) { line.style.display = 'none'; return; }
+        line.style.display = 'block';
+        line.style.top = top + 'px';
+      }
 
       function renderCalendar() {
         const weekDates = getWeekDates();
@@ -2320,6 +2355,19 @@
         });
 
         body.innerHTML = html;
+
+        // Inject current-time line into today's column
+        const todayColIdx = weekDates.indexOf(todayStr);
+        if (todayColIdx !== -1) {
+          const todayCol = body.querySelector(`#dc-${todayColIdx}`);
+          if (todayCol) {
+            const nl = document.createElement('div');
+            nl.className = 'time-now-line';
+            nl.id = 'time-now-line';
+            todayCol.appendChild(nl);
+          }
+        }
+        positionNowLine();
 
         // Delete handlers
         body.querySelectorAll('.cal-del-btn').forEach(btn => {
@@ -2401,6 +2449,7 @@
       }
 
       renderCalendar();
+      setInterval(positionNowLine, 60000); // update time line every minute
 
       /* ── Gaby schedule upload ── */
       const gabBtn  = document.getElementById('gaby-upload-btn');
