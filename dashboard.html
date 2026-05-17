@@ -1678,6 +1678,27 @@
     .gaby-result.err { color: #c94f4f; }
     .gaby-result pre { font-size: 9px; max-height: 100px; overflow: auto; margin-top: 4px; color: #666; white-space: pre-wrap; }
 
+    /* Calendar drag / resize */
+    .cal-block { cursor: grab; }
+    .cal-block.is-dragging { cursor: grabbing; opacity: 0.85; z-index: 10; }
+
+    .cb-resize-top, .cb-resize-bot {
+      position: absolute; left: 0; right: 0; height: 7px; z-index: 4;
+      cursor: ns-resize;
+    }
+    .cb-resize-top { top: 0; border-radius: 5px 5px 0 0; }
+    .cb-resize-bot { bottom: 0; border-radius: 0 0 5px 5px; }
+    .cb-resize-top::after, .cb-resize-bot::after {
+      content: '';
+      display: block;
+      margin: 2px auto 0;
+      width: 18px; height: 2px;
+      border-radius: 1px;
+      background: rgba(255,255,255,0.2);
+    }
+    .cb-resize-bot::after { margin-top: 3px; }
+    .cb-resize-top:hover::after, .cb-resize-bot:hover::after { background: rgba(255,255,255,0.5); }
+
     /* Current-time indicator line */
     .time-now-line {
       position: absolute;
@@ -2296,6 +2317,54 @@
         purple: { bg:'rgba(150,110,201,0.12)', bl:'rgba(150,110,201,0.6)', tx:'#9b7ac9' },
       };
 
+      /* ── Drag state ── */
+      let dragState = null;
+
+      // Convert pixel offset from grid top (06:00 baseline) to HH:MM snapped to 15 min
+      function pxToTime(px) {
+        const totalMin = Math.round((px * 60 / 34) / 15) * 15;
+        const absHour  = 6 + Math.floor(totalMin / 60);
+        const min      = totalMin % 60;
+        const h        = absHour >= 24 ? absHour - 24 : absHour;
+        return String(h).padStart(2,'0') + ':' + String(min).padStart(2,'0');
+      }
+
+      document.addEventListener('mousemove', function(e) {
+        if (!dragState) return;
+        const dy = e.clientY - dragState.mouseY0;
+        const el = dragState.el;
+        if (dragState.type === 'move') {
+          const t = Math.max(0, Math.min(714 - dragState.h0, dragState.top0 + dy));
+          el.style.top = t + 'px';
+        } else if (dragState.type === 'bot') {
+          el.style.height = Math.max(17, dragState.h0 + dy) + 'px';
+        } else if (dragState.type === 'top') {
+          const nh = dragState.h0 - dy;
+          const nt = dragState.top0 + dy;
+          if (nh >= 17 && nt >= 0) { el.style.top = nt + 'px'; el.style.height = nh + 'px'; }
+        }
+      });
+
+      document.addEventListener('mouseup', function() {
+        if (!dragState) return;
+        const el = dragState.el;
+        if (el) {
+          el.classList.remove('is-dragging');
+          const newTop = parseFloat(el.style.top) || 0;
+          const newH   = parseFloat(el.style.height) || 34;
+          const block  = calBlocks.find(b => b.id === dragState.id);
+          if (block) {
+            block.start = pxToTime(newTop);
+            block.end   = pxToTime(newTop + newH);
+            saveCal(calBlocks);
+            renderCalendar();
+          }
+        }
+        dragState = null;
+        document.body.style.userSelect = '';
+        document.body.style.cursor = '';
+      });
+
       function positionNowLine() {
         const line = document.getElementById('time-now-line');
         if (!line) return;
@@ -2351,10 +2420,12 @@
             const bdr = `2px ${bl.style==='dashed'?'dashed':'solid'} ${c.bl}`;
             const showTime = ht > 32;
             html += `<div class="tb cal-block" style="top:${top}px;height:${ht}px;background:${c.bg};border-left:${bdr}" data-id="${bl.id}">
+              <div class="cb-resize-top" data-id="${bl.id}"></div>
               <span class="tb-label" style="color:${c.tx}">${bl.label}</span>
               ${showTime ? `<span class="tb-time">${bl.start}–${bl.end}</span>` : ''}
               ${bl.note  ? `<span class="tb-note">${bl.note}</span>` : ''}
               <button class="cal-del-btn" data-id="${bl.id}">×</button>
+              <div class="cb-resize-bot" data-id="${bl.id}"></div>
             </div>`;
           });
 
@@ -2383,6 +2454,39 @@
             calBlocks = calBlocks.filter(b => b.id !== btn.dataset.id);
             saveCal(calBlocks);
             renderCalendar();
+          });
+        });
+
+        // Drag handlers
+        body.querySelectorAll('.cal-block').forEach(el => {
+          const id = el.dataset.id;
+
+          // Resize top edge
+          el.querySelector('.cb-resize-top')?.addEventListener('mousedown', e => {
+            e.preventDefault(); e.stopPropagation();
+            dragState = { type:'top', id, el, mouseY0:e.clientY, top0:parseFloat(el.style.top)||0, h0:parseFloat(el.style.height)||34 };
+            document.body.style.userSelect = 'none';
+            document.body.style.cursor = 'ns-resize';
+          });
+
+          // Resize bottom edge
+          el.querySelector('.cb-resize-bot')?.addEventListener('mousedown', e => {
+            e.preventDefault(); e.stopPropagation();
+            dragState = { type:'bot', id, el, mouseY0:e.clientY, top0:parseFloat(el.style.top)||0, h0:parseFloat(el.style.height)||34 };
+            document.body.style.userSelect = 'none';
+            document.body.style.cursor = 'ns-resize';
+          });
+
+          // Move (block body — not resize handles or delete button)
+          el.addEventListener('mousedown', e => {
+            if (e.target.classList.contains('cb-resize-top') ||
+                e.target.classList.contains('cb-resize-bot') ||
+                e.target.classList.contains('cal-del-btn')) return;
+            e.preventDefault();
+            el.classList.add('is-dragging');
+            dragState = { type:'move', id, el, mouseY0:e.clientY, top0:parseFloat(el.style.top)||0, h0:parseFloat(el.style.height)||34 };
+            document.body.style.userSelect = 'none';
+            document.body.style.cursor = 'grabbing';
           });
         });
 
@@ -2423,11 +2527,17 @@
           });
         });
 
+        const COLOR_DEFAULTS = { red:"Gaby's shift", blue:'Euroaula', green:'@2.chicos', purple:'Random', gray:'Free time' };
         addRow.querySelectorAll('.abf-color-btn').forEach(btn => {
           btn.addEventListener('click', () => {
             const col = btn.dataset.col;
             addRow.querySelectorAll(`.abf-color-btn[data-col="${col}"]`).forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
+            // Auto-fill label if blank or still a default value
+            const lbl = document.getElementById(`abf-lbl-${col}`);
+            if (lbl && (!lbl.value || Object.values(COLOR_DEFAULTS).includes(lbl.value))) {
+              lbl.value = COLOR_DEFAULTS[btn.dataset.color] || '';
+            }
           });
         });
 
