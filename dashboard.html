@@ -1530,6 +1530,160 @@
     }
 
     .lg-form.open { display: flex; }
+
+    /* ═══════════════════════════════
+       CALENDAR — dynamic blocks + controls
+    ═══════════════════════════════ */
+    .tb-note { font-size: 8px; color: #888; opacity: 0.85; font-style: italic; }
+
+    .tb.cal-block { position: absolute; left: 3px; right: 3px; }
+
+    .cal-del-btn {
+      position: absolute; top: 2px; right: 2px;
+      width: 12px; height: 12px;
+      border: none; background: transparent; color: transparent;
+      font-size: 11px; cursor: pointer; border-radius: 2px;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0; line-height: 1;
+      transition: background 0.1s, color 0.1s;
+    }
+    .tb:hover .cal-del-btn { color: rgba(255,255,255,0.5); }
+    .cal-del-btn:hover { background: rgba(255,255,255,0.15) !important; color: #fff !important; }
+
+    .tb.purple { background: rgba(150,110,201,0.12); border-left: 2px solid rgba(150,110,201,0.55); }
+    .tb.purple .tb-label { color: #9b7ac9; }
+
+    /* Add-block row */
+    .add-block-row {
+      display: grid;
+      grid-template-columns: 48px repeat(7, 1fr);
+      border-top: 1px solid #1a1a1a;
+    }
+    .add-block-spacer { border-right: 1px solid #1a1a1a; }
+    .add-block-col {
+      padding: 5px 3px;
+      position: relative;
+      border-right: 1px solid #1a1a1a;
+    }
+    .add-block-col:last-child { border-right: none; }
+    .add-block-trigger {
+      display: flex; align-items: center; justify-content: center;
+      width: 100%; height: 22px; border-radius: 4px;
+      border: 1px dashed #1e1e1e; background: transparent;
+      color: #2e2e2e; font-size: 14px; cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .add-block-trigger:hover { border-color: #333; color: #666; }
+
+    .add-block-form {
+      display: none; position: absolute;
+      bottom: calc(100% + 2px); left: 0; right: 0;
+      background: #161616; border: 1px solid #2a2a2a;
+      border-radius: 6px; padding: 8px; z-index: 20;
+      flex-direction: column; gap: 5px;
+      min-width: 155px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.7);
+    }
+    .add-block-form.open { display: flex; }
+
+    .abf-input {
+      background: #0d0d0d; border: 1px solid #1e1e1e;
+      border-radius: 3px; color: #aaa;
+      font-family: 'Inter', sans-serif; font-size: 10px;
+      padding: 4px 6px; outline: none; transition: border-color 0.15s;
+    }
+    .abf-input:focus { border-color: #333; }
+    .abf-input::placeholder { color: #333; }
+    .abf-row { display: flex; gap: 4px; }
+
+    .abf-color-btn {
+      flex: 1; height: 14px; border-radius: 2px;
+      border: 2px solid transparent; cursor: pointer;
+      transition: transform 0.1s, border-color 0.1s;
+    }
+    .abf-color-btn:hover { transform: scale(1.12); }
+    .abf-color-btn.selected { border-color: rgba(255,255,255,0.75); }
+    .abf-color-btn.col-red    { background: #c94f4f; }
+    .abf-color-btn.col-blue   { background: #4f7ec9; }
+    .abf-color-btn.col-green  { background: #4daa7d; }
+    .abf-color-btn.col-gray   { background: #666; }
+    .abf-color-btn.col-purple { background: #9b7ac9; }
+
+    .abf-actions { display: flex; gap: 4px; justify-content: flex-end; align-items: center; }
+    .abf-cancel-btn {
+      background: transparent; border: none; color: #555;
+      font-family: 'Inter', sans-serif; font-size: 10px;
+      cursor: pointer; padding: 3px 5px;
+      transition: color 0.15s;
+    }
+    .abf-cancel-btn:hover { color: #aaa; }
+    .abf-save-btn {
+      background: #1e1e1e; border: none; border-radius: 3px;
+      color: #aaa; font-family: 'Inter', sans-serif;
+      font-size: 10px; font-weight: 500;
+      padding: 4px 9px; cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .abf-save-btn:hover { background: #2a2a2a; color: #e0e0e0; }
+
+    /* Week header with date numbers */
+    .wh-day { flex-direction: column; gap: 1px; align-items: center; }
+    .wh-date { font-size: 11px; color: #555; font-variant-numeric: tabular-nums; font-weight: 400; letter-spacing: 0; text-transform: none; }
+    .wh-day.today .wh-date { color: #e0e0e0; }
+
+    /* Gaby upload bar */
+    .gaby-upload-bar {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 20px; padding: 11px 14px;
+      background: #111; border: 1px solid #1e1e1e;
+      border-radius: 10px; flex-wrap: wrap;
+    }
+    .gaby-upload-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 13px; border-radius: 5px;
+      border: 1px solid #222; background: transparent;
+      color: #888; font-family: 'Inter', sans-serif;
+      font-size: 11px; font-weight: 500; cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .gaby-upload-btn:hover { border-color: #444; color: #ccc; }
+
+    .gaby-apikey-wrap {
+      display: none; flex-direction: column; gap: 6px;
+      width: 100%; margin-top: 4px; padding: 10px 12px;
+      background: #0d0d0d; border: 1px solid #1e1e1e; border-radius: 6px;
+    }
+    .gaby-apikey-wrap.show { display: flex; }
+    .gaby-apikey-lbl { font-size: 9px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: #555; }
+    .gaby-apikey-row { display: flex; gap: 6px; align-items: center; }
+    .gaby-apikey-input {
+      flex: 1; max-width: 300px; background: #111;
+      border: 1px solid #1a1a1a; border-radius: 4px;
+      color: #aaa; font-family: 'Inter', sans-serif;
+      font-size: 11px; padding: 6px 9px; outline: none;
+      transition: border-color 0.15s;
+    }
+    .gaby-apikey-input:focus { border-color: #333; }
+    .gaby-key-hint { font-size: 9px; color: #2e2e2e; }
+
+    .gaby-spinner { display: none; align-items: center; gap: 6px; font-size: 11px; color: #555; }
+    .gaby-spinner.show { display: flex; }
+    @keyframes cal-spin { to { transform: rotate(360deg); } }
+    .spin-icon { display: inline-block; animation: cal-spin 0.8s linear infinite; }
+
+    .gaby-result { display: none; font-size: 11px; }
+    .gaby-result.show { display: block; }
+    .gaby-result.ok  { color: #4daa7d; }
+    .gaby-result.err { color: #c94f4f; }
+    .gaby-result pre { font-size: 9px; max-height: 100px; overflow: auto; margin-top: 4px; color: #666; white-space: pre-wrap; }
+
+    /* Sidebar priority dot */
+    .nav-priority-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #4f7ec9; margin-left: auto; flex-shrink: 0;
+      box-shadow: 0 0 4px rgba(79,126,201,0.6);
+    }
   </style>
 </head>
 <body>
@@ -1547,7 +1701,7 @@
         <span class="nav-dot"></span>School
       </div>
       <div class="nav-item" data-section="chicos">
-        <span class="nav-dot"></span>@2.chicos
+        <span class="nav-dot"></span>@2.chicos<span class="nav-priority-dot"></span>
       </div>
       <div class="nav-item" data-section="side-projects">
         <span class="nav-dot"></span>Side Projects
@@ -1568,211 +1722,59 @@
 
       <!-- ══ TIME OS ══ -->
       <div id="section-time-os" class="section active">
+
+        <!-- Upload Gaby's Schedule -->
+        <div class="gaby-upload-bar">
+          <button class="gaby-upload-btn" id="gaby-upload-btn">📅 Upload Gaby's Schedule</button>
+          <input type="file" id="gaby-file-input" accept="image/*" style="display:none">
+          <div class="gaby-apikey-wrap" id="gaby-apikey-wrap">
+            <span class="gaby-apikey-lbl">Anthropic API Key — stored locally only</span>
+            <div class="gaby-apikey-row">
+              <input type="password" class="gaby-apikey-input" id="gaby-apikey-input" placeholder="sk-ant-...">
+              <button class="abf-save-btn" id="gaby-apikey-save">Save key</button>
+            </div>
+            <span class="gaby-key-hint">Saved to localStorage · never sent anywhere else</span>
+          </div>
+          <div class="gaby-spinner" id="gaby-spinner"><span class="spin-icon">◌</span>&nbsp;Processing image…</div>
+          <div class="gaby-result" id="gaby-result"></div>
+        </div>
+
         <div class="section-label">This week</div>
 
         <div class="stat-cards">
           <div class="stat-card red">
             <div class="sc-label">Gaby's Shifts</div>
-            <div class="sc-hours">16h</div>
-            <div class="sc-sub">Tue · Thu · Fri · Sat</div>
+            <div class="sc-hours">12h</div>
+            <div class="sc-sub">Fri 22 · Sat 23</div>
             <div class="sc-track"><div class="sc-fill"></div></div>
           </div>
           <div class="stat-card blue">
             <div class="sc-label">Euroaula</div>
-            <div class="sc-hours">25h</div>
-            <div class="sc-sub">Mon – Fri · 09–14</div>
+            <div class="sc-hours">11.5h</div>
+            <div class="sc-sub">Mon–Thu · new schedule</div>
             <div class="sc-track"><div class="sc-fill"></div></div>
           </div>
           <div class="stat-card green">
             <div class="sc-label">@2.chicos</div>
             <div class="sc-hours">20h</div>
-            <div class="sc-sub">Afternoons, Mon – Fri</div>
+            <div class="sc-sub">Mornings, Mon–Sat</div>
             <div class="sc-track"><div class="sc-fill"></div></div>
           </div>
           <div class="stat-card muted">
             <div class="sc-label">Free Time</div>
-            <div class="sc-hours">28h</div>
+            <div class="sc-hours">30h</div>
             <div class="sc-sub">Available this week</div>
             <div class="sc-track"><div class="sc-fill"></div></div>
           </div>
         </div>
 
-        <!-- Weekly grid: 06:00–00:00 = 18 h × 34px = 612px -->
-        <!-- top = (hour − 6) × 34   |   height = duration × 34 -->
+        <!-- Weekly grid — JS rendered -->
         <div class="week-grid-wrap">
-          <div class="week-header">
-            <div class="wh-spacer"></div>
-            <div class="wh-day" id="hd-0">Mon</div>
-            <div class="wh-day" id="hd-1">Tue</div>
-            <div class="wh-day" id="hd-2">Wed</div>
-            <div class="wh-day" id="hd-3">Thu</div>
-            <div class="wh-day" id="hd-4">Fri</div>
-            <div class="wh-day" id="hd-5">Sat</div>
-            <div class="wh-day" id="hd-6">Sun</div>
+          <div class="week-header" id="cal-header" style="display:grid;grid-template-columns:48px repeat(7,1fr);border-bottom:1px solid #1a1a1a"></div>
+          <div class="week-body" id="cal-body" style="display:grid;grid-template-columns:48px repeat(7,1fr);height:612px">
+            <!-- JS fills this -->
           </div>
-
-          <div class="week-body">
-
-            <!-- Time labels 06–23 -->
-            <div class="time-labels">
-              <div class="tl-hour">06</div><div class="tl-hour">07</div>
-              <div class="tl-hour">08</div><div class="tl-hour">09</div>
-              <div class="tl-hour">10</div><div class="tl-hour">11</div>
-              <div class="tl-hour">12</div><div class="tl-hour">13</div>
-              <div class="tl-hour">14</div><div class="tl-hour">15</div>
-              <div class="tl-hour">16</div><div class="tl-hour">17</div>
-              <div class="tl-hour">18</div><div class="tl-hour">19</div>
-              <div class="tl-hour">20</div><div class="tl-hour">21</div>
-              <div class="tl-hour">22</div><div class="tl-hour">23</div>
-            </div>
-
-            <!-- Monday: free 06-09 · school 09-14 · 2chicos 15-19 · free 19-00 -->
-            <div class="day-col">
-              <div class="hour-lines"></div>
-              <div class="tb gray" style="top:0;height:102px">
-                <span class="tb-label">Free</span>
-                <span class="tb-time">06–09</span>
-                <div class="tb-chips"><span class="chip">Calisthenics</span></div>
-              </div>
-              <div class="tb blue" style="top:102px;height:170px">
-                <span class="tb-label">Euroaula</span>
-                <span class="tb-time">09–14</span>
-              </div>
-              <div class="tb green" style="top:306px;height:136px">
-                <span class="tb-label">@2.chicos</span>
-                <span class="tb-time">15–19</span>
-              </div>
-              <div class="tb gray" style="top:442px;height:170px">
-                <span class="tb-label">Free</span>
-                <span class="tb-time">19–00</span>
-                <div class="tb-chips">
-                  <span class="chip">Film content</span>
-                  <span class="chip">Brand outreach</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Tuesday: free 06-09 · school 09-14 · 2chicos 15-19 · Gaby 20-00 -->
-            <div class="day-col">
-              <div class="hour-lines"></div>
-              <div class="tb gray" style="top:0;height:102px">
-                <span class="tb-label">Free</span>
-                <span class="tb-time">06–09</span>
-              </div>
-              <div class="tb blue" style="top:102px;height:170px">
-                <span class="tb-label">Euroaula</span>
-                <span class="tb-time">09–14</span>
-              </div>
-              <div class="tb green" style="top:306px;height:136px">
-                <span class="tb-label">@2.chicos</span>
-                <span class="tb-time">15–19</span>
-              </div>
-              <div class="tb red" style="top:476px;height:136px">
-                <span class="tb-label">Gaby's shift</span>
-                <span class="tb-time">20–00</span>
-              </div>
-            </div>
-
-            <!-- Wednesday: free 06-09 · school 09-14 · 2chicos 15-19 · free 19-00 -->
-            <div class="day-col">
-              <div class="hour-lines"></div>
-              <div class="tb gray" style="top:0;height:102px">
-                <span class="tb-label">Free</span>
-                <span class="tb-time">06–09</span>
-              </div>
-              <div class="tb blue" style="top:102px;height:170px">
-                <span class="tb-label">Euroaula</span>
-                <span class="tb-time">09–14</span>
-              </div>
-              <div class="tb green" style="top:306px;height:136px">
-                <span class="tb-label">@2.chicos</span>
-                <span class="tb-time">15–19</span>
-              </div>
-              <div class="tb gray" style="top:442px;height:170px">
-                <span class="tb-label">Free</span>
-                <span class="tb-time">19–00</span>
-                <div class="tb-chips">
-                  <span class="chip">Calisthenics</span>
-                  <span class="chip">Brand outreach</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Thursday: free 06-09 · school 09-14 · 2chicos 15-19 · Gaby 20-00 -->
-            <div class="day-col">
-              <div class="hour-lines"></div>
-              <div class="tb gray" style="top:0;height:102px">
-                <span class="tb-label">Free</span>
-                <span class="tb-time">06–09</span>
-              </div>
-              <div class="tb blue" style="top:102px;height:170px">
-                <span class="tb-label">Euroaula</span>
-                <span class="tb-time">09–14</span>
-              </div>
-              <div class="tb green" style="top:306px;height:136px">
-                <span class="tb-label">@2.chicos</span>
-                <span class="tb-time">15–19</span>
-              </div>
-              <div class="tb red" style="top:476px;height:136px">
-                <span class="tb-label">Gaby's shift</span>
-                <span class="tb-time">20–00</span>
-              </div>
-            </div>
-
-            <!-- Friday: free 06-09 · school 09-14 · 2chicos 15-19 · Gaby 20-00 -->
-            <div class="day-col">
-              <div class="hour-lines"></div>
-              <div class="tb gray" style="top:0;height:102px">
-                <span class="tb-label">Free</span>
-                <span class="tb-time">06–09</span>
-              </div>
-              <div class="tb blue" style="top:102px;height:170px">
-                <span class="tb-label">Euroaula</span>
-                <span class="tb-time">09–14</span>
-              </div>
-              <div class="tb green" style="top:306px;height:136px">
-                <span class="tb-label">@2.chicos</span>
-                <span class="tb-time">15–19</span>
-              </div>
-              <div class="tb red" style="top:476px;height:136px">
-                <span class="tb-label">Gaby's shift</span>
-                <span class="tb-time">20–00</span>
-              </div>
-            </div>
-
-            <!-- Saturday: free 06-10 · 2chicos 10-19 · Gaby 20-00 -->
-            <div class="day-col">
-              <div class="hour-lines"></div>
-              <div class="tb gray" style="top:0;height:136px">
-                <span class="tb-label">Free</span>
-                <span class="tb-time">06–10</span>
-                <div class="tb-chips"><span class="chip">Film content</span></div>
-              </div>
-              <div class="tb green" style="top:136px;height:306px">
-                <span class="tb-label">@2.chicos</span>
-                <span class="tb-time">10–19</span>
-              </div>
-              <div class="tb red" style="top:476px;height:136px">
-                <span class="tb-label">Gaby's shift</span>
-                <span class="tb-time">20–00</span>
-              </div>
-            </div>
-
-            <!-- Sunday: free all day -->
-            <div class="day-col">
-              <div class="hour-lines"></div>
-              <div class="tb gray" style="top:0;height:612px">
-                <span class="tb-label">Free day</span>
-                <span class="tb-time">All day</span>
-                <div class="tb-chips">
-                  <span class="chip">Film content</span>
-                  <span class="chip">Calisthenics</span>
-                  <span class="chip">Brand outreach</span>
-                </div>
-              </div>
-            </div>
-
-          </div>
+          <div class="add-block-row" id="add-block-row"></div>
         </div>
       </div>
 
@@ -2193,13 +2195,6 @@
       weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
     });
 
-    // Highlight today's column (Mon=0 … Sun=6)
-    const colMap = { 1:0, 2:1, 3:2, 4:3, 5:4, 6:5, 0:6 };
-    const todayCol = colMap[now.getDay()];
-    if (todayCol !== undefined) {
-      document.getElementById(`hd-${todayCol}`).classList.add('today');
-    }
-
     // Section switching
     document.querySelectorAll('.nav-item').forEach(item => {
       item.addEventListener('click', () => {
@@ -2210,6 +2205,292 @@
         if (target) target.classList.add('active');
       });
     });
+
+    /* ══════════════════════════════
+       TIME OS — DYNAMIC CALENDAR + GABY UPLOAD
+    ══════════════════════════════ */
+    (function () {
+      const CAL_KEY = 'leon-calendar-v2';
+      const DAYS    = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+      /* Default calendar blocks
+         day  = recurring every week on that weekday
+         date = specific YYYY-MM-DD (overrides recurring for that day) */
+      const DEFAULT_BLOCKS = [
+        // ── Euroaula (recurring, updated schedule) ──
+        { id:'sch-mon', day:'Mon', label:'Euroaula',         start:'15:30', end:'20:00', color:'blue',  style:'solid' },
+        { id:'sch-tue', day:'Tue', label:'Euroaula',         start:'16:00', end:'19:00', color:'blue',  style:'solid' },
+        { id:'sch-wed', day:'Wed', label:'Digitalización',   start:'15:30', end:'16:00', color:'blue',  style:'dashed', note:'optional · 1h' },
+        { id:'sch-thu', day:'Thu', label:'Euroaula',         start:'15:30', end:'19:00', color:'blue',  style:'solid' },
+        { id:'sch-fri', day:'Fri', label:'Skip unless exam', start:'06:00', end:'00:00', color:'gray',  style:'dashed' },
+        // ── @2.chicos (recurring, mornings) ──
+        { id:'ch-mon', day:'Mon', label:'@2.chicos', start:'09:00', end:'14:30', color:'green', style:'solid' },
+        { id:'ch-tue', day:'Tue', label:'@2.chicos', start:'09:00', end:'15:00', color:'green', style:'solid' },
+        { id:'ch-wed', day:'Wed', label:'@2.chicos', start:'09:00', end:'14:30', color:'green', style:'solid' },
+        { id:'ch-thu', day:'Thu', label:'@2.chicos', start:'09:00', end:'14:30', color:'green', style:'solid' },
+        { id:'ch-sat', day:'Sat', label:'@2.chicos', start:'09:00', end:'16:00', color:'green', style:'solid' },
+        // ── Gaby shifts — week May 18-24 ──
+        { id:'gb-0522', date:'2026-05-22', label:"Gaby · sala",  start:'10:00', end:'16:00', color:'red', style:'solid' },
+        { id:'gb-0523', date:'2026-05-23', label:"Gaby's shift", start:'18:00', end:'00:00', color:'red', style:'solid' },
+        // ── Gaby shifts — week May 25-31 ──
+        { id:'gb-0529', date:'2026-05-29', label:"Gaby · sala",  start:'10:00', end:'16:00', color:'red', style:'solid' },
+        { id:'gb-0530', date:'2026-05-30', label:"Gaby · sala",  start:'18:30', end:'23:30', color:'red', style:'solid' },
+      ];
+
+      function loadCal() {
+        try { const v = localStorage.getItem(CAL_KEY); return v ? JSON.parse(v) : JSON.parse(JSON.stringify(DEFAULT_BLOCKS)); }
+        catch(_) { return JSON.parse(JSON.stringify(DEFAULT_BLOCKS)); }
+      }
+      function saveCal(b) { try { localStorage.setItem(CAL_KEY, JSON.stringify(b)); } catch(_) {} }
+
+      let calBlocks = loadCal();
+
+      function getWeekDates() {
+        const t = new Date(); const d = t.getDay();
+        const mon = new Date(t); mon.setDate(t.getDate() + (d === 0 ? -6 : 1 - d)); mon.setHours(0,0,0,0);
+        return Array.from({length:7}, (_,i) => { const x = new Date(mon); x.setDate(mon.getDate()+i); return x.toISOString().slice(0,10); });
+      }
+
+      // top in px from 06:00 baseline (34px/hr)
+      function tpx(t, asEnd) {
+        const [h,m] = t.split(':').map(Number);
+        const hr = (asEnd && h === 0) ? 24 : h;
+        return (hr - 6) * 34 + (m / 60) * 34;
+      }
+
+      const PAL = {
+        red:    { bg:'rgba(201,79,79,0.15)',   bl:'rgba(201,79,79,0.7)',   tx:'#c94f4f' },
+        blue:   { bg:'rgba(79,126,201,0.15)',  bl:'rgba(79,126,201,0.7)',  tx:'#4f7ec9' },
+        green:  { bg:'rgba(77,170,125,0.12)',  bl:'rgba(77,170,125,0.65)', tx:'#4daa7d' },
+        gray:   { bg:'rgba(255,255,255,0.02)', bl:'#2a2a2a',               tx:'#666' },
+        purple: { bg:'rgba(150,110,201,0.12)', bl:'rgba(150,110,201,0.6)', tx:'#9b7ac9' },
+      };
+
+      function renderCalendar() {
+        const weekDates = getWeekDates();
+        const todayStr  = new Date().toISOString().slice(0,10);
+
+        /* ── Header ── */
+        const hdr = document.getElementById('cal-header');
+        if (hdr) {
+          hdr.innerHTML = '<div class="wh-spacer" style="border-right:1px solid #1a1a1a;height:100%"></div>' +
+            DAYS.map((d,i) => {
+              const dt = weekDates[i];
+              const num = new Date(dt+'T00:00:00').getDate();
+              const isToday = dt === todayStr;
+              return `<div class="wh-day${isToday?' today':''}">
+                ${d}<span class="wh-date">${num}</span>
+              </div>`;
+            }).join('');
+        }
+
+        /* ── Body ── */
+        const body = document.getElementById('cal-body');
+        if (!body) return;
+
+        // Time labels column
+        let html = '<div class="time-labels">';
+        for (let h = 6; h < 24; h++) html += `<div class="tl-hour">${String(h).padStart(2,'0')}</div>`;
+        html += '</div>';
+
+        // Day columns
+        DAYS.forEach((dayName, i) => {
+          const dateStr  = weekDates[i];
+          const dayBlocks = calBlocks
+            .filter(b => (!b.date && b.day === dayName) || b.date === dateStr)
+            .sort((a,b) => a.start < b.start ? -1 : 1);
+
+          html += `<div class="day-col" id="dc-${i}"><div class="hour-lines"></div>`;
+
+          dayBlocks.forEach(bl => {
+            const c   = PAL[bl.color] || PAL.gray;
+            const top = tpx(bl.start, false);
+            const ht  = Math.max(tpx(bl.end, true) - top, 17);
+            const bdr = `2px ${bl.style==='dashed'?'dashed':'solid'} ${c.bl}`;
+            const showTime = ht > 32;
+            html += `<div class="tb cal-block" style="top:${top}px;height:${ht}px;background:${c.bg};border-left:${bdr}" data-id="${bl.id}">
+              <span class="tb-label" style="color:${c.tx}">${bl.label}</span>
+              ${showTime ? `<span class="tb-time">${bl.start}–${bl.end}</span>` : ''}
+              ${bl.note  ? `<span class="tb-note">${bl.note}</span>` : ''}
+              <button class="cal-del-btn" data-id="${bl.id}">×</button>
+            </div>`;
+          });
+
+          html += '</div>';
+        });
+
+        body.innerHTML = html;
+
+        // Delete handlers
+        body.querySelectorAll('.cal-del-btn').forEach(btn => {
+          btn.addEventListener('click', e => {
+            e.stopPropagation();
+            calBlocks = calBlocks.filter(b => b.id !== btn.dataset.id);
+            saveCal(calBlocks);
+            renderCalendar();
+          });
+        });
+
+        /* ── Add-block row ── */
+        const addRow = document.getElementById('add-block-row');
+        if (!addRow) return;
+
+        let rowHtml = '<div class="add-block-spacer"></div>';
+        DAYS.forEach((dayName, i) => {
+          const dateStr = weekDates[i];
+          rowHtml += `<div class="add-block-col">
+            <button class="add-block-trigger" data-col="${i}">+</button>
+            <div class="add-block-form" id="abf-${i}">
+              <input class="abf-input" id="abf-lbl-${i}" placeholder="Label">
+              <div class="abf-row">
+                <input class="abf-input" id="abf-s-${i}" placeholder="Start HH:MM" style="flex:1">
+                <input class="abf-input" id="abf-e-${i}" placeholder="End HH:MM"   style="flex:1">
+              </div>
+              <div class="abf-row" style="align-items:center;gap:4px">
+                <span style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:.05em">Color</span>
+                ${['red','blue','green','gray','purple'].map((c,ci) =>
+                  `<button class="abf-color-btn col-${c}${ci===0?' selected':''}" data-color="${c}" data-col="${i}"></button>`
+                ).join('')}
+              </div>
+              <div class="abf-actions">
+                <button class="abf-cancel-btn" data-col="${i}">Cancel</button>
+                <button class="abf-save-btn"   data-col="${i}" data-date="${dateStr}" data-day="${dayName}">Add</button>
+              </div>
+            </div>
+          </div>`;
+        });
+        addRow.innerHTML = rowHtml;
+
+        addRow.querySelectorAll('.add-block-trigger').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const f = document.getElementById(`abf-${btn.dataset.col}`);
+            f && f.classList.toggle('open');
+          });
+        });
+
+        addRow.querySelectorAll('.abf-color-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const col = btn.dataset.col;
+            addRow.querySelectorAll(`.abf-color-btn[data-col="${col}"]`).forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+          });
+        });
+
+        addRow.querySelectorAll('.abf-cancel-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const f = document.getElementById(`abf-${btn.dataset.col}`);
+            f && f.classList.remove('open');
+          });
+        });
+
+        addRow.querySelectorAll('.abf-save-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const col   = btn.dataset.col;
+            const label = document.getElementById(`abf-lbl-${col}`)?.value.trim();
+            const start = document.getElementById(`abf-s-${col}`)?.value.trim();
+            const end   = document.getElementById(`abf-e-${col}`)?.value.trim();
+            const selC  = addRow.querySelector(`.abf-color-btn.selected[data-col="${col}"]`);
+            const color = selC ? selC.dataset.color : 'gray';
+            if (!label || !start || !end) return;
+
+            calBlocks.push({ id:'custom-'+Date.now(), date: btn.dataset.date, label, start, end, color, style:'solid' });
+            saveCal(calBlocks);
+            renderCalendar();
+          });
+        });
+      }
+
+      renderCalendar();
+
+      /* ── Gaby schedule upload ── */
+      const gabBtn  = document.getElementById('gaby-upload-btn');
+      const gabFile = document.getElementById('gaby-file-input');
+      const akWrap  = document.getElementById('gaby-apikey-wrap');
+      const akInput = document.getElementById('gaby-apikey-input');
+      const akSave  = document.getElementById('gaby-apikey-save');
+      const spinner = document.getElementById('gaby-spinner');
+      const result  = document.getElementById('gaby-result');
+
+      if (gabBtn) gabBtn.addEventListener('click', () => {
+        if (localStorage.getItem('anthropic_api_key')) { gabFile.click(); }
+        else { akWrap.classList.add('show'); akInput.focus(); }
+      });
+
+      if (akSave) akSave.addEventListener('click', () => {
+        const k = akInput.value.trim();
+        if (!k) return;
+        localStorage.setItem('anthropic_api_key', k);
+        akWrap.classList.remove('show');
+        akInput.value = '';
+        gabFile.click();
+      });
+
+      if (gabFile) gabFile.addEventListener('change', async () => {
+        const file = gabFile.files[0];
+        if (!file) return;
+        const apiKey = localStorage.getItem('anthropic_api_key');
+        if (!apiKey) return;
+
+        spinner.classList.add('show');
+        result.className = 'gaby-result';
+
+        try {
+          const { b64, mime } = await new Promise(res => {
+            const r = new FileReader();
+            r.onload = () => res({ b64: r.result.split(',')[1], mime: file.type || 'image/jpeg' });
+            r.readAsDataURL(file);
+          });
+
+          const resp = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+            body: JSON.stringify({
+              model: 'claude-opus-4-5',
+              max_tokens: 1024,
+              system: "You are reading a restaurant staff schedule spreadsheet image. Find the row labeled 'leon' (lowercase). For each day column (Lunes, Martes, Miércoles, Jueves, Viernes, Sábado, Domingo), read the date number shown under the day name and the shift time if not OFF. Return ONLY a valid JSON array, no explanation, no markdown: [{\"date\":\"YYYY-MM-DD\",\"start\":\"HH:MM\",\"end\":\"HH:MM\",\"location\":\"sala/bar/etc\"}]. Use the current year. Omit days that are OFF or empty.",
+              messages: [{ role:'user', content: [
+                { type:'image', source: { type:'base64', media_type: mime, data: b64 } },
+                { type:'text', text:"Extract leon's schedule from this image." }
+              ]}]
+            }),
+          });
+
+          if (!resp.ok) throw new Error(await resp.text());
+          const data = await resp.json();
+          const raw  = data.content[0].text.trim();
+
+          let shifts;
+          try { const m = raw.match(/\[[\s\S]*\]/); shifts = JSON.parse(m ? m[0] : raw); }
+          catch(_) {
+            spinner.classList.remove('show');
+            result.className = 'gaby-result err show';
+            result.innerHTML = `Parse error. Raw response:<br><pre>${raw}</pre>`;
+            return;
+          }
+
+          let added = 0;
+          shifts.forEach(s => {
+            if (!s.date || !s.start || !s.end) return;
+            const id = 'gaby-upload-' + s.date;
+            calBlocks = calBlocks.filter(b => b.id !== id);
+            calBlocks.push({ id, date: s.date, label: 'Gaby' + (s.location ? ` · ${s.location}` : ''), start: s.start, end: s.end, color: 'red', style: 'solid' });
+            added++;
+          });
+
+          saveCal(calBlocks);
+          renderCalendar();
+          spinner.classList.remove('show');
+          result.className = 'gaby-result ok show';
+          result.textContent = `✓ ${added} shift${added!==1?'s':''} added to calendar`;
+
+        } catch(err) {
+          spinner.classList.remove('show');
+          result.className = 'gaby-result err show';
+          result.textContent = 'Error: ' + (err.message || String(err));
+        }
+        gabFile.value = '';
+      });
+    })();
 
     /* ══════════════════════════════
        MOVEMENT — skill badges
@@ -2494,8 +2775,8 @@
       const LS_KANBAN  = 'leon-chicos-kanban';
 
       const DEF_STATS = {
-        followers: 8420, posts: 12, engagement: 4.8,
-        dmsSent: 23, dmsReplied: 7, episodes: 2
+        followers: 15988, engagement: 17.3, views30d: 1712,
+        interactions: 296, newFollowers: 136, netChange: -136
       };
 
       const DEF_FOLLOWERS = [
@@ -2507,6 +2788,7 @@
         { date: '2026-04-27', count: 8180 },
         { date: '2026-05-04', count: 8310 },
         { date: '2026-05-11', count: 8420 },
+        { date: '2026-05-18', count: 15988 },
       ];
 
       const DEF_KANBAN = {
@@ -2540,18 +2822,28 @@
 
       /* ── Stat cards ── */
       const STAT_DEFS = [
-        { key: 'followers',  label: 'Followers',         unit: '' },
-        { key: 'posts',      label: 'Posts this month',  unit: '' },
-        { key: 'engagement', label: 'Avg engagement',    unit: '%' },
-        { key: 'dmsSent',    label: 'Brand DMs sent',    unit: '' },
-        { key: 'dmsReplied', label: 'Brand DMs replied', unit: '' },
-        { key: 'episodes',   label: 'Episodes published', unit: '' },
+        { key: 'followers',    label: 'Followers',       unit: '' },
+        { key: 'engagement',   label: 'Engagement',      unit: '%' },
+        { key: 'views30d',     label: 'Views (30d)',      unit: '' },
+        { key: 'interactions', label: 'Interactions',    unit: '' },
+        { key: 'newFollowers', label: 'New this month',  unit: '' },
+        { key: 'netChange',    label: 'Net change',       unit: '' },
       ];
 
       function fmtStat(val, key) {
-        if (key === 'engagement') return (+val).toFixed(1);
-        if (key === 'followers')  return val >= 1000 ? (val / 1000).toFixed(1) + 'k' : String(val);
+        if (key === 'engagement')   return (+val).toFixed(1);
+        if (key === 'followers')    return val >= 1000 ? (val/1000).toFixed(1)+'k' : String(val);
+        if (key === 'netChange')    return (val > 0 ? '+' : '') + val;
+        if (key === 'views30d' || key === 'interactions' || key === 'newFollowers')
+          return val >= 1000 ? (val/1000).toFixed(1)+'k' : String(val);
         return String(val);
+      }
+
+      function applyStatColors() {
+        const nc = document.getElementById('cv-netChange');
+        if (nc) nc.style.color = chicosStats.netChange < 0 ? '#c94f4f' : '#4daa7d';
+        const nf = document.getElementById('cv-newFollowers');
+        if (nf) nf.style.color = '#4daa7d';
       }
 
       function initStatCards() {
@@ -2569,14 +2861,16 @@
 
           const el = card.querySelector('.cs-value');
           el.addEventListener('focus', () => {
-            el.textContent = chicosStats[def.key];
+            el.textContent = String(chicosStats[def.key]);
             const r = document.createRange(); r.selectNodeContents(el);
             const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
           });
           el.addEventListener('blur', () => {
-            const n = parseFloat(el.textContent.replace(/[^0-9.]/g, ''));
+            const raw = el.textContent.replace(/[^0-9.\-]/g, '');
+            const n = parseFloat(raw);
             if (!isNaN(n)) { chicosStats[def.key] = n; lsSave(LS_STATS, chicosStats); }
             el.textContent = fmtStat(chicosStats[def.key], def.key);
+            applyStatColors();
           });
           el.addEventListener('keydown', e => {
             if (e.key === 'Enter')  { e.preventDefault(); el.blur(); }
@@ -2779,6 +3073,7 @@
         if (inited) return;
         inited = true;
         initStatCards();
+        applyStatColors();
         initSnapshotForm();
         renderKanban();
         initAddButtons();
