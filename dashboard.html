@@ -1699,19 +1699,19 @@
     .cb-resize-bot::after { margin-top: 3px; }
     .cb-resize-top:hover::after, .cb-resize-bot:hover::after { background: rgba(255,255,255,0.5); }
 
-    /* Current-time indicator line */
+    /* Current-time indicator line — injected into #cal-body, spans all 7 day columns */
     .time-now-line {
       position: absolute;
-      left: 0; right: 0;
+      left: 48px; right: 0; /* 48px = time-label column width */
       height: 1px;
       background: #e05252;
-      z-index: 5;
+      z-index: 15;
       pointer-events: none;
     }
     .time-now-line::before {
       content: '';
       position: absolute;
-      left: -1px; top: -3px;
+      left: -7px; top: -3px;
       width: 7px; height: 7px;
       border-radius: 50%;
       background: #e05252;
@@ -2368,11 +2368,63 @@
       function positionNowLine() {
         const line = document.getElementById('time-now-line');
         if (!line) return;
-        const n = new Date();
-        const top = (n.getHours() - 6) * 34 + (n.getMinutes() / 60) * 34;
+        const n  = new Date();
+        const h  = n.getHours();
+        const hr = h < 6 ? h + 24 : h; // 00–05 = post-midnight (24–29)
+        const top = (hr - 6) * 34 + (n.getMinutes() / 60) * 34;
         if (top < 0 || top > 714) { line.style.display = 'none'; return; }
         line.style.display = 'block';
         line.style.top = top + 'px';
+      }
+
+      // Hours between two HH:MM times (handles midnight crossing)
+      function blockHours(bl) {
+        const [sh, sm] = bl.start.split(':').map(Number);
+        const [eh, em] = bl.end.split(':').map(Number);
+        const startMin = sh * 60 + sm;
+        let endMin = eh * 60 + em;
+        if (eh < 6) endMin += 24 * 60; // post-midnight end
+        return Math.max(0, (endMin - startMin) / 60);
+      }
+
+      // Human-readable duration string e.g. "6h" or "1h30m"
+      function durationStr(start, end) {
+        const h = blockHours({ start, end });
+        const hrs = Math.floor(h);
+        const mins = Math.round((h - hrs) * 60);
+        return mins > 0 ? `${hrs}h${mins}m` : `${hrs}h`;
+      }
+
+      // Recompute and update the "This week" stat cards from calBlocks
+      function updateStatCards() {
+        const wDates = getWeekDates();
+        const totals = { red: 0, blue: 0, green: 0 };
+
+        calBlocks.forEach(bl => {
+          const inWeek = bl.date ? wDates.includes(bl.date) : true; // recurring = every week
+          if (!inWeek || totals[bl.color] === undefined) return;
+          totals[bl.color] += blockHours(bl);
+        });
+
+        const fmt = h => {
+          const hrs = Math.floor(h); const mins = Math.round((h - hrs) * 60);
+          return mins > 0 ? `${hrs}h${mins}m` : `${hrs}h`;
+        };
+
+        const q = (sel) => document.querySelector(`#section-time-os ${sel}`);
+        const setHours = (sel, val) => { const el = q(sel); if (el) el.textContent = val; };
+
+        setHours('.stat-card.red   .sc-hours', fmt(totals.red));
+        setHours('.stat-card.blue  .sc-hours', fmt(totals.blue));
+        setHours('.stat-card.green .sc-hours', fmt(totals.green));
+
+        // Free time: 7 days × 18 waking hours minus committed
+        const committed = totals.red + totals.blue + totals.green;
+        setHours('.stat-card.muted .sc-hours', Math.round(Math.max(0, 7 * 18 - committed)) + 'h');
+
+        // Update sub labels
+        const redSub = q('.stat-card.red .sc-sub');
+        if (redSub) redSub.textContent = totals.red > 0 ? 'This week' : 'No shifts this week';
       }
 
       function renderCalendar() {
@@ -2422,7 +2474,7 @@
             html += `<div class="tb cal-block" style="top:${top}px;height:${ht}px;background:${c.bg};border-left:${bdr}" data-id="${bl.id}">
               <div class="cb-resize-top" data-id="${bl.id}"></div>
               <span class="tb-label" style="color:${c.tx}">${bl.label}</span>
-              ${showTime ? `<span class="tb-time">${bl.start}–${bl.end}</span>` : ''}
+              ${showTime ? `<span class="tb-time">${bl.start}–${bl.end} (${durationStr(bl.start, bl.end)})</span>` : ''}
               ${bl.note  ? `<span class="tb-note">${bl.note}</span>` : ''}
               <button class="cal-del-btn" data-id="${bl.id}">×</button>
               <div class="cb-resize-bot" data-id="${bl.id}"></div>
@@ -2434,18 +2486,16 @@
 
         body.innerHTML = html;
 
-        // Inject current-time line into today's column
-        const todayColIdx = weekDates.indexOf(todayStr);
-        if (todayColIdx !== -1) {
-          const todayCol = body.querySelector(`#dc-${todayColIdx}`);
-          if (todayCol) {
-            const nl = document.createElement('div');
-            nl.className = 'time-now-line';
-            nl.id = 'time-now-line';
-            todayCol.appendChild(nl);
-          }
+        // Inject time-now-line into body so it spans all 7 day columns
+        body.style.position = 'relative';
+        if (weekDates.includes(todayStr)) {
+          const nl = document.createElement('div');
+          nl.className = 'time-now-line';
+          nl.id = 'time-now-line';
+          body.appendChild(nl);
         }
         positionNowLine();
+        updateStatCards();
 
         // Delete handlers
         body.querySelectorAll('.cal-del-btn').forEach(btn => {
