@@ -1531,6 +1531,162 @@
 
     .lg-form.open { display: flex; }
 
+    /* ══════════════════════════════
+       LIFE OS
+    ══════════════════════════════ */
+    .los-tabs {
+      display: flex; gap: 3px;
+      background: #111; border: 1px solid #1e1e1e; border-radius: 8px;
+      padding: 4px; margin-bottom: 20px;
+    }
+    .los-tab {
+      flex: 1; padding: 7px 0; border-radius: 5px; border: none;
+      background: transparent; color: #444; font-family: 'Inter', sans-serif;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; cursor: pointer; transition: background 0.15s, color 0.15s;
+    }
+    .los-tab:hover { color: #888; }
+    .los-tab.active { background: #1e1e1e; color: #e0e0e0; }
+
+    .los-pane { display: none; flex-direction: column; }
+    .los-pane.active { display: flex; }
+
+    .los-card {
+      background: #111; border: 1px solid #1e1e1e;
+      border-radius: 10px; padding: 16px;
+    }
+    .los-card-title {
+      font-size: 10px; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; color: #555; margin-bottom: 12px;
+    }
+    .los-header {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 16px;
+    }
+    .los-month-label { font-size: 18px; font-weight: 600; color: #ccc; }
+
+    /* GIFD */
+    .gifd-entry {
+      background: #111; border: 1px solid #1e1e1e; border-radius: 10px;
+      padding: 13px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 10px;
+    }
+    .gifd-entry-header { display: flex; align-items: center; gap: 8px; }
+    .gifd-date { font-size: 11px; font-weight: 500; color: #777; flex-shrink: 0; }
+    .gifd-desc {
+      flex: 1; background: #0d0d0d; border: 1px solid #1a1a1a; border-radius: 4px;
+      color: #bbb; font-family: 'Inter', sans-serif; font-size: 12px;
+      padding: 5px 8px; outline: none; transition: border-color 0.15s;
+    }
+    .gifd-desc:focus { border-color: #333; }
+    .gifd-desc::placeholder { color: #2e2e2e; }
+    .gifd-del {
+      width: 18px; height: 18px; border: none; background: transparent;
+      color: #2e2e2e; font-size: 14px; cursor: pointer; border-radius: 3px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      transition: color 0.12s, background 0.12s;
+    }
+    .gifd-del:hover { color: #c94f4f; background: rgba(201,79,79,0.08); }
+    .gifd-chip-group-label {
+      font-size: 9px; font-weight: 600; letter-spacing: 0.07em;
+      text-transform: uppercase; color: #2e2e2e; margin-bottom: 5px;
+    }
+    .gifd-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+    .gifd-chip {
+      padding: 4px 10px; border-radius: 20px; border: 1px solid #1e1e1e;
+      background: transparent; font-family: 'Inter', sans-serif; font-size: 11px;
+      cursor: pointer; transition: all 0.15s; color: #555; user-select: none;
+    }
+    .gifd-chip.bad.active  { color: #c94f4f; border-color: #c94f4f; background: rgba(201,79,79,0.12); }
+    .gifd-chip.good.active { color: #4daa7d; border-color: #4daa7d; background: rgba(77,170,125,0.12); }
+    .gifd-score-row { display: flex; align-items: center; gap: 12px; }
+    .gifd-score { font-size: 22px; font-weight: 700; min-width: 44px; font-variant-numeric: tabular-nums; }
+    .gifd-score.pos { color: #4daa7d; } .gifd-score.neg { color: #c94f4f; } .gifd-score.zero { color: #555; }
+    .gifd-happy-btns { display: flex; gap: 5px; }
+    .gifd-happy-btn {
+      padding: 4px 9px; border-radius: 20px; border: 1px solid #1e1e1e;
+      background: transparent; font-family: 'Inter', sans-serif; font-size: 11px;
+      cursor: pointer; color: #444; transition: all 0.15s;
+    }
+    .gifd-happy-btn.sad.active   { color: #c94f4f; border-color: #c94f4f; background: rgba(201,79,79,0.1); }
+    .gifd-happy-btn.mild.active  { color: #c9a032; border-color: #c9a032; background: rgba(201,160,50,0.1); }
+    .gifd-happy-btn.happy.active { color: #4daa7d; border-color: #4daa7d; background: rgba(77,170,125,0.1); }
+
+    /* Skills */
+    .los-xp-bars { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-bottom: 4px; }
+    .los-xp-card { background: #111; border: 1px solid #1e1e1e; border-radius: 10px; padding: 14px; }
+    .los-xp-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+    .los-xp-label { font-size: 11px; font-weight: 700; letter-spacing: 0.05em; color: #bbb; }
+    .los-xp-val   { font-size: 10px; color: #444; font-variant-numeric: tabular-nums; }
+    .los-xp-track { height: 4px; background: #1a1a1a; border-radius: 2px; overflow: hidden; }
+    .los-xp-fill  { height: 4px; border-radius: 2px; transition: width 0.4s ease; min-width: 2px; }
+    .los-slider-row { display: flex; flex-direction: column; gap: 4px; }
+    .sk-session-item { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-top: 1px solid #151515; font-size: 12px; }
+    .sk-session-item:first-child { border-top: none; }
+    .sk-si-date  { color: #555; width: 68px; flex-shrink: 0; }
+    .sk-si-skill { font-weight: 600; color: #888; width: 44px; flex-shrink: 0; }
+    .sk-si-deta  { font-size: 10px; color: #333; flex: 1; }
+    .sk-si-xp    { color: #4daa7d; font-weight: 600; }
+
+    /* Radar debuffs */
+    .debuff-card {
+      background: rgba(201,79,79,0.07); border: 1px solid rgba(201,79,79,0.22);
+      border-radius: 8px; padding: 12px; margin-bottom: 8px;
+      display: flex; align-items: flex-start; gap: 10px;
+    }
+    .debuff-card.resolved { opacity: 0.35; background: #111; border-color: #1e1e1e; }
+    .debuff-name { font-size: 13px; font-weight: 600; color: #c94f4f; margin-bottom: 3px; }
+    .debuff-card.resolved .debuff-name { color: #444; text-decoration: line-through; }
+    .debuff-desc { font-size: 11px; color: #555; line-height: 1.45; }
+    .debuff-resolve-btn {
+      margin-left: auto; padding: 4px 10px; border-radius: 4px;
+      border: 1px solid rgba(201,79,79,0.3); background: transparent; color: #c94f4f;
+      font-family: 'Inter', sans-serif; font-size: 10px; cursor: pointer;
+      white-space: nowrap; flex-shrink: 0; transition: all 0.15s;
+    }
+    .debuff-resolve-btn:hover { background: rgba(201,79,79,0.1); }
+    .radar-snap-item { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-top: 1px solid #151515; font-size: 11px; }
+    .radar-snap-item:first-child { border-top: none; }
+    .rsi-date  { color: #555; } .rsi-stats { color: #333; font-size: 10px; }
+
+    /* Mana / Streaks */
+    .los-circles { display: flex; gap: 6px; flex-wrap: wrap; }
+    .los-circle {
+      width: 30px; height: 30px; border-radius: 50%;
+      border: 1px solid #2a2a2a; background: transparent;
+      font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      color: #2e2e2e; transition: all 0.15s; font-family: 'Inter', sans-serif; font-weight: 600;
+    }
+    .los-circle.filled { background: #4daa7d; border-color: #4daa7d; color: #0a0a0a; }
+    .los-circle.broken { background: #c94f4f; border-color: #c94f4f; color: #fff; }
+    .los-circle:hover  { border-color: #555; }
+    .los-streak-count  { font-size: 22px; font-weight: 700; color: #4daa7d; }
+    .mana-log-item { display: flex; align-items: center; gap: 12px; padding: 7px 0; border-top: 1px solid #151515; font-size: 12px; }
+    .mana-log-item:first-child { border-top: none; }
+    .mli-hour { color: #555; width: 44px; flex-shrink: 0; }
+    .mli-bar  { flex: 1; height: 4px; background: #1a1a1a; border-radius: 2px; overflow: hidden; }
+    .mli-fill { height: 4px; border-radius: 2px; background: #9b7ac9; }
+    .mli-val  { color: #666; width: 28px; text-align: right; font-variant-numeric: tabular-nums; }
+
+    /* Codex */
+    .codex-item { border-bottom: 1px solid #1a1a1a; }
+    .codex-item:last-child { border-bottom: none; }
+    .codex-header { display: flex; align-items: flex-start; gap: 10px; padding: 11px 0; cursor: pointer; user-select: none; }
+    .codex-num { font-size: 10px; font-weight: 700; color: #2e2e2e; width: 22px; flex-shrink: 0; padding-top: 1px; }
+    .codex-title { flex: 1; font-size: 12px; font-weight: 500; color: #888; line-height: 1.4; }
+    .codex-arrow { font-size: 8px; color: #2e2e2e; transition: transform 0.2s; flex-shrink: 0; padding-top: 3px; }
+    .codex-item.open .codex-arrow { transform: rotate(90deg); }
+    .codex-body { display: none; padding: 0 0 12px 32px; font-size: 12px; color: #555; line-height: 1.6; }
+    .codex-item.open .codex-body { display: block; }
+    .codex-custom .codex-title { color: #4f7ec9; }
+    .codex-custom .codex-num   { color: #4f7ec9; }
+
+    /* School exam badge */
+    .assign-exam-badge {
+      display: inline-flex; padding: 2px 7px; border-radius: 4px;
+      font-size: 9px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+      background: rgba(150,110,201,0.15); color: #9b7ac9; flex-shrink: 0;
+    }
+
     /* ═══════════════════════════════
        CALENDAR — dynamic blocks + controls
     ═══════════════════════════════ */
@@ -1735,6 +1891,9 @@
       </div>
       <div class="nav-item" data-section="movement">
         <span class="nav-dot"></span>Movement
+      </div>
+      <div class="nav-item" data-section="life-os">
+        <span class="nav-dot"></span>Life OS
       </div>
       <div class="nav-item" data-section="school">
         <span class="nav-dot"></span>School
@@ -1946,6 +2105,181 @@
             </thead>
             <tbody id="habits-body"></tbody>
           </table>
+        </div>
+
+      </div>
+
+      <!-- ══ LIFE OS ══ -->
+      <div id="section-life-os" class="section">
+
+        <div class="los-tabs">
+          <button class="los-tab active" data-los-tab="gifd">GIFD</button>
+          <button class="los-tab" data-los-tab="skills">Skills</button>
+          <button class="los-tab" data-los-tab="radar">Radar</button>
+          <button class="los-tab" data-los-tab="mana">Mana</button>
+          <button class="los-tab" data-los-tab="codex">Codex</button>
+        </div>
+
+        <!-- ── TAB 1: GIFD ── -->
+        <div class="los-pane active" id="los-gifd">
+          <div class="los-header">
+            <span class="los-month-label" id="gifd-month-label"></span>
+            <div style="display:flex;gap:8px;align-items:center">
+              <select class="form-select" id="gifd-archive-select" style="font-size:11px;padding:5px 9px;width:auto">
+                <option value="">Past months…</option>
+              </select>
+              <button class="add-assign-btn" id="gifd-new-btn">+ New Day Entry</button>
+            </div>
+          </div>
+          <div id="gifd-entries"></div>
+          <div class="los-card" style="margin-top:16px">
+            <div class="los-card-title">GIFD Score — This Month</div>
+            <div style="height:180px;position:relative"><canvas id="gifd-score-chart"></canvas></div>
+          </div>
+          <div class="los-card" style="margin-top:10px">
+            <div class="los-card-title">Happiness</div>
+            <div style="height:110px;position:relative"><canvas id="gifd-happy-chart"></canvas></div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;margin-top:14px">
+            <button class="add-assign-btn" id="gifd-close-month">Close Month &amp; Archive</button>
+          </div>
+        </div>
+
+        <!-- ── TAB 2: Skills ── -->
+        <div class="los-pane" id="los-skills">
+          <div class="los-xp-bars" id="skills-xp-bars"></div>
+          <div class="los-card" style="margin-top:12px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+              <span class="los-card-title" style="margin-bottom:0">Session Log</span>
+              <button class="add-assign-btn" id="skills-log-btn">+ Log session</button>
+            </div>
+            <div class="add-assign-form" id="skills-form" style="border-top:none;padding:0">
+              <div class="form-row">
+                <div class="form-field">
+                  <label class="form-label">Date</label>
+                  <input type="date" class="form-input" id="sk-date">
+                </div>
+                <div class="form-field">
+                  <label class="form-label">Skill</label>
+                  <select class="form-select" id="sk-skill">
+                    <option value="SOC">SOC — Social</option>
+                    <option value="STR">STR — Strength</option>
+                    <option value="WOK">WOK — Work</option>
+                    <option value="INT">INT/WIS — Intelligence</option>
+                  </select>
+                </div>
+              </div>
+              <div class="los-slider-row">
+                <label class="form-label">D — Effort &nbsp;<span id="sk-d-val" style="color:#4daa7d">0</span></label>
+                <input type="range" min="0" max="5" value="0" class="goal-progress" id="sk-d">
+              </div>
+              <div class="los-slider-row">
+                <label class="form-label">I — Discomfort &nbsp;<span id="sk-i-val" style="color:#4f7ec9">0</span></label>
+                <input type="range" min="0" max="5" value="0" class="goal-progress" id="sk-i">
+              </div>
+              <div class="los-slider-row">
+                <label class="form-label">C — Completion &nbsp;<span id="sk-c-val" style="color:#c9a032">0</span></label>
+                <input type="range" min="0" max="5" value="0" class="goal-progress" id="sk-c">
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">
+                <span style="font-size:12px;color:#666">Total XP: <strong id="sk-total" style="color:#e0e0e0">0</strong></span>
+                <button class="form-submit" id="sk-save">Log</button>
+              </div>
+            </div>
+          </div>
+          <div class="los-card" style="margin-top:10px">
+            <div class="los-card-title">History</div>
+            <div id="skills-history"></div>
+          </div>
+        </div>
+
+        <!-- ── TAB 3: Radar ── -->
+        <div class="los-pane" id="los-radar">
+          <div class="los-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+              <span class="los-card-title" style="margin-bottom:0">Life Stats Radar</span>
+              <button class="add-assign-btn" id="radar-update-btn">Update Stats</button>
+            </div>
+            <div style="height:280px;position:relative"><canvas id="radar-chart"></canvas></div>
+            <div style="font-size:10px;color:#2e2e2e;margin-top:8px;text-align:right" id="radar-date-stamp"></div>
+          </div>
+          <div class="los-card" id="radar-form-card" style="margin-top:10px;display:none">
+            <div class="los-card-title">Update Stats</div>
+            <div id="radar-sliders"></div>
+            <div style="display:flex;justify-content:flex-end;margin-top:10px">
+              <button class="form-submit" id="radar-save">Save Snapshot</button>
+            </div>
+          </div>
+          <div class="los-card" style="margin-top:10px">
+            <div class="los-card-title">Recent Snapshots</div>
+            <div id="radar-history"></div>
+          </div>
+          <div class="los-card" style="margin-top:10px">
+            <div class="los-card-title">⚠ Current Debuffs</div>
+            <div id="debuff-cards"></div>
+          </div>
+        </div>
+
+        <!-- ── TAB 4: Mana ── -->
+        <div class="los-pane" id="los-mana">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+            <div class="los-card">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+                <span class="los-card-title" style="margin-bottom:0">🧹 Cleanse Streak</span>
+                <span class="los-streak-count" id="cleanse-count">0</span>
+              </div>
+              <div class="los-circles" id="cleanse-circles"></div>
+            </div>
+            <div class="los-card">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+                <span class="los-card-title" style="margin-bottom:0">📲 Post Streak</span>
+                <span class="los-streak-count" id="post-count">0</span>
+              </div>
+              <div class="los-circles" id="post-circles"></div>
+            </div>
+          </div>
+          <div class="los-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+              <span class="los-card-title" style="margin-bottom:0">Mana — Today</span>
+              <button class="add-assign-btn" id="mana-log-btn">+ Log Mana</button>
+            </div>
+            <div class="add-assign-form" id="mana-form" style="border-top:none;padding:0 0 12px">
+              <div class="form-row">
+                <div class="form-field">
+                  <label class="form-label">Hour (0–23)</label>
+                  <input type="number" class="form-input" id="mana-hour" min="0" max="23" placeholder="e.g. 14">
+                </div>
+                <div class="form-field">
+                  <label class="form-label">Energy (0–10)</label>
+                  <input type="number" class="form-input" id="mana-energy" min="0" max="10" placeholder="0–10">
+                </div>
+              </div>
+              <button class="form-submit" id="mana-save">Log</button>
+            </div>
+            <div style="height:200px;position:relative"><canvas id="mana-chart"></canvas></div>
+          </div>
+          <div class="los-card" style="margin-top:10px">
+            <div class="los-card-title">Today's Log</div>
+            <div id="mana-log-list"></div>
+          </div>
+        </div>
+
+        <!-- ── TAB 5: Codex ── -->
+        <div class="los-pane" id="los-codex">
+          <div class="los-card">
+            <div class="los-card-title">Life Gamified — Codex</div>
+            <div id="codex-rules"></div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;margin-top:12px;justify-content:flex-end">
+            <button class="add-assign-btn" id="codex-add-btn">+ Add Rule</button>
+          </div>
+          <div class="add-assign-form" id="codex-form" style="margin-top:8px;border-top:none;padding:0">
+            <div class="form-field">
+              <label class="form-label">Custom Rule</label>
+              <input type="text" class="form-input" id="codex-input" placeholder="Write your own rule…">
+            </div>
+            <button class="form-submit" id="codex-save">Add to Codex</button>
+          </div>
         </div>
 
       </div>
@@ -2834,30 +3168,15 @@
        SCHOOL
     ══════════════════════════════ */
     (function () {
-      const LS_KEY = 'leon-school-assignments';
+      const LS_KEY = 'leon-school-v2';
 
       const DEFAULTS = [
-        {
-          id: 'def1',
-          subject: 'Investigación de Mercados',
-          title: 'Análisis competitivo — Sector Moda',
-          due: '2026-05-19',
-          status: 'not-started'
-        },
-        {
-          id: 'def2',
-          subject: 'Gestión de Medios Digitales',
-          title: 'Campaña en RRSS — Caso práctico',
-          due: '2026-05-21',
-          status: 'in-progress'
-        },
-        {
-          id: 'def3',
-          subject: 'Comunicación Publicitaria',
-          title: 'Brief creativo: lanzamiento de producto',
-          due: '2026-05-30',
-          status: 'not-started'
-        }
+        { id:'def1', subject:'Inma Cabrera',      title:'Diseño y elaboración de material de comunicación', due:'2026-05-18', status:'in-progress' },
+        { id:'def2', subject:'Relaciones Públicas', title:'EJERCICIO CONGRESO',                              due:'2026-05-18', status:'not-started' },
+        { id:'def3', subject:'Digitalización',     title:'ACTIVIDAD PACKAGING',                             due:'2026-05-20', status:'not-started' },
+        { id:'def4', subject:'Digitalización',     title:'FIDELIZACIÓN',                                    due:'2026-05-20', status:'not-started' },
+        { id:'def5', subject:'Inglés (Dafne)',     title:'Written exam 2 — Upper Intermediate',             due:'2026-06-01', status:'not-started', type:'exam' },
+        { id:'def6', subject:'Inglés (Dafne)',     title:'Listening test 4 — Upper Intermediate',           due:'2026-06-01', status:'not-started', type:'exam' },
       ];
 
       let assignments;
@@ -2935,6 +3254,7 @@
 
           card.innerHTML = `
             <span class="assign-subject" style="background:${col.bg};color:${col.fg}">${a.subject}</span>
+            ${a.type==='exam'?'<span class="assign-exam-badge">EXAM</span>':''}
             <span class="assign-title">${a.title}</span>
             <span class="assign-due">${fmtDue(a.due)}</span>
             <select class="assign-status-sel" data-id="${a.id}">${opts}</select>`;
@@ -3454,6 +3774,421 @@
         if (sec.classList.contains('active')) { inited = true; render(); }
       }
     })();
+
+    /* Life OS IIFE follows directly — */
+    /* ══════════════════════════════
+       LIFE OS
+    ══════════════════════════════ */
+    (function () {
+      /* shared utils */
+      const lDate = d => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+      function loadChartLOS(cb) {
+        if (window.Chart) { cb(); return; }
+        const s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
+        s.onload = cb; document.head.appendChild(s);
+      }
+
+      /* ── Tab switching ── */
+      function initTabs() {
+        document.querySelectorAll('.los-tab').forEach(tab => {
+          tab.addEventListener('click', () => {
+            document.querySelectorAll('.los-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.los-pane').forEach(p => p.classList.remove('active'));
+            tab.classList.add('active');
+            const pane = document.getElementById(`los-${tab.dataset.losTab}`);
+            if (pane) pane.classList.add('active');
+            if (tab.dataset.losTab === 'radar') initRadarChart();
+            if (tab.dataset.losTab === 'mana')  initManaChart();
+            if (tab.dataset.losTab === 'gifd')  renderGIFDCharts();
+          });
+        });
+      }
+
+      /* ════ GIFD ════ */
+      const LS_GIFD = 'los-gifd-current';
+      let gifdEntries = [];
+      function loadGIFD() { try { gifdEntries = JSON.parse(localStorage.getItem(LS_GIFD)||'[]'); } catch(_){ gifdEntries=[]; } }
+      function saveGIFD() { try { localStorage.setItem(LS_GIFD, JSON.stringify(gifdEntries)); } catch(_){} }
+
+      const BAD_CHIPS  = [['weed','Weed'],['porn','Porn'],['scroll','Scroll +1h'],['junk','Junk food']];
+      const GOOD_CHIPS = [['posted','Posted @2.chicos'],['trained','Trained'],['meditate','Meditated'],['slept','Slept on schedule'],['read','Read +10 pages']];
+
+      function calcScore(e) {
+        return Object.values(e.good||{}).filter(Boolean).length - Object.values(e.bad||{}).filter(Boolean).length;
+      }
+
+      function renderGIFDEntries() {
+        const el = document.getElementById('gifd-entries'); if (!el) return;
+        el.innerHTML = '';
+        if (!gifdEntries.length) {
+          el.innerHTML = '<div style="font-size:12px;color:#2e2e2e;padding:12px 0;text-align:center">No entries yet. Hit + New Day Entry.</div>';
+          return;
+        }
+        [...gifdEntries].sort((a,b)=>b.date<a.date?-1:1).forEach(entry => {
+          const sc = calcScore(entry);
+          const div = document.createElement('div'); div.className = 'gifd-entry';
+          div.innerHTML = `
+            <div class="gifd-entry-header">
+              <span class="gifd-date">${entry.date}</span>
+              <input class="gifd-desc" value="${(entry.desc||'').replace(/"/g,'&quot;')}" placeholder="What happened today…" data-id="${entry.id}">
+              <button class="gifd-del" data-id="${entry.id}">×</button>
+            </div>
+            <div><div class="gifd-chip-group-label">Bad (−1 each)</div><div class="gifd-chips">
+              ${BAD_CHIPS.map(([k,l])=>`<button class="gifd-chip bad${entry.bad[k]?' active':''}" data-id="${entry.id}" data-g="bad" data-k="${k}">${l}</button>`).join('')}
+            </div></div>
+            <div><div class="gifd-chip-group-label">Good (+1 each)</div><div class="gifd-chips">
+              ${GOOD_CHIPS.map(([k,l])=>`<button class="gifd-chip good${entry.good[k]?' active':''}" data-id="${entry.id}" data-g="good" data-k="${k}">${l}</button>`).join('')}
+            </div></div>
+            <div class="gifd-score-row">
+              <span class="gifd-score ${sc>0?'pos':sc<0?'neg':'zero'}">${sc>0?'+'+sc:sc}</span>
+              <div class="gifd-happy-btns">
+                ${[['sad','😞 Sad',1],['mild','😐 Mild',2],['happy','😊 Happy',3]].map(([c,l,v])=>
+                  `<button class="gifd-happy-btn ${c}${entry.happiness===v?' active':''}" data-id="${entry.id}" data-v="${v}">${l}</button>`).join('')}
+              </div>
+            </div>`;
+          el.appendChild(div);
+        });
+        el.querySelectorAll('.gifd-chip').forEach(b => b.addEventListener('click', () => {
+          const e = gifdEntries.find(x=>x.id===b.dataset.id); if (!e) return;
+          e[b.dataset.g][b.dataset.k] = !e[b.dataset.g][b.dataset.k];
+          saveGIFD(); renderGIFDEntries(); renderGIFDCharts();
+        }));
+        el.querySelectorAll('.gifd-desc').forEach(i => i.addEventListener('blur', () => {
+          const e = gifdEntries.find(x=>x.id===i.dataset.id); if (e) { e.desc=i.value; saveGIFD(); }
+        }));
+        el.querySelectorAll('.gifd-del').forEach(b => b.addEventListener('click', () => {
+          gifdEntries=gifdEntries.filter(e=>e.id!==b.dataset.id); saveGIFD(); renderGIFDEntries(); renderGIFDCharts();
+        }));
+        el.querySelectorAll('.gifd-happy-btn').forEach(b => b.addEventListener('click', () => {
+          const e=gifdEntries.find(x=>x.id===b.dataset.id); if(e){e.happiness=+b.dataset.v; saveGIFD(); renderGIFDEntries(); renderGIFDCharts();}
+        }));
+      }
+
+      let gScoreChart=null, gHappyChart=null;
+      function renderGIFDCharts() {
+        if (!window.Chart) return;
+        const sorted=[...gifdEntries].sort((a,b)=>a.date<b.date?-1:1);
+        const days=sorted.map(e=>e.date.slice(8));
+        const scores=sorted.map(calcScore);
+        const happy=sorted.map(e=>e.happiness||null);
+
+        const sc=document.getElementById('gifd-score-chart');
+        if(sc){if(gScoreChart){gScoreChart.destroy();gScoreChart=null;}
+          gScoreChart=new Chart(sc.getContext('2d'),{type:'line',data:{labels:days,datasets:[
+            {data:scores,borderColor:'#4f7ec9',borderWidth:1.5,pointRadius:3,pointBackgroundColor:'#4f7ec9',tension:0.3,
+             fill:{target:0,above:'rgba(77,170,125,0.15)',below:'rgba(201,79,79,0.15)'}},
+            {data:days.map(()=>0),borderColor:'rgba(255,255,255,0.08)',borderDash:[4,4],borderWidth:1,pointRadius:0}
+          ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+            scales:{x:{grid:{color:'#161616'},border:{color:'#1e1e1e'},ticks:{color:'#333',font:{size:9}}},
+                    y:{grid:{color:'#161616'},border:{color:'#1e1e1e'},ticks:{color:'#333',font:{size:9}}}}}}); }
+
+        const hc=document.getElementById('gifd-happy-chart');
+        if(hc){if(gHappyChart){gHappyChart.destroy();gHappyChart=null;}
+          gHappyChart=new Chart(hc.getContext('2d'),{type:'line',data:{labels:days,datasets:[
+            {data:happy,borderColor:'#9b7ac9',backgroundColor:'rgba(150,110,201,0.12)',borderWidth:1.5,
+             pointRadius:3,pointBackgroundColor:'#9b7ac9',stepped:'before',fill:true,spanGaps:false}
+          ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+            scales:{x:{grid:{color:'#161616'},border:{color:'#1e1e1e'},ticks:{color:'#333',font:{size:9}}},
+                    y:{grid:{color:'#161616'},border:{color:'#1e1e1e'},min:0,max:4,
+                       ticks:{color:'#333',font:{size:9},callback:v=>['','Sad','Mild','Happy'][v]||''}}}}});}
+      }
+
+      function populateGIFDArchive() {
+        const sel=document.getElementById('gifd-archive-select'); if(!sel) return;
+        const keys=[]; for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('los-gifd-archive-'))keys.push(k);}
+        sel.innerHTML='<option value="">Past months…</option>';
+        keys.sort().reverse().forEach(k=>{ sel.innerHTML+=`<option value="${k}">${k.replace('los-gifd-archive-','')}</option>`; });
+        sel.onchange=()=>{if(!sel.value)return;
+          try{const a=JSON.parse(localStorage.getItem(sel.value)||'[]');alert(`${sel.value}: ${a.length} entries archived.`);}catch(_){}
+          sel.value='';};
+      }
+
+      function initGIFD() {
+        loadGIFD();
+        const ml=document.getElementById('gifd-month-label');
+        if(ml) ml.textContent=new Date().toLocaleDateString('en-US',{month:'long',year:'numeric'});
+        document.getElementById('gifd-new-btn')?.addEventListener('click',()=>{
+          const badObj={},goodObj={};
+          BAD_CHIPS.forEach(([k])=>badObj[k]=false); GOOD_CHIPS.forEach(([k])=>goodObj[k]=false);
+          gifdEntries.unshift({id:Date.now().toString(),date:lDate(new Date()),desc:'',bad:badObj,good:goodObj,happiness:2});
+          saveGIFD(); renderGIFDEntries();
+        });
+        document.getElementById('gifd-close-month')?.addEventListener('click',()=>{
+          if(!gifdEntries.length) return;
+          const key=`los-gifd-archive-${new Date().toISOString().slice(0,7)}`;
+          try{localStorage.setItem(key,JSON.stringify(gifdEntries));}catch(_){}
+          gifdEntries=[]; saveGIFD(); renderGIFDEntries(); renderGIFDCharts(); populateGIFDArchive();
+        });
+        populateGIFDArchive(); renderGIFDEntries();
+      }
+
+      /* ════ SKILLS ════ */
+      const LS_SKILLS_XP='los-skills-xp', LS_SKILLS_HX='los-skills-history';
+      const SKILL_DEFS=[{key:'SOC',label:'SOC',sub:'Social',color:'#4f7ec9'},{key:'STR',label:'STR',sub:'Strength',color:'#c94f4f'},{key:'WOK',label:'WOK',sub:'Work',color:'#c9a032'},{key:'INT',label:'INT',sub:'Intelligence',color:'#9b7ac9'}];
+      function lsLoad(k){try{return JSON.parse(localStorage.getItem(k)||'null');}catch(_){return null;}}
+      function lsSave2(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(_){}}
+
+      function renderSkillsXP(){
+        const xp=lsLoad(LS_SKILLS_XP)||{};
+        const grid=document.getElementById('skills-xp-bars'); if(!grid) return; grid.innerHTML='';
+        SKILL_DEFS.forEach(def=>{
+          const pts=xp[def.key]||0,lv=Math.floor(pts/100)+1,pct=Math.min(100,pts%100);
+          const c=document.createElement('div'); c.className='los-xp-card';
+          c.innerHTML=`<div class="los-xp-header"><span class="los-xp-label">${def.label} <span style="font-size:9px;color:#333">Lv${lv}</span></span><span class="los-xp-val">${pts} XP</span></div>
+            <div style="font-size:9px;color:#2e2e2e;margin-bottom:6px">${def.sub}</div>
+            <div class="los-xp-track"><div class="los-xp-fill" style="width:${pct}%;background:${def.color}"></div></div>`;
+          grid.appendChild(c);
+        });
+      }
+
+      function renderSkillsHistory(){
+        const hx=lsLoad(LS_SKILLS_HX)||[];
+        const el=document.getElementById('skills-history'); if(!el) return;
+        el.innerHTML=!hx.length?'<div style="font-size:12px;color:#2e2e2e;padding:8px 0">No sessions yet.</div>':'';
+        [...hx].reverse().slice(0,20).forEach(s=>{
+          el.innerHTML+=`<div class="sk-session-item"><span class="sk-si-date">${s.date}</span><span class="sk-si-skill">${s.skill}</span><span class="sk-si-deta">D${s.d} I${s.i} C${s.c}</span><span class="sk-si-xp">+${s.d+s.i+s.c}XP</span></div>`;
+        });
+      }
+
+      function initSkills(){
+        renderSkillsXP(); renderSkillsHistory();
+        const dateEl=document.getElementById('sk-date'); if(dateEl) dateEl.value=lDate(new Date());
+        document.getElementById('skills-log-btn')?.addEventListener('click',()=>document.getElementById('skills-form')?.classList.toggle('open'));
+        ['sk-d','sk-i','sk-c'].forEach((id,ci)=>{
+          const sl=document.getElementById(id); if(!sl) return;
+          const colors=['#4daa7d','#4f7ec9','#c9a032'];
+          const upd=()=>{
+            document.getElementById(`${id}-val`).textContent=sl.value;
+            const pct=(+sl.value/5)*100;
+            sl.style.background=`linear-gradient(to right,${colors[ci]} 0%,${colors[ci]} ${pct}%,#1e1e1e ${pct}%)`;
+            document.getElementById('sk-total').textContent=[+document.getElementById('sk-d').value,+document.getElementById('sk-i').value,+document.getElementById('sk-c').value].reduce((a,b)=>a+b,0);
+          };
+          sl.addEventListener('input',upd);
+        });
+        document.getElementById('sk-save')?.addEventListener('click',()=>{
+          const date=document.getElementById('sk-date').value, skill=document.getElementById('sk-skill').value;
+          const d=+document.getElementById('sk-d').value, i=+document.getElementById('sk-i').value, c=+document.getElementById('sk-c').value;
+          if(!date) return;
+          const xp=lsLoad(LS_SKILLS_XP)||{}; xp[skill]=(xp[skill]||0)+d+i+c; lsSave2(LS_SKILLS_XP,xp);
+          const hx=lsLoad(LS_SKILLS_HX)||[]; hx.push({date,skill,d,i,c}); lsSave2(LS_SKILLS_HX,hx);
+          renderSkillsXP(); renderSkillsHistory();
+          ['sk-d','sk-i','sk-c'].forEach(id=>{document.getElementById(id).value=0;document.getElementById(`${id}-val`).textContent=0;});
+          document.getElementById('sk-total').textContent=0;
+          document.getElementById('skills-form').classList.remove('open');
+        });
+      }
+
+      /* ════ RADAR ════ */
+      const LS_RADAR='los-radar-snapshots', LS_DEBUFFS='los-radar-debuffs';
+      const R_AXES=['INT/WIS','CHA','STR','DEX','LUK'], R_KEYS=['int','cha','str','dex','luk'];
+      const R_DEF={int:7,cha:6,str:7,dex:4,luk:3};
+      let radarChart=null;
+
+      function loadSnaps(){const v=lsLoad(LS_RADAR)||[];return v.length?v:[{date:lDate(new Date()),stats:{...R_DEF}}];}
+      function saveSnaps(s){lsSave2(LS_RADAR,s);}
+
+      const DEF_DEBUFFS=[
+        {id:'d1',name:'Clouded Mind',desc:'Waking late + weed = massive mana leak. Start day at 20% Mana.',resolved:false},
+        {id:'d2',name:'Creator Quest Ghost',desc:'Abandoned creator quest creates Incomplete Quest debuff, lowers resolve.',resolved:false},
+        {id:'d3',name:'Dark Cloud',desc:'High stats but zero current Main Quest. Feeling over-leveled with nothing to aim at.',resolved:false},
+      ];
+      function getDebuffs(){const s=lsLoad(LS_DEBUFFS);return s&&s.length?s:DEF_DEBUFFS.map(d=>({...d}));}
+
+      function renderDebuffs(){
+        const el=document.getElementById('debuff-cards'); if(!el) return;
+        const debuffs=getDebuffs(); el.innerHTML='';
+        debuffs.forEach(df=>{
+          const c=document.createElement('div'); c.className=`debuff-card${df.resolved?' resolved':''}`;
+          c.innerHTML=`<div style="flex:1"><div class="debuff-name">${df.name}</div><div class="debuff-desc">${df.desc}</div></div>
+            <button class="debuff-resolve-btn" data-id="${df.id}"${df.resolved?' style="color:#333;border-color:#222"':''}>${df.resolved?'Resolved':'Remove Debuff'}</button>`;
+          el.appendChild(c);
+        });
+        el.querySelectorAll('.debuff-resolve-btn').forEach(b=>b.addEventListener('click',()=>{
+          const d2=getDebuffs(),d=d2.find(x=>x.id===b.dataset.id);
+          if(d){d.resolved=!d.resolved;lsSave2(LS_DEBUFFS,d2);renderDebuffs();}
+        }));
+      }
+
+      function initRadarChart(){
+        if(!window.Chart){loadChartLOS(initRadarChart);return;}
+        const snaps=loadSnaps(),latest=snaps[snaps.length-1];
+        const canvas=document.getElementById('radar-chart'); if(!canvas) return;
+        if(radarChart){radarChart.destroy();radarChart=null;}
+        radarChart=new Chart(canvas.getContext('2d'),{type:'radar',data:{labels:R_AXES,datasets:[{
+          data:R_KEYS.map(k=>latest.stats[k]||0),backgroundColor:'rgba(79,126,201,0.25)',
+          borderColor:'#4f7ec9',borderWidth:1.5,pointRadius:3,pointBackgroundColor:'#4f7ec9'
+        }]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+          scales:{r:{min:0,max:10,ticks:{display:false},grid:{color:'#1e1e1e'},angleLines:{color:'#1e1e1e'},
+                    pointLabels:{color:'#666',font:{family:'Inter',size:11}}}}}});
+        const st=document.getElementById('radar-date-stamp');if(st)st.textContent='Last updated: '+latest.date;
+        const hel=document.getElementById('radar-history');if(hel){
+          hel.innerHTML=loadSnaps().slice(-3).reverse().map(s=>
+            `<div class="radar-snap-item"><span class="rsi-date">${s.date}</span><span class="rsi-stats">${R_AXES.map((a,i)=>`${a}:${s.stats[R_KEYS[i]]}`).join(' · ')}</span></div>`).join('');
+        }
+      }
+
+      function initRadar(){
+        const fc=document.getElementById('radar-form-card');
+        document.getElementById('radar-update-btn')?.addEventListener('click',()=>{
+          const open=fc.style.display==='none'||!fc.style.display; fc.style.display=open?'block':'none';
+          if(open){
+            const cur=loadSnaps().slice(-1)[0]?.stats||R_DEF;
+            document.getElementById('radar-sliders').innerHTML=R_KEYS.map((k,i)=>`
+              <div class="los-slider-row" style="margin-bottom:10px">
+                <label class="form-label">${R_AXES[i]} &nbsp;<span id="rsl-${k}" style="color:#4f7ec9">${cur[k]||0}</span></label>
+                <input type="range" min="0" max="10" value="${cur[k]||0}" class="goal-progress" id="rs-${k}"
+                  style="background:linear-gradient(to right,#4f7ec9 0%,#4f7ec9 ${(cur[k]||0)*10}%,#1e1e1e ${(cur[k]||0)*10}%)">
+              </div>`).join('');
+            R_KEYS.forEach(k=>{const sl=document.getElementById(`rs-${k}`);if(!sl)return;
+              sl.addEventListener('input',()=>{document.getElementById(`rsl-${k}`).textContent=sl.value;const p=+sl.value*10;sl.style.background=`linear-gradient(to right,#4f7ec9 0%,#4f7ec9 ${p}%,#1e1e1e ${p}%)`;});});
+          }
+        });
+        document.getElementById('radar-save')?.addEventListener('click',()=>{
+          const stats={};R_KEYS.forEach(k=>{stats[k]=+(document.getElementById(`rs-${k}`)?.value||0);});
+          const snaps=loadSnaps();snaps.push({date:lDate(new Date()),stats});saveSnaps(snaps);
+          fc.style.display='none';initRadarChart();
+        });
+        renderDebuffs();
+      }
+
+      /* ════ MANA ════ */
+      const LS_STREAKS='los-streaks';
+      let manaChart=null;
+      function getManaKey(){return 'los-mana-'+lDate(new Date());}
+      function loadManaToday(){return lsLoad(getManaKey())||[];}
+      function saveManaToday(l){lsSave2(getManaKey(),l);}
+
+      function initManaChart(){
+        if(!window.Chart){loadChartLOS(initManaChart);return;}
+        const canvas=document.getElementById('mana-chart');if(!canvas)return;
+        const pts=Array(25).fill(null);
+        loadManaToday().forEach(p=>{pts[p.hour]=p.energy;});
+        if(manaChart){manaChart.destroy();manaChart=null;}
+        manaChart=new Chart(canvas.getContext('2d'),{type:'line',data:{
+          labels:Array.from({length:25},(_,i)=>i+':00'),
+          datasets:[{data:pts,borderColor:'#9b7ac9',backgroundColor:'rgba(150,110,201,0.15)',
+            borderWidth:1.5,pointRadius:4,pointBackgroundColor:'#9b7ac9',tension:0.4,fill:true,spanGaps:false}]
+        },options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+          scales:{x:{grid:{color:'#161616'},border:{color:'#1e1e1e'},ticks:{color:'#333',font:{size:9},maxRotation:0,maxTicksLimit:12}},
+                  y:{grid:{color:'#161616'},border:{color:'#1e1e1e'},ticks:{color:'#333',font:{size:9}},min:0,max:10}}}});
+      }
+
+      function renderManaLog(){
+        const el=document.getElementById('mana-log-list');if(!el)return;
+        const log=loadManaToday();
+        el.innerHTML=!log.length?'<div style="font-size:12px;color:#2e2e2e;padding:8px 0">Nothing logged today.</div>':'';
+        log.sort((a,b)=>a.hour-b.hour).forEach(p=>{
+          el.innerHTML+=`<div class="mana-log-item"><span class="mli-hour">${String(p.hour).padStart(2,'0')}:00</span><div class="mli-bar"><div class="mli-fill" style="width:${p.energy*10}%"></div></div><span class="mli-val">${p.energy}/10</span></div>`;
+        });
+      }
+
+      function renderStreaks(){
+        const str=lsLoad(LS_STREAKS)||{};
+        const t=new Date(),d=t.getDay();
+        const mon=new Date(t);mon.setDate(t.getDate()+(d===0?1:1-d));mon.setHours(0,0,0,0);
+        const wDates=Array.from({length:7},(_,i)=>{const x=new Date(mon);x.setDate(mon.getDate()+i);return lDate(x);});
+        const todayStr=lDate(new Date());
+        ['cleanse','post'].forEach(type=>{
+          const el=document.getElementById(`${type}-circles`);if(!el)return; el.innerHTML='';
+          let consec=0;
+          wDates.forEach(date=>{
+            const state=str[`${type}-${date}`]||'empty';
+            const btn=document.createElement('button');btn.className=`los-circle${state==='filled'?' filled':state==='broken'?' broken':''}`;
+            const abbr=new Date(date+'T00:00:00').toLocaleDateString('en',{weekday:'short'}).slice(0,2);
+            btn.textContent=state==='broken'?'✕':state==='filled'?'✓':abbr;btn.title=date;
+            btn.addEventListener('click',()=>{
+              const cur=str[`${type}-${date}`]||'empty';
+              str[`${type}-${date}`]=cur==='empty'?'filled':cur==='filled'?'broken':'empty';
+              lsSave2(LS_STREAKS,str);renderStreaks();
+            });
+            el.appendChild(btn);
+          });
+          const ti=wDates.indexOf(todayStr);
+          for(let i=ti;i>=0;i--){if((str[`${type}-${wDates[i]}`]||'empty')==='filled')consec++;else break;}
+          const c=document.getElementById(`${type}-count`);if(c)c.textContent=consec;
+        });
+      }
+
+      function initMana(){
+        renderStreaks(); renderManaLog();
+        document.getElementById('mana-log-btn')?.addEventListener('click',()=>document.getElementById('mana-form')?.classList.toggle('open'));
+        document.getElementById('mana-save')?.addEventListener('click',()=>{
+          const h=+(document.getElementById('mana-hour')?.value);
+          const e=+(document.getElementById('mana-energy')?.value);
+          if(isNaN(h)||isNaN(e)||h<0||h>23||e<0||e>10)return;
+          const log=loadManaToday();const xi=log.findIndex(p=>p.hour===h);
+          if(xi!==-1)log[xi].energy=e;else log.push({hour:h,energy:e});
+          saveManaToday(log);
+          document.getElementById('mana-hour').value='';document.getElementById('mana-energy').value='';
+          document.getElementById('mana-form').classList.remove('open');
+          renderManaLog();initManaChart();
+        });
+      }
+
+      /* ════ CODEX ════ */
+      const LS_CODEX='los-codex-custom';
+      const CODEX=[
+        [1,"If you don't choose your main quest the system assigns the default: Study→9-5→Marriage→Mortgage→Retire at 70. Most people don't customise. You can."],
+        [2,"Random spawn point. Some people start with more resources or higher intelligence. It's RNG. Don't waste time complaining about your spawn."],
+        [3,"Base stats are locked with slight adjustments. Any build is viable but don't force a build that fights your natural fit."],
+        [4,"Customisable build. Base stats mostly fixed but your build isn't. Experiment and design your playstyle throughout the years."],
+        [5,"You level up through reps not talent. Ability is malleable. Grinding the boring stuff beats natural talent every time."],
+        [6,"Time is the most OP currency. Early XP compounds. Late grinding is harder and less forgiving."],
+        [7,"You can change classes mid-game. You're not locked into your first career, identity or role. Switching feels scary but staying costs more XP."],
+        [8,"Single player game with multiplayer modes. Guilds, partners and allies can massively boost your stats."],
+        [9,"Status items don't help you beat the game. Shiny gear looks good (+Aura) but often slows progression. Freedom builds quietly not visibly."],
+        [10,"You decide your win condition. Retire early. Build something meaningful. Do nothing. Go all in. The game doesn't judge, only you do."],
+        [11,"Rest mechanic is not optional. Skipping the save cycle leads to Burnout debuff which applies -X% multiplier on productivity and charisma stats."],
+        [12,"High tier loot is gated by cringe. Growth, success, love are hidden behind quests that are awkward or risky. If a quest makes you nervous the XP payout is greater."],
+        [13,"Environment is a passive buff. Your home base and guild provide stat modifiers. Toxic party = constant drain on mana. Clean base = +10 on focus."],
+        [14,"Staying in the starter base stops your XP gain. To level up you have to enter uncharted territory where mobs are tougher. Comfort is a level cap."],
+        [15,"Manage your inventory. You have limited slots for habits and commitments. Drop low-tier junk to make room for legendary opportunities."],
+        [16,"Difficulty scales with levels. You get better at the controls but level 40 requires a more refined strategy than level 20."],
+        [17,"You can't control your spawn but can influence the drop rate of good luck by increasing your surface area: meeting new people, sharing your work, staying curious."],
+        [18,"Failure is a reload with kept XP. Unless it's Game Over every failure is just a boss fight. Analyse the death recap then respawn and try again."],
+        [19,"Invisible UI. No on-screen health bar. You have to manually check your character sheet before your stats hit zero."],
+        [20,"Protect HP. No HP no game."],
+        [21,"Early game is beta. Use your first 25 levels to test different builds and biomes."],
+        [22,"Avoid gold sinks. Instant dopamine micro-transactions drain long-term XP."],
+      ];
+
+      function renderCodex(){
+        const el=document.getElementById('codex-rules');if(!el)return;
+        const custom=lsLoad(LS_CODEX)||[];
+        const all=[...CODEX,...custom.map((t,i)=>[23+i,t])];
+        el.innerHTML=all.map(([n,text])=>`<div class="codex-item${n>=23?' codex-custom':''}">
+          <div class="codex-header"><span class="codex-num">${String(n).padStart(2,'0')}</span>
+            <span class="codex-title">${text.split('.')[0]}.</span><span class="codex-arrow">▶</span></div>
+          <div class="codex-body">${text}</div></div>`).join('');
+        el.querySelectorAll('.codex-header').forEach(h=>h.addEventListener('click',()=>h.closest('.codex-item').classList.toggle('open')));
+      }
+
+      function initCodex(){
+        renderCodex();
+        document.getElementById('codex-add-btn')?.addEventListener('click',()=>document.getElementById('codex-form')?.classList.toggle('open'));
+        document.getElementById('codex-save')?.addEventListener('click',()=>{
+          const t=document.getElementById('codex-input')?.value.trim();if(!t)return;
+          const c=lsLoad(LS_CODEX)||[];c.push(t);lsSave2(LS_CODEX,c);renderCodex();
+          document.getElementById('codex-input').value='';document.getElementById('codex-form').classList.remove('open');
+        });
+      }
+
+      /* ── Init ── */
+      function initLOS(){
+        initTabs(); initGIFD(); initSkills(); initRadar(); initMana(); initCodex();
+        loadChartLOS(()=>{renderGIFDCharts();});
+      }
+
+      const losSec=document.getElementById('section-life-os');
+      let losInited=false;
+      if(losSec){
+        new MutationObserver(()=>{if(losSec.classList.contains('active')&&!losInited){losInited=true;initLOS();}})
+          .observe(losSec,{attributes:true,attributeFilter:['class']});
+        if(losSec.classList.contains('active')){losInited=true;initLOS();}
+      }
+
+    })(); /* end Life OS IIFE */
 
     /* ══════════════════════════════
        LIFE GOALS
