@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1879,6 +1879,97 @@
       background: #4f7ec9; margin-left: auto; flex-shrink: 0;
       box-shadow: 0 0 4px rgba(79,126,201,0.6);
     }
+
+    /* ════ MAP (Fog of War) ════ */
+    .map-stale-banner {
+      background: rgba(201,79,79,0.1);
+      border: 1px solid rgba(201,79,79,0.35);
+      border-radius: 6px;
+      padding: 8px 14px;
+      font-size: 11px;
+      color: #c94f4f;
+      margin-bottom: 10px;
+      display: none;
+      animation: mapStalePulse 2s ease-in-out infinite;
+    }
+    @keyframes mapStalePulse { 0%,100%{opacity:1} 50%{opacity:0.38} }
+    .map-canvas-wrap {
+      position: relative;
+      border-radius: 10px;
+      border: 1px solid #1e1e1e;
+      overflow: hidden;
+      background: #0a0a0a;
+      line-height: 0;
+    }
+    #fog-map-canvas { display: block; width: 100%; cursor: crosshair; }
+    .map-explore-btn {
+      position: absolute; top: 12px; right: 12px;
+      padding: 7px 14px; border-radius: 5px;
+      border: 1px solid #c8860a;
+      background: rgba(45,27,14,0.9);
+      color: #c8860a;
+      font-family: 'Press Start 2P', monospace; font-size: 9px;
+      cursor: pointer; z-index: 10;
+      backdrop-filter: blur(4px);
+      transition: background 0.15s;
+    }
+    .map-explore-btn:hover { background: rgba(45,27,14,1); color: #e8a020; }
+    .map-dice-overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.76);
+      display: none; align-items: center; justify-content: center;
+      flex-direction: column; gap: 14px; z-index: 20;
+      border-radius: 10px;
+    }
+    .map-dice-overlay.active { display: flex; }
+    .map-dice-num {
+      font-family: 'Press Start 2P', monospace; font-size: 52px;
+      color: #c8860a; text-shadow: 0 0 24px rgba(200,134,10,0.8);
+    }
+    .map-dice-num.spinning { animation: diceFlicker 0.13s linear infinite; }
+    @keyframes diceFlicker { 0%{color:#c8860a} 50%{color:#f0e040} 100%{color:#c8860a} }
+    .map-dice-result {
+      font-family: 'Press Start 2P', monospace; font-size: 10px;
+      color: #e0e0e0; text-align: center;
+    }
+    .map-dice-gold {
+      font-family: 'Press Start 2P', monospace; font-size: 11px;
+      color: #ffd700; text-shadow: 0 0 16px rgba(255,215,0,0.9);
+      animation: goldPop 0.65s ease-in-out infinite alternate;
+    }
+    @keyframes goldPop { from{transform:scale(1)} to{transform:scale(1.13)} }
+    .map-explore-form {
+      background: #111; border: 1px solid #1e1e1e; border-radius: 10px;
+      padding: 14px 16px; margin-top: 10px;
+      display: none; flex-direction: column; gap: 10px;
+    }
+    .map-explore-form.open { display: flex; }
+    .map-log-wrap {
+      background: #111; border: 1px solid #1e1e1e; border-radius: 10px;
+      padding: 14px 16px; margin-top: 10px;
+    }
+    .map-log-header {
+      font-size: 10px; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; color: #555; margin-bottom: 10px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .map-log-item {
+      display: flex; gap: 10px; align-items: flex-start;
+      padding: 7px 0; border-bottom: 1px solid #1a1a1a; font-size: 12px;
+    }
+    .map-log-item:last-child { border-bottom: none; }
+    .map-log-date  { color: #444; flex: 0 0 82px; font-size: 11px; }
+    .map-log-tile  { color: #c8860a; font-weight: 600; flex: 0 0 100px; }
+    .map-log-notes { color: #777; flex: 1; font-size: 11px; }
+    .map-tooltip {
+      position: fixed;
+      background: #111; border: 1px solid #2d1b0e; border-radius: 4px;
+      padding: 4px 8px;
+      font-family: 'Press Start 2P', monospace; font-size: 8px;
+      color: #c8860a; pointer-events: none; z-index: 9999;
+      display: none; white-space: nowrap;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
   </style>
 </head>
 <body>
@@ -2117,6 +2208,7 @@
           <button class="los-tab" data-los-tab="skills">Skills</button>
           <button class="los-tab" data-los-tab="radar">Radar</button>
           <button class="los-tab" data-los-tab="mana">Mana</button>
+          <button class="los-tab" data-los-tab="map">Map</button>
           <button class="los-tab" data-los-tab="codex">Codex</button>
         </div>
 
@@ -2261,6 +2353,47 @@
           <div class="los-card" style="margin-top:10px">
             <div class="los-card-title">Today's Log</div>
             <div id="mana-log-list"></div>
+          </div>
+        </div>
+
+        <!-- ── TAB 4.5: Map ── -->
+        <div class="los-pane" id="los-map">
+          <div class="map-stale-banner" id="map-stale-banner">⚠ MAP GOING STATIC — explore a new tile</div>
+          <div class="map-canvas-wrap">
+            <canvas id="fog-map-canvas" width="900" height="680"></canvas>
+            <button class="map-explore-btn" id="map-explore-btn">⚔ EXPLORE</button>
+            <div class="map-dice-overlay" id="map-dice-overlay">
+              <div class="map-dice-num" id="map-dice-num">?</div>
+              <div class="map-dice-result" id="map-dice-result"></div>
+            </div>
+          </div>
+          <div class="map-tooltip" id="map-tooltip"></div>
+          <div class="map-explore-form" id="map-explore-form">
+            <div class="form-row">
+              <div class="form-field">
+                <label class="form-label">Location name</label>
+                <input type="text" class="form-input" id="map-loc-name" placeholder="e.g. Montjuïc">
+              </div>
+              <div class="form-field">
+                <label class="form-label">Tile</label>
+                <select class="form-select" id="map-tile-sel"></select>
+              </div>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Notes</label>
+              <input type="text" class="form-input" id="map-notes" placeholder="What happened here?">
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <button class="add-assign-btn" id="map-explore-cancel">Cancel</button>
+              <button class="form-submit" id="map-explore-submit">Explore &amp; Roll</button>
+            </div>
+          </div>
+          <div class="map-log-wrap">
+            <div class="map-log-header">
+              <span>Explored Locations</span>
+              <span id="map-total-count" style="color:#c8860a;font-family:'Press Start 2P',monospace;font-size:9px">0 tiles</span>
+            </div>
+            <div id="map-log-list"></div>
           </div>
         </div>
 
@@ -4174,9 +4307,389 @@
         });
       }
 
+      /* ════ MAP (Fog of War) ════ */
+      const LS_MAP='fog_explored_tiles';
+      function initMap(){
+        const canvas=document.getElementById('fog-map-canvas');
+        if(!canvas)return;
+        const ctx=canvas.getContext('2d');
+        const CW=canvas.width,CH=canvas.height;
+        const R=120,SQ3=Math.sqrt(3),CX=CW/2,CY=Math.round(CH/2)-10;
+        const hr=new Date().getHours(),isNight=(hr<6||hr>=20);
+
+        /* ── tile layout (flat-top hexes) ── */
+        const TILES=[
+          {id:'sitges',   label:'SITGES',   subs:['Plaza España',"Gaby's"],dx:0,      dy:0,         chars:['leon','maxi','chris','chemi','alex'],unlocked:true},
+          {id:'beach',    label:'PLATJA',   subs:['Sitges Beach'],          dx:0,      dy:SQ3*R,     chars:['leon_b','alex_b'],                  unlocked:true},
+          {id:'vilanova', label:'VILANOVA', subs:[],                         dx:-1.5*R, dy:SQ3*R/2,  chars:['luena'],                            unlocked:false},
+          {id:'bcn',      label:'BARCELONA',subs:[],                         dx:1.5*R,  dy:-SQ3*R/2, chars:['adri','noi'],                       unlocked:false},
+          {id:'fog_nw',   label:'',         subs:[],                         dx:-1.5*R, dy:-SQ3*R/2, chars:[],                                   unlocked:false},
+          {id:'fog_n',    label:'',         subs:[],                         dx:0,      dy:-SQ3*R,   chars:[],                                   unlocked:false},
+          {id:'fog_se',   label:'',         subs:[],                         dx:1.5*R,  dy:SQ3*R/2,  chars:[],                                   unlocked:false},
+        ];
+
+        /* ── character definitions ── */
+        const CD={
+          leon:  {name:'Leon', sk:'#8B6B3D',hr:'#3b82f6',bd:'#2d2d2d',lg:'#1a1a1a',glasses:true, chain:true},
+          maxi:  {name:'Maxi', sk:'#C4956A',hr:'#2d1b0e',bd:'#6b7c3d',lg:'#1a1a1a'},
+          chris: {name:'Chris',sk:'#E8C99A',hr:'#c8450a',bd:'#f0f0f0',lg:'#333333'},
+          chemi: {name:'Chemi',sk:'#C4956A',hr:'#1a1a1a',bd:'#1e3a8a',lg:'#0d0d2a'},
+          alex:  {name:'Alex', sk:'#D4A876',hr:'#1a1a1a',bd:'#4a4a4a',lg:'#2a2a2a'},
+          luena: {name:'Luena',sk:'#A0785A',hr:'#0d0d0d',bd:'#1a1a1a',lg:'#111111',shades:true},
+          adri:  {name:'Adri', sk:'#8B6B3D',hr:'#0d0d0d',bd:'#111111',lg:'#1a1a1a',hoodie:true},
+          noi:   {name:'Noi',  sk:'#E8C99A',hr:'#c8a050',bd:'#888888',lg:'#555555'},
+          leon_b:{name:'Leon', sk:'#8B6B3D',hr:'#3b82f6',bd:'#2d2d2d',lg:'#1a1a1a',glasses:true,chain:true},
+          alex_b:{name:'Alex', sk:'#D4A876',hr:'#1a1a1a',bd:'#4a4a4a',lg:'#2a2a2a'},
+        };
+
+        /* ── localStorage helpers ── */
+        function loadExp(){try{return JSON.parse(localStorage.getItem(LS_MAP)||'[]');}catch(_){return[];}}
+        function saveExp(a){try{localStorage.setItem(LS_MAP,JSON.stringify(a));}catch(_){}}
+
+        /* ── apply saved explored state to TILES ── */
+        loadExp().forEach(e=>{
+          const t=TILES.find(t2=>t2.id===e.tile);
+          if(t){t.unlocked=true;if(t.id.startsWith('fog_')&&e.name)t.label=e.name.toUpperCase().slice(0,12);}
+        });
+
+        /* ── fog particles (only for still-fogged tiles) ── */
+        const fogPts={};
+        TILES.forEach(t=>{
+          if(t.unlocked)return;
+          const tx2=CX+t.dx,ty2=CY+t.dy;
+          fogPts[t.id]=Array.from({length:22},()=>({
+            x:tx2+(Math.random()-0.5)*R*1.4, y:ty2+(Math.random()-0.5)*R*0.85,
+            vx:(Math.random()-0.5)*0.5, vy:(Math.random()-0.5)*0.4,
+            r:7+Math.random()*11, a:0.07+Math.random()*0.1,
+          }));
+        });
+
+        /* ── character states ── */
+        const CS={};
+        function initCS(){
+          TILES.forEach(t=>{
+            if(!t.unlocked)return;
+            const tx2=CX+t.dx,ty2=CY+t.dy,n=t.chars.length;
+            t.chars.forEach((cid,i)=>{
+              if(CS[cid])return;
+              const ang=(i/Math.max(n,1))*Math.PI*2,r2=n>1?28:0;
+              CS[cid]={
+                x:tx2+Math.cos(ang)*r2, y:ty2+Math.sin(ang)*r2*0.5,
+                tx2,ty2,
+                tgx:tx2+(Math.random()-0.5)*80, tgy:ty2+(Math.random()-0.5)*38,
+                nxt:Date.now()+Math.random()*3000, bob:0, def:CD[cid],
+              };
+            });
+          });
+        }
+        initCS();
+
+        /* bob animation */
+        let bobOn=false;
+        setInterval(()=>{bobOn=!bobOn;Object.values(CS).forEach(s=>{s.bob=bobOn?2:0;});},500);
+
+        /* ── hex path helper ── */
+        function hexPath(tx2,ty2){
+          ctx.beginPath();
+          for(let i=0;i<6;i++){const a=Math.PI/3*i;i===0?ctx.moveTo(tx2+R*Math.cos(a),ty2+R*Math.sin(a)):ctx.lineTo(tx2+R*Math.cos(a),ty2+R*Math.sin(a));}
+          ctx.closePath();
+        }
+
+        /* ── sprite drawing (10×16 grid, SC=3 → 30×48px) ── */
+        const SC=3;
+        function drawSprite(x,y,def){
+          const bx=Math.round(x)-5*SC, by=Math.round(y)-16*SC;
+          ctx.fillStyle=def.hr; ctx.fillRect(bx+SC,by,8*SC,2*SC);         // hair
+          ctx.fillStyle=def.sk; ctx.fillRect(bx+SC,by+2*SC,8*SC,4*SC);    // face
+          if(def.glasses){ctx.fillStyle='#111';ctx.fillRect(bx+2*SC,by+3*SC,2*SC,SC);ctx.fillRect(bx+6*SC,by+3*SC,2*SC,SC);}
+          if(def.shades) {ctx.fillStyle='#111';ctx.fillRect(bx+2*SC,by+3*SC,6*SC,SC);}
+          ctx.fillStyle=def.bd; ctx.fillRect(bx,by+6*SC,10*SC,6*SC);      // body
+          if(def.hoodie){ctx.fillStyle='#555';ctx.fillRect(bx+SC,by+8*SC,8*SC,3*SC);ctx.fillStyle=def.bd;ctx.fillRect(bx,by+6*SC,3*SC,6*SC);ctx.fillRect(bx+7*SC,by+6*SC,3*SC,6*SC);}
+          if(def.chain) {ctx.fillStyle='#f5c518';ctx.fillRect(bx+3*SC,by+9*SC,4*SC,SC);}
+          ctx.fillStyle=def.lg;                                             // legs
+          ctx.fillRect(bx+SC,by+12*SC,3*SC,4*SC); ctx.fillRect(bx+6*SC,by+12*SC,3*SC,4*SC);
+        }
+
+        /* ── precomputed BCN building windows ── */
+        const BCN_BLDGS=[
+          {dx:-55,w:15,h:65},{dx:-35,w:13,h:85},{dx:-16,w:18,h:52},
+          {dx:12, w:11,h:75},{dx:28, w:15,h:95},{dx:48, w:11,h:58}
+        ].map(b=>{
+          const wins=[];
+          for(let wy=5;wy<b.h-5;wy+=11)for(let wx=2;wx<b.w-2;wx+=5)
+            if(((b.dx+wx*3+wy*7)&0xf)>5)wins.push({wx,wy});
+          return{...b,wins};
+        });
+
+        /* ── landmark drawing ── */
+        function drawLandmarks(tx2,ty2,id){
+          ctx.save(); hexPath(tx2,ty2); ctx.clip();
+          if(id==='sitges'){
+            // Church (2 towers)
+            const cx2=tx2-28;
+            ctx.fillStyle='#5a3d22';
+            ctx.fillRect(cx2-10,ty2-48,9,38); ctx.fillRect(cx2+2,ty2-43,9,33);
+            ctx.fillRect(cx2-14,ty2-32,30,22);
+            ctx.fillStyle='#3d2510';
+            ctx.fillRect(cx2-11,ty2-54,11,9); ctx.fillRect(cx2+1,ty2-49,11,9);
+            ctx.fillStyle='#c8860a';
+            ctx.fillRect(cx2-2,ty2-63,2,11); ctx.fillRect(cx2-5,ty2-58,8,2);
+            // Palm tree
+            const px=tx2+28;
+            ctx.fillStyle='#5d3e1a'; ctx.fillRect(px,ty2-38,3,50);
+            ctx.fillStyle='#2d5a1a';
+            [{dx:-14,dy:-42,w:12},{dx:-8,dy:-47,w:11},{dx:3,dy:-42,w:13},{dx:1,dy:-47,w:11},{dx:-5,dy:-51,w:14}]
+              .forEach(l=>ctx.fillRect(px+l.dx,ty2+l.dy,l.w,3));
+            // Street lamp + glow
+            const lx=tx2+6;
+            ctx.fillStyle='#c8860a'; ctx.fillRect(lx,ty2-32,2,38); ctx.fillRect(lx-4,ty2-35,10,5);
+            const lg=ctx.createRadialGradient(lx+1,ty2-30,0,lx+1,ty2-30,22);
+            lg.addColorStop(0,'rgba(255,200,50,0.28)'); lg.addColorStop(1,'rgba(255,200,50,0)');
+            ctx.fillStyle=lg; ctx.fillRect(lx-21,ty2-52,44,44);
+          }else if(id==='beach'){
+            ctx.fillStyle='#0d2d4a'; ctx.fillRect(tx2-R,ty2+5,2*R,48);   // water
+            ctx.fillStyle='#3d2e18'; ctx.fillRect(tx2-R,ty2+53,2*R,40);  // sand
+            ctx.strokeStyle='rgba(60,140,220,0.32)'; ctx.lineWidth=2;     // waves
+            [-18,-6,6].forEach((off,i)=>{ctx.beginPath();ctx.moveTo(tx2-58,ty2+16+i*10+off);ctx.quadraticCurveTo(tx2,ty2+12+i*10+off,tx2+58,ty2+16+i*10+off);ctx.stroke();});
+            ctx.fillStyle='#c8450a';                                       // umbrella
+            ctx.beginPath();ctx.moveTo(tx2-24,ty2+8);ctx.lineTo(tx2-5,ty2+8);ctx.lineTo(tx2-14,ty2-8);ctx.closePath();ctx.fill();
+            ctx.fillStyle='#5a3d1a'; ctx.fillRect(tx2-15,ty2+8,2,26);
+            ctx.fillStyle='#2e2e2e';                                       // rocks
+            [[tx2+30,ty2+30,9,5],[tx2+23,ty2+37,6,3],[tx2+17,ty2+40,5,3]].forEach(([rx,ry,rw,rh])=>{ctx.beginPath();ctx.ellipse(rx,ry,rw,rh,0,0,Math.PI*2);ctx.fill();});
+          }else if(id==='vilanova'){
+            ctx.strokeStyle='#3a3a3a'; ctx.lineWidth=1;                    // rails
+            ctx.setLineDash([8,5]);
+            ctx.beginPath();ctx.moveTo(tx2-R+8,ty2+5);ctx.lineTo(tx2+R-8,ty2+5);ctx.stroke();
+            ctx.setLineDash([]);
+            [-8,8].forEach(oy=>{ctx.beginPath();ctx.moveTo(tx2-R+8,ty2+oy);ctx.lineTo(tx2+R-8,ty2+oy);ctx.stroke();});
+            ctx.strokeStyle='#222'; ctx.lineWidth=3;                       // sleepers
+            for(let sx=tx2-72;sx<tx2+72;sx+=18){ctx.beginPath();ctx.moveTo(sx,ty2-10);ctx.lineTo(sx,ty2+18);ctx.stroke();}
+            ctx.strokeStyle=''; ctx.lineWidth=1;
+            [{x:tx2-42,y:ty2-48,w:22,h:38},{x:tx2+5,y:ty2-42,w:28,h:32}].forEach(b=>{
+              ctx.fillStyle='#1e1e2e'; ctx.fillRect(b.x,b.y,b.w,b.h);
+              ctx.fillStyle='rgba(255,220,80,0.22)';
+              ctx.fillRect(b.x+4,b.y+8,7,6); ctx.fillRect(b.x+b.w-11,b.y+8,7,6);
+            });
+          }else if(id==='bcn'){
+            BCN_BLDGS.forEach(b=>{                                          // skyline
+              ctx.fillStyle='#141420'; ctx.fillRect(tx2+b.dx,ty2-b.h,b.w,b.h+10);
+              ctx.fillStyle='rgba(255,220,60,0.22)';
+              b.wins.forEach(w=>ctx.fillRect(tx2+b.dx+w.wx,ty2-b.h+w.wy,2,3));
+            });
+            const sfx=tx2-10;                                               // Sagrada Familia
+            ctx.fillStyle='#1e1e30';
+            ctx.fillRect(sfx-3,ty2-88,7,88); ctx.fillRect(sfx+7,ty2-78,6,78);
+            ctx.beginPath();ctx.moveTo(sfx-3,ty2-88);ctx.lineTo(sfx+0.5,ty2-106);ctx.lineTo(sfx+4,ty2-88);ctx.closePath();ctx.fill();
+            ctx.beginPath();ctx.moveTo(sfx+7,ty2-78);ctx.lineTo(sfx+10,ty2-94);ctx.lineTo(sfx+13,ty2-78);ctx.closePath();ctx.fill();
+            const nx=tx2+28;                                                // RAZZ neon
+            ctx.fillStyle='#150a15'; ctx.fillRect(nx,ty2-48,34,15);
+            ctx.shadowColor='#ff00dd'; ctx.shadowBlur=7;
+            ctx.fillStyle='#ff44ee'; ctx.font='bold 8px monospace'; ctx.textAlign='left';
+            ctx.fillText('RAZZ',nx+5,ty2-36);
+            ctx.shadowBlur=0; ctx.textAlign='center';
+          }
+          ctx.restore();
+        }
+
+        /* ── draw tile: unlocked ── */
+        function drawUnlocked(tx2,ty2,tile){
+          ctx.save(); hexPath(tx2,ty2); ctx.clip();
+          ctx.fillStyle='#1a0e05'; ctx.fillRect(tx2-R,ty2-R,2*R,2*R);
+          const g=ctx.createRadialGradient(tx2,ty2,0,tx2,ty2,R*0.82);
+          g.addColorStop(0,isNight?'#4a2d12':'#3d2510'); g.addColorStop(1,'#150b04');
+          ctx.fillStyle=g; ctx.fillRect(tx2-R,ty2-R,2*R,2*R);
+          ctx.strokeStyle='rgba(200,134,10,0.06)'; ctx.lineWidth=1;
+          for(let ly=ty2-R+6;ly<ty2+R;ly+=14){ctx.beginPath();ctx.moveTo(tx2-R,ly);ctx.lineTo(tx2+R,ly);ctx.stroke();}
+          ctx.restore();
+          hexPath(tx2,ty2);
+          ctx.strokeStyle=isNight?'#d08010':'#c8860a'; ctx.lineWidth=isNight?2:1.5; ctx.stroke();
+          drawLandmarks(tx2,ty2,tile.id);
+        }
+
+        /* ── draw tile: fogged ── */
+        function drawFogged(tx2,ty2,tile){
+          ctx.save(); hexPath(tx2,ty2); ctx.clip();
+          ctx.fillStyle='#0d0d1a'; ctx.fillRect(tx2-R,ty2-R,2*R,2*R);
+          const pts=fogPts[tile.id];
+          if(pts) pts.forEach(p=>{
+            if(p.a<=0)return;
+            ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+            ctx.fillStyle=`rgba(20,20,50,${p.a.toFixed(3)})`; ctx.fill();
+          });
+          ctx.restore();
+          hexPath(tx2,ty2); ctx.strokeStyle='#18182e'; ctx.lineWidth=1; ctx.stroke();
+        }
+
+        /* ── tooltip ── */
+        const tip=document.getElementById('map-tooltip');
+        canvas.addEventListener('mousemove',e=>{
+          const rc=canvas.getBoundingClientRect();
+          const mx=(e.clientX-rc.left)*(CW/rc.width);
+          const my=(e.clientY-rc.top)*(CH/rc.height);
+          let found=null;
+          outer:for(const t of TILES){
+            if(!t.unlocked)continue;
+            for(const cid of t.chars){
+              const s=CS[cid];if(!s)continue;
+              const bx=s.x-5*SC,by=s.y-s.bob-16*SC;
+              if(mx>=bx&&mx<=bx+10*SC&&my>=by&&my<=by+16*SC){found=s.def.name;break outer;}
+            }
+          }
+          if(tip){
+            if(found){tip.style.display='block';tip.textContent=found;tip.style.left=(e.clientX+14)+'px';tip.style.top=(e.clientY-24)+'px';}
+            else tip.style.display='none';
+          }
+        });
+        canvas.addEventListener('mouseleave',()=>{if(tip)tip.style.display='none';});
+
+        /* ── main RAF loop ── */
+        function mapLoop(){
+          if(!document.getElementById('los-map')?.classList.contains('active')){requestAnimationFrame(mapLoop);return;}
+          ctx.clearRect(0,0,CW,CH);
+          ctx.fillStyle=isNight?'#03030a':'#0a0a0a'; ctx.fillRect(0,0,CW,CH);
+          // update characters
+          const now=Date.now();
+          Object.values(CS).forEach(s=>{
+            if(now>=s.nxt){s.tgx=s.tx2+(Math.random()-0.5)*90;s.tgy=s.ty2+(Math.random()-0.5)*42;s.nxt=now+2000+Math.random()*2500;}
+            s.x+=(s.tgx-s.x)*0.012; s.y+=(s.tgy-s.y)*0.012;
+          });
+          // update + draw fog
+          TILES.forEach(t=>{
+            if(t.unlocked)return;
+            const pts=fogPts[t.id];if(!pts)return;
+            const tx2=CX+t.dx,ty2=CY+t.dy;
+            pts.forEach(p=>{
+              p.x+=p.vx; p.y+=p.vy;
+              if(Math.abs(p.x-tx2)>R*0.83)p.vx*=-1;
+              if(Math.abs(p.y-ty2)>R*0.72)p.vy*=-1;
+              if(t._fading)p.a=Math.max(0,p.a-0.006);
+            });
+          });
+          // draw tiles
+          TILES.forEach(t=>{
+            const tx2=CX+t.dx,ty2=CY+t.dy;
+            if(t.unlocked) drawUnlocked(tx2,ty2,t);
+            else           drawFogged(tx2,ty2,t);
+          });
+          // draw labels
+          TILES.forEach(t=>{
+            if(!t.unlocked||!t.label)return;
+            const tx2=CX+t.dx,ty2=CY+t.dy;
+            ctx.save(); ctx.textAlign='center';
+            ctx.fillStyle='#c8860a'; ctx.font="6px 'Press Start 2P',monospace";
+            ctx.fillText(t.label,tx2,ty2+R*0.69);
+            if(t.subs?.length){
+              ctx.fillStyle='rgba(200,134,10,0.55)'; ctx.font="5px 'Press Start 2P',monospace";
+              t.subs.forEach((s,si)=>ctx.fillText(s,tx2,ty2+R*0.69+11+si*9));
+            }
+            ctx.restore();
+          });
+          // draw characters
+          TILES.forEach(t=>{
+            if(!t.unlocked)return;
+            const tx2=CX+t.dx,ty2=CY+t.dy;
+            t.chars.forEach(cid=>{
+              const s=CS[cid];if(!s)return;
+              ctx.save(); hexPath(tx2,ty2); ctx.clip();
+              drawSprite(s.x,s.y-s.bob,s.def);
+              ctx.restore();
+            });
+          });
+          requestAnimationFrame(mapLoop);
+        }
+        requestAnimationFrame(mapLoop);
+
+        /* ── explore form logic ── */
+        function checkStale(){
+          const exp=loadExp();if(!exp.length)return;
+          const last=exp.reduce((a,b)=>a.date>b.date?a:b);
+          const days=(Date.now()-new Date(last.date).getTime())/86400000;
+          const bn=document.getElementById('map-stale-banner');
+          if(bn)bn.style.display=days>=7?'block':'none';
+        }
+        checkStale();
+
+        function populateDrop(){
+          const sel=document.getElementById('map-tile-sel');if(!sel)return;
+          sel.innerHTML='';
+          const fogged=TILES.filter(t=>!t.unlocked);
+          if(!fogged.length){sel.innerHTML='<option>All tiles explored!</option>';return;}
+          fogged.forEach(t=>{
+            const o=document.createElement('option');o.value=t.id;
+            o.textContent=t.id.startsWith('fog_')?'Unknown ('+t.id.replace('fog_','').toUpperCase()+')':t.label||t.id;
+            sel.appendChild(o);
+          });
+        }
+        populateDrop();
+
+        function renderLog(){
+          const el=document.getElementById('map-log-list');
+          const cnt=document.getElementById('map-total-count');
+          const exp=loadExp();
+          if(cnt)cnt.textContent=exp.length+(exp.length===1?' tile':' tiles');
+          if(!el)return;
+          if(!exp.length){el.innerHTML='<div style="font-size:12px;color:#2e2e2e;padding:8px 0">No tiles explored yet. Hit ⚔ EXPLORE to begin your journey.</div>';return;}
+          el.innerHTML=[...exp].reverse().map(e=>`<div class="map-log-item"><span class="map-log-date">${e.date}</span><span class="map-log-tile">${e.name||e.tile}</span><span class="map-log-notes">${e.notes||'—'}</span></div>`).join('');
+        }
+        renderLog();
+
+        const eBtn=document.getElementById('map-explore-btn');
+        const eForm=document.getElementById('map-explore-form');
+        eBtn?.addEventListener('click',()=>{eForm?.classList.toggle('open');populateDrop();});
+        document.getElementById('map-explore-cancel')?.addEventListener('click',()=>eForm?.classList.remove('open'));
+
+        document.getElementById('map-explore-submit')?.addEventListener('click',()=>{
+          const name=(document.getElementById('map-loc-name')?.value||'').trim();
+          const tileId=document.getElementById('map-tile-sel')?.value;
+          const notes=(document.getElementById('map-notes')?.value||'').trim();
+          if(!name||!tileId)return;
+          const tile=TILES.find(t=>t.id===tileId);if(!tile||tile.unlocked)return;
+          eForm?.classList.remove('open');
+          // fog fade + unlock
+          tile._fading=true;
+          setTimeout(()=>{
+            tile.unlocked=true; tile._fading=false;
+            if(tile.id.startsWith('fog_')&&name)tile.label=name.toUpperCase().slice(0,12);
+            delete fogPts[tile.id];
+            initCS(); populateDrop();
+          },1000);
+          // save
+          const exp=loadExp();
+          exp.push({date:new Date().toISOString().slice(0,10),tile:tileId,name,notes});
+          saveExp(exp); checkStale();
+          // clear inputs
+          ['map-loc-name','map-notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+          // dice roll
+          const ov=document.getElementById('map-dice-overlay');
+          const dn=document.getElementById('map-dice-num');
+          const dr=document.getElementById('map-dice-result');
+          if(ov&&dn&&dr){
+            ov.classList.add('active'); dn.classList.add('spinning');
+            let spins=0;
+            const iv=setInterval(()=>{
+              dn.textContent=Math.floor(Math.random()*6)+1;
+              if(++spins>=8){
+                clearInterval(iv);
+                const roll=Math.floor(Math.random()*6)+1;
+                dn.textContent=roll; dn.classList.remove('spinning');
+                if(roll===6){
+                  dr.innerHTML='<div class="map-dice-gold">LEGENDARY LOOT 🎲</div>';
+                }else{
+                  dr.textContent='+15 SOC XP!';
+                  const xpd=lsLoad(LS_SKILLS_XP)||{};
+                  xpd['SOC']=(xpd['SOC']||0)+15; lsSave2(LS_SKILLS_XP,xpd);
+                  renderSkillsXP();
+                }
+                setTimeout(()=>{ov.classList.remove('active');dn.textContent='?';dr.textContent='';renderLog();},2200);
+              }
+            },100);
+          }
+        });
+      } /* end initMap */
+
       /* ── Init ── */
       function initLOS(){
-        initTabs(); initGIFD(); initSkills(); initRadar(); initMana(); initCodex();
+        initTabs(); initGIFD(); initSkills(); initRadar(); initMana(); initCodex(); initMap();
         loadChartLOS(()=>{renderGIFDCharts();});
       }
 
