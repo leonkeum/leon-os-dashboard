@@ -701,84 +701,105 @@
     .si-feel.good      { color: #4daa7d; }
     .si-feel.locked-in { color: #4f7ec9; }
 
-    /* Habits tracker */
-    .habits-wrap {
-      background: #111;
-      border: 1px solid #1e1e1e;
-      border-radius: 10px;
-      overflow: hidden;
+    /* ── Workout Logger ── */
+    .workout-log-card {
+      background: #111; border: 1px solid #1e1e1e; border-radius: 12px;
+      padding: 18px; margin-bottom: 12px;
+    }
+    .workout-log-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .workout-log-title { font-size: 10px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: #555; }
+    .workout-pr-indicator { font-size: 11px; font-weight: 600; color: var(--green); }
+    @keyframes pr-glow { 0%{opacity:0;transform:scale(.9)} 50%{opacity:1;transform:scale(1.05)} 100%{opacity:1;transform:scale(1)} }
+
+    .workout-input-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .workout-ex-input  { flex: 2; min-width: 140px; }
+    .workout-num-input { flex: 1; min-width: 60px; max-width: 80px; }
+    .workout-x { font-size: 14px; color: #444; flex-shrink: 0; }
+
+    .workout-lastbest {
+      margin-top: 8px; font-size: 11px; color: #555;
+      padding: 6px 10px; background: #0d0d0d;
+      border-radius: 6px; border: 1px solid #1a1a1a;
+    }
+    .workout-lastbest .pr-highlight { color: var(--green); font-weight: 600; }
+
+    .workout-session-wrap { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+    .workout-session-empty {
+      padding: 18px; font-size: 12px; color: #2e2e2e;
+      background: #111; border: 1px solid #1e1e1e;
+      border-radius: 10px; text-align: center;
     }
 
-    .habits-head {
-      padding: 13px 16px;
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #666;
-      border-bottom: 1px solid #181818;
+    .workout-exercise-group { background: #111; border: 1px solid #1e1e1e; border-radius: 10px; overflow: hidden; }
+    .workout-ex-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; border-bottom: 1px solid #181818;
     }
-
-    .habits-table { width: 100%; border-collapse: collapse; }
-
-    .habits-table th,
-    .habits-table td {
-      padding: 10px 8px;
-      text-align: center;
-      border-bottom: 1px solid #141414;
+    .workout-ex-name { font-size: 13px; font-weight: 500; color: #ccc; }
+    .workout-ex-pr {
+      font-size: 10px; color: var(--green); background: rgba(77,170,125,0.1);
+      padding: 2px 7px; border-radius: 4px; font-weight: 600; display: none;
     }
-    .habits-table tr:last-child td { border-bottom: none; }
+    .workout-ex-pr.show { display: inline; }
 
-    .habits-table th {
-      font-size: 9px;
-      font-weight: 500;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: #666;
+    .workout-set-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 7px 14px; border-bottom: 1px solid #141414;
+      font-size: 12px; color: #999;
     }
-
-    .ht-name {
-      text-align: left !important;
-      padding-left: 16px !important;
-      font-size: 12px;
-      color: #aaa;
-      width: 190px;
+    .workout-set-row:last-child { border-bottom: none; }
+    .workout-set-num  { color: #444; width: 44px; flex-shrink: 0; }
+    .workout-set-data { flex: 1; }
+    .workout-set-del  {
+      width: 18px; height: 18px; border: none; background: transparent;
+      color: #333; font-size: 14px; cursor: pointer; border-radius: 3px;
+      display: flex; align-items: center; justify-content: center;
+      transition: color 0.12s, background 0.12s;
     }
+    .workout-set-del:hover { color: var(--red); background: rgba(201,79,79,0.07); }
 
-    .ht-pct {
-      text-align: right !important;
-      padding-right: 16px !important;
-      font-size: 10px;
-      color: #666;
-      font-variant-numeric: tabular-nums;
-      width: 48px;
+    .workout-history-wrap { background: #111; border: 1px solid #1e1e1e; border-radius: 10px; overflow: hidden; }
+    .workout-history-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px; font-size: 10px; font-weight: 600;
+      letter-spacing: 0.09em; text-transform: uppercase; color: #555;
     }
+    .workout-history-session { padding: 10px 16px; border-top: 1px solid #161616; font-size: 12px; color: #666; }
+    .workout-history-date   { font-weight: 600; color: #777; margin-bottom: 3px; }
+    .workout-history-detail { color: #555; line-height: 1.5; }
 
-    .habits-table th.amber-th { color: #c9a032 !important; }
-    .habits-table td.amber-td { background: rgba(201,160,50,0.04); }
-
-    .habit-cb {
-      appearance: none;
-      -webkit-appearance: none;
-      width: 13px;
-      height: 13px;
-      border: 1px solid #333;
-      border-radius: 3px;
-      cursor: pointer;
-      position: relative;
-      vertical-align: middle;
-      transition: border-color 0.15s, background 0.15s;
+    /* ── Sleep Logger ── */
+    .sleep-log-card { background: #111; border: 1px solid #1e1e1e; border-radius: 12px; padding: 18px; margin-bottom: 12px; }
+    .sleep-log-row  { display: flex; align-items: flex-end; gap: 20px; flex-wrap: wrap; }
+    .sleep-field    { display: flex; flex-direction: column; gap: 8px; }
+    .sleep-label    { font-size: 9px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: #555; }
+    .sleep-hours-row { display: flex; align-items: center; gap: 10px; }
+    .sleep-adj-btn {
+      width: 32px; height: 32px; border-radius: 6px; border: 1px solid #222;
+      background: transparent; color: #777; font-size: 18px; line-height: 1; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.12s, color 0.12s, background 0.12s;
     }
-    .habit-cb:hover { border-color: #555; }
-    .habit-cb:checked { background: #252525; border-color: #555; }
-    .habit-cb:checked::after {
-      content: '';
-      position: absolute;
-      left: 3px; top: 1px;
-      width: 4px; height: 7px;
-      border: 1.5px solid #aaa;
-      border-top: none; border-left: none;
-      transform: rotate(45deg);
+    .sleep-adj-btn:hover { border-color: #333; color: #ccc; background: #1a1a1a; }
+    .sleep-hours-num {
+      font-size: 32px; font-weight: 600; color: #ccc;
+      min-width: 64px; text-align: center; font-variant-numeric: tabular-nums; line-height: 1;
+    }
+    .sleep-quality-field { flex: 1; min-width: 220px; }
+    .sleep-quality-pills { display: flex; gap: 5px; flex-wrap: wrap; }
+    .sleep-quality-pill {
+      padding: 6px 12px; border-radius: 6px; border: 1px solid #1e1e1e;
+      background: transparent; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500;
+      cursor: pointer; color: #555; transition: background 0.12s, border-color 0.12s, color 0.12s; user-select: none;
+    }
+    .sleep-quality-pill:hover { background: #161616; color: #aaa; }
+    .sleep-quality-pill[data-q="1"].sel,.sleep-quality-pill[data-q="2"].sel,.sleep-quality-pill[data-q="3"].sel { color: var(--red);   border-color: rgba(201,79,79,0.3);  background: rgba(201,79,79,0.08); }
+    .sleep-quality-pill[data-q="4"].sel,.sleep-quality-pill[data-q="5"].sel { color: var(--amber); border-color: rgba(201,160,50,0.3); background: rgba(201,160,50,0.08); }
+    .sleep-quality-pill[data-q="6"].sel,.sleep-quality-pill[data-q="7"].sel { color: var(--green); border-color: rgba(77,170,125,0.3);  background: rgba(77,170,125,0.08); }
+    .sleep-saved-msg {
+      margin-top: 10px; font-size: 12px; color: var(--green);
+      padding: 8px 12px; background: rgba(77,170,125,0.07);
+      border-radius: 6px; border: 1px solid rgba(77,170,125,0.1);
     }
 
     /* ══════════════════════════════
@@ -1677,51 +1698,125 @@
     }
     .los-month-label { font-size: 18px; font-weight: 600; color: #ccc; }
 
-    /* GIFD */
-    .gifd-entry {
-      background: #111; border: 1px solid #1e1e1e; border-radius: 10px;
-      padding: 13px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 10px;
+    /* ── GIFD Today Hero ── */
+    .gifd-today-card {
+      background: #111; border: 1px solid #1e1e1e; border-radius: 14px;
+      padding: 22px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 16px;
     }
-    .gifd-entry-header { display: flex; align-items: center; gap: 8px; }
-    .gifd-date { font-size: 11px; font-weight: 500; color: #777; flex-shrink: 0; }
-    .gifd-desc {
-      flex: 1; background: #0d0d0d; border: 1px solid #1a1a1a; border-radius: 4px;
-      color: #bbb; font-family: 'Inter', sans-serif; font-size: 12px;
-      padding: 5px 8px; outline: none; transition: border-color 0.15s;
+    .gifd-today-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+    .gifd-today-date { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #555; margin-bottom: 3px; }
+    .gifd-today-subtitle { font-size: 18px; font-weight: 600; color: #ddd; }
+
+    .gifd-live-score-wrap { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+    .gifd-live-score {
+      font-size: 52px; font-weight: 700; line-height: 1; letter-spacing: -0.02em;
+      color: #333; font-variant-numeric: tabular-nums;
+      transition: color 0.25s ease;
     }
-    .gifd-desc:focus { border-color: #333; }
-    .gifd-desc::placeholder { color: #2e2e2e; }
-    .gifd-del {
-      width: 18px; height: 18px; border: none; background: transparent;
-      color: #2e2e2e; font-size: 14px; cursor: pointer; border-radius: 3px;
-      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-      transition: color 0.12s, background 0.12s;
+    @keyframes score-pop { 0%{transform:scale(1.2)} 100%{transform:scale(1)} }
+    .gifd-live-score.pop { animation: score-pop 0.2s ease; }
+    .gifd-live-score.pos { color: var(--green); }
+    .gifd-live-score.neg { color: var(--red); }
+    .gifd-live-score-label { font-size: 8px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #444; margin-top: 3px; }
+
+    .gifd-journal-textarea {
+      width: 100%; background: #0d0d0d; border: 1px solid #1e1e1e; border-radius: 10px;
+      color: #ddd; font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.65;
+      padding: 16px 18px; outline: none; resize: none; min-height: 110px;
+      transition: border-color 0.15s, box-shadow 0.15s;
     }
-    .gifd-del:hover { color: #c94f4f; background: rgba(201,79,79,0.08); }
-    .gifd-chip-group-label {
-      font-size: 9px; font-weight: 600; letter-spacing: 0.07em;
-      text-transform: uppercase; color: #2e2e2e; margin-bottom: 5px;
+    .gifd-journal-textarea:focus { border-color: #2a2a2a; box-shadow: 0 0 0 2px rgba(77,170,125,0.08); }
+    .gifd-journal-textarea::placeholder { color: #252525; }
+
+    /* Two-column habits */
+    .gifd-habits-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .gifd-habits-col  { border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 6px; }
+    .gifd-habits-col.bad  { background: rgba(201,79,79,0.04);  border: 1px solid rgba(201,79,79,0.1); }
+    .gifd-habits-col.good { background: rgba(77,170,125,0.04); border: 1px solid rgba(77,170,125,0.1); }
+
+    .gifd-habits-col-header {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      padding-bottom: 8px; border-bottom: 1px solid; margin-bottom: 4px;
+      display: flex; align-items: center; gap: 6px;
     }
-    .gifd-chips { display: flex; flex-wrap: wrap; gap: 5px; }
-    .gifd-chip {
-      padding: 4px 10px; border-radius: 20px; border: 1px solid #1e1e1e;
-      background: transparent; font-family: 'Inter', sans-serif; font-size: 11px;
-      cursor: pointer; transition: all 0.15s; color: #555; user-select: none;
+    .gifd-habits-col-header.bad  { color: var(--red);   border-color: rgba(201,79,79,0.15); }
+    .gifd-habits-col-header.good { color: var(--green); border-color: rgba(77,170,125,0.15); }
+    .gifd-col-sub { font-size: 9px; font-weight: 500; opacity: 0.6; margin-left: auto; letter-spacing: 0; text-transform: none; }
+    .gifd-habits-list { display: flex; flex-direction: column; gap: 5px; }
+
+    .gifd-habit-chip {
+      display: flex; align-items: center; gap: 10px; width: 100%;
+      min-height: 44px; padding: 10px 13px; border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.04); background: rgba(255,255,255,0.02);
+      font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 400; color: #666;
+      cursor: pointer; text-align: left;
+      transition: background 0.12s, border-color 0.12s, color 0.12s, transform 0.1s;
+      user-select: none;
     }
-    .gifd-chip.bad.active  { color: #c94f4f; border-color: #c94f4f; background: rgba(201,79,79,0.12); }
-    .gifd-chip.good.active { color: #4daa7d; border-color: #4daa7d; background: rgba(77,170,125,0.12); }
-    .gifd-score-row { display: flex; align-items: center; gap: 12px; }
-    .gifd-score { font-size: 22px; font-weight: 700; min-width: 44px; font-variant-numeric: tabular-nums; }
-    .gifd-score.pos { color: #4daa7d; } .gifd-score.neg { color: #c94f4f; } .gifd-score.zero { color: #555; }
-    .gifd-happy-btns { display: flex; gap: 5px; }
-    .gifd-happy-btn {
-      padding: 4px 9px; border-radius: 20px; border: 1px solid #1e1e1e;
-      background: transparent; font-family: 'Inter', sans-serif; font-size: 11px;
-      cursor: pointer; color: #444; transition: all 0.15s;
+    .gifd-habit-chip:hover { background: rgba(255,255,255,0.05); color: #aaa; }
+    .gifd-habit-chip .chip-icon { font-size: 14px; flex-shrink: 0; opacity: 0.4; transition: opacity 0.12s; }
+    @keyframes chip-pop { 0%{transform:scale(.95)} 60%{transform:scale(1.03)} 100%{transform:scale(1)} }
+    .gifd-habit-chip.pop { animation: chip-pop 0.18s ease; }
+
+    .gifd-habit-chip.bad.active  { background: rgba(201,79,79,0.12); border-color: rgba(201,79,79,0.3); border-left: 3px solid var(--red);   color: var(--red);   }
+    .gifd-habit-chip.bad.active  .chip-icon { opacity: 1; }
+    .gifd-habit-chip.good.active { background: rgba(77,170,125,0.12); border-color: rgba(77,170,125,0.3); border-left: 3px solid var(--green); color: var(--green); }
+    .gifd-habit-chip.good.active .chip-icon { opacity: 1; }
+
+    /* Feel row */
+    .gifd-feel-row   { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .gifd-feel-label { font-size: 11px; color: #555; white-space: nowrap; }
+    .gifd-feel-btns  { display: flex; gap: 6px; flex-wrap: wrap; }
+    .gifd-feel-btn {
+      padding: 8px 13px; border-radius: 7px; border: 1px solid #1e1e1e;
+      background: transparent; font-family: 'Inter', sans-serif; font-size: 12px; color: #555;
+      cursor: pointer; transition: background 0.12s, border-color 0.12s, color 0.12s; user-select: none;
     }
-    .gifd-happy-btn.sad.active   { color: #c94f4f; border-color: #c94f4f; background: rgba(201,79,79,0.1); }
-    .gifd-happy-btn.mild.active  { color: #c9a032; border-color: #c9a032; background: rgba(201,160,50,0.1); }
-    .gifd-happy-btn.happy.active { color: #4daa7d; border-color: #4daa7d; background: rgba(77,170,125,0.1); }
+    .gifd-feel-btn:hover { background: #161616; color: #aaa; border-color: #2a2a2a; }
+    .gifd-feel-btn.active { background: #1c1c1c; border-color: #333; color: #ddd; }
+
+    .gifd-save-btn {
+      width: 100%; padding: 14px; border-radius: 9px; border: none;
+      background: #181818; color: #888; font-family: 'Inter', sans-serif;
+      font-size: 13px; font-weight: 600; cursor: pointer; letter-spacing: 0.02em;
+      transition: background 0.15s, color 0.15s;
+    }
+    .gifd-save-btn:hover { background: #242424; color: #e0e0e0; }
+    .gifd-save-btn.saved { background: rgba(77,170,125,0.14); color: var(--green); }
+
+    /* Past entries header */
+    .gifd-past-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 6px 0 12px; border-top: 1px solid #161616; margin-top: 4px;
+    }
+    .gifd-past-title { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #3a3a3a; }
+
+    /* Past entry cards */
+    .gifd-entry { background: #111; border: 1px solid #1e1e1e; border-radius: 10px; padding: 14px 16px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 8px; }
+    .gifd-entry-header { display: flex; align-items: center; gap: 10px; }
+    .gifd-date { font-size: 11px; font-weight: 600; color: #777; flex-shrink: 0; }
+    .gifd-desc { flex: 1; background: transparent; border: none; color: #999; font-family: 'Inter', sans-serif; font-size: 12px; padding: 0; outline: none; cursor: text; }
+    .gifd-del { width: 18px; height: 18px; border: none; background: transparent; color: #333; font-size: 14px; cursor: pointer; border-radius: 3px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: color 0.12s, background 0.12s; }
+    .gifd-del:hover { color: var(--red); background: rgba(201,79,79,0.08); }
+
+    .gifd-past-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+    .gifd-past-chip { padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 500; }
+    .gifd-past-chip.bad  { background: rgba(201,79,79,0.1);  color: var(--red); }
+    .gifd-past-chip.good { background: rgba(77,170,125,0.1); color: var(--green); }
+
+    .gifd-score-row { display: flex; align-items: center; gap: 10px; }
+    .gifd-score { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .gifd-score.pos { color: var(--green); } .gifd-score.neg { color: var(--red); } .gifd-score.zero { color: #555; }
+    .gifd-chip-group-label { font-size: 9px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: #2e2e2e; margin-bottom: 3px; }
+    .gifd-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+    .gifd-chip { padding: 3px 9px; border-radius: 20px; border: 1px solid #1e1e1e; background: transparent; font-family: 'Inter', sans-serif; font-size: 10px; cursor: pointer; color: #444; transition: all 0.12s; user-select: none; }
+    .gifd-chip.bad.active  { color: var(--red);   border-color: var(--red);   background: rgba(201,79,79,0.1); }
+    .gifd-chip.good.active { color: var(--green); border-color: var(--green); background: rgba(77,170,125,0.1); }
+    .gifd-happy-btns { display: flex; gap: 4px; }
+    .gifd-happy-btn { padding: 3px 8px; border-radius: 20px; border: 1px solid #1e1e1e; background: transparent; font-family: 'Inter', sans-serif; font-size: 10px; cursor: pointer; color: #444; transition: all 0.12s; }
+    .gifd-happy-btn.sad.active   { color: var(--red);   border-color: var(--red);   background: rgba(201,79,79,0.1);  }
+    .gifd-happy-btn.mild.active  { color: var(--amber); border-color: var(--amber); background: rgba(201,160,50,0.1); }
+    .gifd-happy-btn.happy.active { color: var(--green); border-color: var(--green); background: rgba(77,170,125,0.1); }
 
     /* Skills */
     .los-xp-bars { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-bottom: 4px; }
@@ -2636,20 +2731,59 @@
           </div>
         </div>
 
-        <!-- Weekly habits -->
-        <div class="habits-wrap">
-          <div class="habits-head">Weekly habits</div>
-          <table class="habits-table">
-            <thead>
-              <tr>
-                <th class="ht-name"></th>
-                <th id="hh-0">Mon</th><th id="hh-1">Tue</th><th id="hh-2">Wed</th>
-                <th id="hh-3">Thu</th><th id="hh-4">Fri</th><th id="hh-5">Sat</th><th id="hh-6">Sun</th>
-                <th class="ht-pct">Week</th>
-              </tr>
-            </thead>
-            <tbody id="habits-body"></tbody>
-          </table>
+        <!-- ── Workout Logger ── -->
+        <div class="section-label" style="margin-top:20px">Workout Logger</div>
+
+        <div class="workout-log-card">
+          <div class="workout-log-header">
+            <span class="workout-log-title">Log a set</span>
+            <span class="workout-pr-indicator" id="workout-pr-msg" style="display:none;animation:pr-glow 0.5s ease">🏆 New PR!</span>
+          </div>
+          <div class="workout-input-row">
+            <input type="text" list="exercise-history" class="form-input workout-ex-input" id="wo-exercise" placeholder="Exercise name" autocomplete="off">
+            <datalist id="exercise-history"></datalist>
+            <input type="number" class="form-input workout-num-input" id="wo-weight" placeholder="kg" min="0" step="0.5">
+            <span class="workout-x">×</span>
+            <input type="number" class="form-input workout-num-input" id="wo-reps" placeholder="reps" min="1">
+            <button class="form-submit" id="wo-log-btn">Log set</button>
+          </div>
+          <div class="workout-lastbest" id="wo-lastbest" style="display:none"></div>
+        </div>
+
+        <!-- Today's session -->
+        <div class="workout-session-wrap" id="workout-session-wrap">
+          <div class="workout-session-empty" id="workout-session-empty">No sets logged today — add your first set above.</div>
+        </div>
+
+        <!-- History (shows once there are past sessions) -->
+        <div class="workout-history-wrap" id="workout-history-wrap" style="display:none">
+          <div class="workout-history-header">
+            <span>Past Sessions</span>
+            <button class="log-btn" id="workout-history-toggle" style="font-size:10px;padding:4px 10px">Show</button>
+          </div>
+          <div id="workout-history-list" style="display:none"></div>
+        </div>
+
+        <!-- ── Sleep Logger ── -->
+        <div class="section-label" style="margin-top:20px">Sleep Last Night</div>
+
+        <div class="sleep-log-card">
+          <div class="sleep-log-row">
+            <div class="sleep-field">
+              <div class="sleep-label">Hours slept</div>
+              <div class="sleep-hours-row">
+                <button class="sleep-adj-btn" id="sleep-minus">−</button>
+                <span class="sleep-hours-num" id="sleep-hours-display">7h</span>
+                <button class="sleep-adj-btn" id="sleep-plus">+</button>
+              </div>
+            </div>
+            <div class="sleep-field sleep-quality-field">
+              <div class="sleep-label">Quality</div>
+              <div class="sleep-quality-pills" id="sleep-quality-pills"></div>
+            </div>
+            <button class="form-submit" id="sleep-save-btn" style="align-self:flex-end">Save</button>
+          </div>
+          <div class="sleep-saved-msg" id="sleep-saved-msg" style="display:none"></div>
         </div>
 
       </div>
@@ -2668,27 +2802,72 @@
 
         <!-- ── TAB 1: GIFD ── -->
         <div class="los-pane active" id="los-gifd">
-          <div class="los-header">
-            <span class="los-month-label" id="gifd-month-label"></span>
-            <div style="display:flex;gap:8px;align-items:center">
+
+          <!-- TODAY'S ENTRY HERO -->
+          <div class="gifd-today-card" id="gifd-today-card">
+            <div class="gifd-today-header">
+              <div>
+                <div class="gifd-today-date" id="gifd-today-date"></div>
+                <div class="gifd-today-subtitle">What happened today?</div>
+              </div>
+              <div class="gifd-live-score-wrap">
+                <div class="gifd-live-score" id="gifd-live-score">0</div>
+                <div class="gifd-live-score-label">GIFD Score</div>
+              </div>
+            </div>
+
+            <textarea class="gifd-journal-textarea" id="gifd-journal-text"
+              placeholder="Write anything — wins, fails, what you're proud of, what you want to do better tomorrow..."></textarea>
+
+            <div class="gifd-habits-grid">
+              <div class="gifd-habits-col bad">
+                <div class="gifd-habits-col-header bad">✗ Negative<span class="gifd-col-sub">−1 each</span></div>
+                <div class="gifd-habits-list" id="gifd-bad-list"></div>
+              </div>
+              <div class="gifd-habits-col good">
+                <div class="gifd-habits-col-header good">✓ Positive<span class="gifd-col-sub">+1 each</span></div>
+                <div class="gifd-habits-list" id="gifd-good-list"></div>
+              </div>
+            </div>
+
+            <div class="gifd-feel-row">
+              <span class="gifd-feel-label">How did today feel?</span>
+              <div class="gifd-feel-btns" id="gifd-feel-btns">
+                <button class="gifd-feel-btn" data-v="1">😞 Terrible</button>
+                <button class="gifd-feel-btn" data-v="2">😐 Rough</button>
+                <button class="gifd-feel-btn" data-v="3">🙂 Okay</button>
+                <button class="gifd-feel-btn" data-v="4">😊 Good</button>
+                <button class="gifd-feel-btn" data-v="5">🔥 Locked in</button>
+              </div>
+            </div>
+
+            <button class="gifd-save-btn" id="gifd-save-btn">Save today's entry ↵</button>
+          </div>
+
+          <!-- PAST ENTRIES -->
+          <div class="gifd-past-header">
+            <span class="gifd-past-title">Past Entries</span>
+            <button class="log-btn" id="gifd-show-past" style="font-size:10px;padding:4px 10px">Show archive</button>
+          </div>
+          <div id="gifd-entries" style="display:none"></div>
+
+          <div id="gifd-charts-wrap" style="display:none;margin-top:16px">
+            <div class="los-card">
+              <div class="los-card-title">GIFD Score — This Month</div>
+              <div style="height:180px;position:relative"><canvas id="gifd-score-chart"></canvas></div>
+            </div>
+            <div class="los-card" style="margin-top:10px">
+              <div class="los-card-title">Happiness</div>
+              <div style="height:110px;position:relative"><canvas id="gifd-happy-chart"></canvas></div>
+            </div>
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
               <select class="form-select" id="gifd-archive-select" style="font-size:11px;padding:5px 9px;width:auto">
                 <option value="">Past months…</option>
               </select>
-              <button class="add-assign-btn" id="gifd-new-btn">+ New Day Entry</button>
+              <button class="add-assign-btn" id="gifd-close-month">Close Month &amp; Archive</button>
             </div>
           </div>
-          <div id="gifd-entries"></div>
-          <div class="los-card" style="margin-top:16px">
-            <div class="los-card-title">GIFD Score — This Month</div>
-            <div style="height:180px;position:relative"><canvas id="gifd-score-chart"></canvas></div>
-          </div>
-          <div class="los-card" style="margin-top:10px">
-            <div class="los-card-title">Happiness</div>
-            <div style="height:110px;position:relative"><canvas id="gifd-happy-chart"></canvas></div>
-          </div>
-          <div style="display:flex;justify-content:flex-end;margin-top:14px">
-            <button class="add-assign-btn" id="gifd-close-month">Close Month &amp; Archive</button>
-          </div>
+
         </div>
 
         <!-- ── TAB 2: Skills ── -->
@@ -3802,50 +3981,9 @@
       });
     }
 
-    /* ── Habits tracker ── */
-    const habitNames = ['Room clean', 'No late scrolling', 'Kept smoke to one', 'Studied something'];
-    const habitState = habitNames.map(() => Array(7).fill(false));
-
-    function renderHabits() {
-      const tbody = document.getElementById('habits-body');
-
-      // Count unchecked per day
-      const unchecked = Array(7).fill(0);
-      habitState.forEach(row => row.forEach((v, di) => { if (!v) unchecked[di]++; }));
-      const amber = unchecked.map(c => c >= 2);
-
-      // Update column headers
-      for (let di = 0; di < 7; di++) {
-        const th = document.getElementById(`hh-${di}`);
-        if (th) th.className = amber[di] ? 'amber-th' : '';
-      }
-
-      tbody.innerHTML = '';
-      habitNames.forEach((name, hi) => {
-        const checked = habitState[hi].filter(Boolean).length;
-        const pct     = Math.round((checked / 7) * 100);
-        const tr      = document.createElement('tr');
-
-        let html = `<td class="ht-name">${name}</td>`;
-        habitState[hi].forEach((isOn, di) => {
-          html += `<td class="${amber[di] ? 'amber-td' : ''}">
-            <input type="checkbox" class="habit-cb" data-hi="${hi}" data-di="${di}"${isOn ? ' checked' : ''}>
-          </td>`;
-        });
-        html += `<td class="ht-pct">${pct}%</td>`;
-        tr.innerHTML = html;
-        tbody.appendChild(tr);
-      });
-
-      tbody.querySelectorAll('.habit-cb').forEach(cb => {
-        cb.addEventListener('change', () => {
-          habitState[+cb.dataset.hi][+cb.dataset.di] = cb.checked;
-          renderHabits();
         });
       });
     }
-
-    renderHabits();
 
     /* ══════════════════════════════
        SCHOOL
@@ -4491,60 +4629,170 @@
       /* ════ GIFD ════ */
       const LS_GIFD = 'los-gifd-current';
       let gifdEntries = [];
-      function loadGIFD() { try { gifdEntries = JSON.parse(localStorage.getItem(LS_GIFD)||'[]'); } catch(_){ gifdEntries=[]; } }
-      function saveGIFD() { try { localStorage.setItem(LS_GIFD, JSON.stringify(gifdEntries)); } catch(_){} }
+      function loadGIFD()  { try { gifdEntries = JSON.parse(localStorage.getItem(LS_GIFD)||'[]'); } catch(_){ gifdEntries=[]; } }
+      function saveGIFD()  { try { localStorage.setItem(LS_GIFD, JSON.stringify(gifdEntries)); } catch(_){} }
 
-      const BAD_CHIPS  = [['weed','Weed'],['porn','Porn'],['scroll','Scroll +1h'],['junk','Junk food']];
-      const GOOD_CHIPS = [['posted','Posted @2.chicos'],['trained','Trained'],['meditate','Meditated'],['slept','Slept on schedule'],['read','Read +10 pages']];
+      const BAD_CHIPS  = [['weed','Weed'],['porn','Porn'],['scroll','Scroll +1h'],['junk','Junk food'],['smoked','Smoked']];
+      const GOOD_CHIPS = [['posted','Posted @2.chicos'],['trained','Trained'],['meditate','Meditated'],['slept','Slept on schedule'],['read','Read +10 pages'],['clean','Room clean'],['noscroll','No late scrolling'],['studied','Studied something']];
+
+      /* ── Today's entry state ── */
+      let todayBad  = {};
+      let todayGood = {};
+      let todayFeel = 0;
 
       function calcScore(e) {
         return Object.values(e.good||{}).filter(Boolean).length - Object.values(e.bad||{}).filter(Boolean).length;
       }
 
+      function calcLiveScore() {
+        return Object.values(todayGood).filter(Boolean).length - Object.values(todayBad).filter(Boolean).length;
+      }
+
+      function updateLiveScore() {
+        const sc  = calcLiveScore();
+        const el  = document.getElementById('gifd-live-score');
+        if (!el) return;
+        const prev = el.textContent;
+        el.textContent = sc > 0 ? '+' + sc : String(sc);
+        el.className   = 'gifd-live-score' + (sc > 0 ? ' pos' : sc < 0 ? ' neg' : '');
+        if (el.textContent !== prev) {
+          el.classList.remove('pop');
+          void el.offsetWidth;
+          el.classList.add('pop');
+        }
+      }
+
+      function renderTodayCard() {
+        const dateEl = document.getElementById('gifd-today-date');
+        if (dateEl) {
+          dateEl.textContent = new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
+        }
+
+        // Restore today's saved state from entries
+        const todayStr = lDate(new Date());
+        const todayEntry = gifdEntries.find(e => e.date === todayStr);
+        if (todayEntry) {
+          todayBad  = { ...todayEntry.bad };
+          todayGood = { ...todayEntry.good };
+          todayFeel = todayEntry.happiness || 0;
+          const ta  = document.getElementById('gifd-journal-text');
+          if (ta) ta.value = todayEntry.desc || '';
+        } else {
+          BAD_CHIPS.forEach(([k])  => todayBad[k]  = false);
+          GOOD_CHIPS.forEach(([k]) => todayGood[k] = false);
+        }
+
+        // Render bad habits
+        const badList = document.getElementById('gifd-bad-list');
+        if (badList) {
+          badList.innerHTML = '';
+          BAD_CHIPS.forEach(([k, label]) => {
+            const btn = document.createElement('button');
+            btn.className = 'gifd-habit-chip bad' + (todayBad[k] ? ' active' : '');
+            btn.dataset.k = k;
+            btn.innerHTML = `<span class="chip-icon">✗</span>${label}`;
+            btn.addEventListener('click', () => {
+              todayBad[k] = !todayBad[k];
+              btn.classList.toggle('active', todayBad[k]);
+              btn.classList.remove('pop'); void btn.offsetWidth; btn.classList.add('pop');
+              updateLiveScore();
+              autoSaveToday();
+            });
+            badList.appendChild(btn);
+          });
+        }
+
+        // Render good habits
+        const goodList = document.getElementById('gifd-good-list');
+        if (goodList) {
+          goodList.innerHTML = '';
+          GOOD_CHIPS.forEach(([k, label]) => {
+            const btn = document.createElement('button');
+            btn.className = 'gifd-habit-chip good' + (todayGood[k] ? ' active' : '');
+            btn.dataset.k = k;
+            btn.innerHTML = `<span class="chip-icon">✓</span>${label}`;
+            btn.addEventListener('click', () => {
+              todayGood[k] = !todayGood[k];
+              btn.classList.toggle('active', todayGood[k]);
+              btn.classList.remove('pop'); void btn.offsetWidth; btn.classList.add('pop');
+              updateLiveScore();
+              autoSaveToday();
+            });
+            goodList.appendChild(btn);
+          });
+        }
+
+        // Feel buttons
+        document.querySelectorAll('.gifd-feel-btn').forEach(btn => {
+          btn.classList.toggle('active', +btn.dataset.v === todayFeel);
+          btn.addEventListener('click', () => {
+            todayFeel = +btn.dataset.v;
+            document.querySelectorAll('.gifd-feel-btn').forEach(b => b.classList.toggle('active', +b.dataset.v === todayFeel));
+            autoSaveToday();
+          });
+        });
+
+        updateLiveScore();
+      }
+
+      function autoSaveToday() {
+        const todayStr = lDate(new Date());
+        const ta  = document.getElementById('gifd-journal-text');
+        const desc = ta ? ta.value : '';
+        let entry = gifdEntries.find(e => e.date === todayStr);
+        if (!entry) {
+          entry = { id: Date.now().toString(), date: todayStr, desc: '', bad: {}, good: {}, happiness: 0 };
+          gifdEntries.unshift(entry);
+        }
+        entry.bad       = { ...todayBad };
+        entry.good      = { ...todayGood };
+        entry.happiness = todayFeel;
+        entry.desc      = desc;
+        saveGIFD();
+      }
+
       function renderGIFDEntries() {
         const el = document.getElementById('gifd-entries'); if (!el) return;
         el.innerHTML = '';
-        if (!gifdEntries.length) {
-          el.innerHTML = '<div style="font-size:12px;color:#2e2e2e;padding:12px 0;text-align:center">No entries yet. Hit + New Day Entry.</div>';
+        const todayStr = lDate(new Date());
+        const past = gifdEntries.filter(e => e.date !== todayStr).sort((a,b) => b.date < a.date ? -1 : 1);
+        if (!past.length) {
+          el.innerHTML = '<div style="font-size:12px;color:#2e2e2e;padding:12px 0;text-align:center">No past entries yet.</div>';
           return;
         }
-        [...gifdEntries].sort((a,b)=>b.date<a.date?-1:1).forEach(entry => {
-          const sc = calcScore(entry);
+        past.forEach(entry => {
+          const sc  = calcScore(entry);
           const div = document.createElement('div'); div.className = 'gifd-entry';
+          const activeB = BAD_CHIPS.filter(([k]) => entry.bad[k]);
+          const activeG = GOOD_CHIPS.filter(([k]) => entry.good[k]);
+          const chipsHtml = [
+            ...activeB.map(([,l]) => `<span class="gifd-past-chip bad">${l}</span>`),
+            ...activeG.map(([,l]) => `<span class="gifd-past-chip good">${l}</span>`)
+          ].join('');
           div.innerHTML = `
             <div class="gifd-entry-header">
               <span class="gifd-date">${entry.date}</span>
-              <input class="gifd-desc" value="${(entry.desc||'').replace(/"/g,'&quot;')}" placeholder="What happened today…" data-id="${entry.id}">
+              <input class="gifd-desc" value="${(entry.desc||'').replace(/"/g,'&quot;')}" placeholder="What happened…" data-id="${entry.id}">
               <button class="gifd-del" data-id="${entry.id}">×</button>
             </div>
-            <div><div class="gifd-chip-group-label">Bad (−1 each)</div><div class="gifd-chips">
-              ${BAD_CHIPS.map(([k,l])=>`<button class="gifd-chip bad${entry.bad[k]?' active':''}" data-id="${entry.id}" data-g="bad" data-k="${k}">${l}</button>`).join('')}
-            </div></div>
-            <div><div class="gifd-chip-group-label">Good (+1 each)</div><div class="gifd-chips">
-              ${GOOD_CHIPS.map(([k,l])=>`<button class="gifd-chip good${entry.good[k]?' active':''}" data-id="${entry.id}" data-g="good" data-k="${k}">${l}</button>`).join('')}
-            </div></div>
+            ${chipsHtml ? `<div class="gifd-past-chips">${chipsHtml}</div>` : ''}
             <div class="gifd-score-row">
               <span class="gifd-score ${sc>0?'pos':sc<0?'neg':'zero'}">${sc>0?'+'+sc:sc}</span>
               <div class="gifd-happy-btns">
-                ${[['sad','😞 Sad',1],['mild','😐 Mild',2],['happy','😊 Happy',3]].map(([c,l,v])=>
+                ${[['sad','😞',1],['mild','😐',2],['happy','😊',3],['happy','🔥',4]].map(([c,l,v])=>
                   `<button class="gifd-happy-btn ${c}${entry.happiness===v?' active':''}" data-id="${entry.id}" data-v="${v}">${l}</button>`).join('')}
               </div>
             </div>`;
           el.appendChild(div);
         });
-        el.querySelectorAll('.gifd-chip').forEach(b => b.addEventListener('click', () => {
-          const e = gifdEntries.find(x=>x.id===b.dataset.id); if (!e) return;
-          e[b.dataset.g][b.dataset.k] = !e[b.dataset.g][b.dataset.k];
-          saveGIFD(); renderGIFDEntries(); renderGIFDCharts();
-        }));
         el.querySelectorAll('.gifd-desc').forEach(i => i.addEventListener('blur', () => {
-          const e = gifdEntries.find(x=>x.id===i.dataset.id); if (e) { e.desc=i.value; saveGIFD(); }
+          const e = gifdEntries.find(x=>x.id===i.dataset.id); if(e){e.desc=i.value;saveGIFD();}
         }));
         el.querySelectorAll('.gifd-del').forEach(b => b.addEventListener('click', () => {
           gifdEntries=gifdEntries.filter(e=>e.id!==b.dataset.id); saveGIFD(); renderGIFDEntries(); renderGIFDCharts();
         }));
         el.querySelectorAll('.gifd-happy-btn').forEach(b => b.addEventListener('click', () => {
-          const e=gifdEntries.find(x=>x.id===b.dataset.id); if(e){e.happiness=+b.dataset.v; saveGIFD(); renderGIFDEntries(); renderGIFDCharts();}
+          const e=gifdEntries.find(x=>x.id===b.dataset.id); if(e){e.happiness=+b.dataset.v;saveGIFD();renderGIFDEntries();renderGIFDCharts();}
         }));
       }
 
@@ -4555,26 +4803,21 @@
         const days=sorted.map(e=>e.date.slice(8));
         const scores=sorted.map(calcScore);
         const happy=sorted.map(e=>e.happiness||null);
-
         const sc=document.getElementById('gifd-score-chart');
         if(sc){if(gScoreChart){gScoreChart.destroy();gScoreChart=null;}
           gScoreChart=new Chart(sc.getContext('2d'),{type:'line',data:{labels:days,datasets:[
-            {data:scores,borderColor:'#4f7ec9',borderWidth:1.5,pointRadius:3,pointBackgroundColor:'#4f7ec9',tension:0.3,
-             fill:{target:0,above:'rgba(77,170,125,0.15)',below:'rgba(201,79,79,0.15)'}},
+            {data:scores,borderColor:'#4f7ec9',borderWidth:1.5,pointRadius:3,pointBackgroundColor:'#4f7ec9',tension:0.3,fill:{target:0,above:'rgba(77,170,125,0.15)',below:'rgba(201,79,79,0.15)'}},
             {data:days.map(()=>0),borderColor:'rgba(255,255,255,0.08)',borderDash:[4,4],borderWidth:1,pointRadius:0}
           ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
             scales:{x:{grid:{color:'#161616'},border:{color:'#1e1e1e'},ticks:{color:'#333',font:{size:9}}},
                     y:{grid:{color:'#161616'},border:{color:'#1e1e1e'},ticks:{color:'#333',font:{size:9}}}}}}); }
-
         const hc=document.getElementById('gifd-happy-chart');
         if(hc){if(gHappyChart){gHappyChart.destroy();gHappyChart=null;}
           gHappyChart=new Chart(hc.getContext('2d'),{type:'line',data:{labels:days,datasets:[
-            {data:happy,borderColor:'#9b7ac9',backgroundColor:'rgba(150,110,201,0.12)',borderWidth:1.5,
-             pointRadius:3,pointBackgroundColor:'#9b7ac9',stepped:'before',fill:true,spanGaps:false}
+            {data:happy,borderColor:'#9b7ac9',backgroundColor:'rgba(150,110,201,0.12)',borderWidth:1.5,pointRadius:3,pointBackgroundColor:'#9b7ac9',stepped:'before',fill:true,spanGaps:false}
           ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
             scales:{x:{grid:{color:'#161616'},border:{color:'#1e1e1e'},ticks:{color:'#333',font:{size:9}}},
-                    y:{grid:{color:'#161616'},border:{color:'#1e1e1e'},min:0,max:4,
-                       ticks:{color:'#333',font:{size:9},callback:v=>['','Sad','Mild','Happy'][v]||''}}}}});}
+                    y:{grid:{color:'#161616'},border:{color:'#1e1e1e'},min:0,max:5,ticks:{color:'#333',font:{size:9},callback:v=>['','Terrible','Rough','Okay','Good','🔥'][v]||''}}}}});}
       }
 
       function populateGIFDArchive() {
@@ -4582,30 +4825,67 @@
         const keys=[]; for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('los-gifd-archive-'))keys.push(k);}
         sel.innerHTML='<option value="">Past months…</option>';
         keys.sort().reverse().forEach(k=>{ sel.innerHTML+=`<option value="${k}">${k.replace('los-gifd-archive-','')}</option>`; });
-        sel.onchange=()=>{if(!sel.value)return;
-          try{const a=JSON.parse(localStorage.getItem(sel.value)||'[]');alert(`${sel.value}: ${a.length} entries archived.`);}catch(_){}
-          sel.value='';};
+        sel.onchange=()=>{if(!sel.value)return;sel.value='';};
       }
 
       function initGIFD() {
         loadGIFD();
-        const ml=document.getElementById('gifd-month-label');
-        if(ml) ml.textContent=new Date().toLocaleDateString('en-US',{month:'long',year:'numeric'});
-        document.getElementById('gifd-new-btn')?.addEventListener('click',()=>{
-          const badObj={},goodObj={};
-          BAD_CHIPS.forEach(([k])=>badObj[k]=false); GOOD_CHIPS.forEach(([k])=>goodObj[k]=false);
-          gifdEntries.unshift({id:Date.now().toString(),date:lDate(new Date()),desc:'',bad:badObj,good:goodObj,happiness:2});
-          saveGIFD(); renderGIFDEntries();
-        });
-        document.getElementById('gifd-close-month')?.addEventListener('click',()=>{
-          if(!gifdEntries.length) return;
-          const key=`los-gifd-archive-${new Date().toISOString().slice(0,7)}`;
-          try{localStorage.setItem(key,JSON.stringify(gifdEntries));}catch(_){}
-          gifdEntries=[]; saveGIFD(); renderGIFDEntries(); renderGIFDCharts(); populateGIFDArchive();
-        });
-        populateGIFDArchive(); renderGIFDEntries();
-      }
+        renderTodayCard();
 
+        // Journal auto-save on type
+        const ta = document.getElementById('gifd-journal-text');
+        if (ta) {
+          ta.addEventListener('input', () => autoSaveToday());
+          ta.addEventListener('keydown', e => { if (e.key === 'Enter' && e.ctrlKey) { e.preventDefault(); saveBtn?.click(); } });
+        }
+
+        // Save button
+        const saveBtn = document.getElementById('gifd-save-btn');
+        if (saveBtn) {
+          saveBtn.addEventListener('click', () => {
+            autoSaveToday();
+            saveBtn.textContent = '✓ Saved!';
+            saveBtn.classList.add('saved');
+            setTimeout(() => {
+              saveBtn.textContent = "Save today's entry ↵";
+              saveBtn.classList.remove('saved');
+            }, 2000);
+            renderGIFDEntries();
+            loadChartLOS(() => renderGIFDCharts());
+          });
+        }
+
+        // Show/hide archive
+        const showPast = document.getElementById('gifd-show-past');
+        const entriesEl = document.getElementById('gifd-entries');
+        const chartsEl  = document.getElementById('gifd-charts-wrap');
+        if (showPast) {
+          showPast.addEventListener('click', () => {
+            const open = entriesEl?.style.display === 'none' || !entriesEl?.style.display;
+            if (entriesEl) entriesEl.style.display = open ? '' : 'none';
+            if (chartsEl)  chartsEl.style.display  = open ? '' : 'none';
+            showPast.textContent = open ? 'Hide archive' : 'Show archive';
+            if (open) { renderGIFDEntries(); loadChartLOS(() => renderGIFDCharts()); }
+          });
+        }
+
+        // Archive month
+        document.getElementById('gifd-close-month')?.addEventListener('click', () => {
+          if (!gifdEntries.length) return;
+          const key = `los-gifd-archive-${new Date().toISOString().slice(0,7)}`;
+          try { localStorage.setItem(key, JSON.stringify(gifdEntries)); } catch(_) {}
+          gifdEntries = []; saveGIFD();
+          todayBad = {}; todayGood = {}; todayFeel = 0;
+          BAD_CHIPS.forEach(([k])  => todayBad[k]  = false);
+          GOOD_CHIPS.forEach(([k]) => todayGood[k] = false);
+          renderTodayCard(); renderGIFDEntries();
+          if (window.Chart) renderGIFDCharts();
+          populateGIFDArchive();
+        });
+
+        populateGIFDArchive();
+        renderGIFDEntries();
+      }
       /* ════ SKILLS ════ */
       const LS_SKILLS_XP='los-skills-xp', LS_SKILLS_HX='los-skills-history';
       const SKILL_DEFS=[{key:'SOC',label:'SOC',sub:'Social',color:'#4f7ec9'},{key:'STR',label:'STR',sub:'Strength',color:'#c94f4f'},{key:'WOK',label:'WOK',sub:'Work',color:'#c9a032'},{key:'INT',label:'INT',sub:'Intelligence',color:'#9b7ac9'}];
@@ -5601,6 +5881,249 @@
           if (sec.classList.contains('active') && !inited) { inited = true; render(); }
         }).observe(sec, { attributes: true, attributeFilter: ['class'] });
         if (sec.classList.contains('active')) { inited = true; render(); }
+      }
+    })();
+
+    /* ══════════════════════════════
+       MOVEMENT — WORKOUT + SLEEP
+    ══════════════════════════════ */
+    (function () {
+      const LS_WO    = 'leon-workout-v3';
+      const LS_SLEEP = 'leon-sleep-v1';
+      const TODAY    = new Date().toISOString().slice(0, 10);
+
+      /* ── Workout ── */
+      function lsWo()    { try { return JSON.parse(localStorage.getItem(LS_WO) || '{}'); } catch(_) { return {}; } }
+      function saveWo(d) { try { localStorage.setItem(LS_WO, JSON.stringify(d)); } catch(_) {} }
+
+      function getWoData() {
+        const d = lsWo();
+        if (!d.prs)      d.prs      = {};
+        if (!d.sessions) d.sessions = [];
+        return d;
+      }
+
+      function todaySets(d) {
+        let s = d.sessions.find(s => s.date === TODAY);
+        if (!s) { s = { date: TODAY, sets: [] }; d.sessions.push(s); }
+        return s;
+      }
+
+      function isPR(d, exercise, kg, reps) {
+        const prev = d.prs[exercise];
+        if (!prev) return true;
+        if (kg > prev.kg) return true;
+        return kg === prev.kg && reps > prev.reps;
+      }
+
+      function updatePR(d, exercise, kg, reps) {
+        const prev = d.prs[exercise];
+        if (!prev || kg > prev.kg || (kg === prev.kg && reps > prev.reps)) {
+          d.prs[exercise] = { kg, reps };
+        }
+      }
+
+      function refreshExerciseList(d) {
+        const dl = document.getElementById('exercise-history');
+        if (!dl) return;
+        dl.innerHTML = '';
+        const names = [...new Set(d.sessions.flatMap(s => s.sets.map(x => x.exercise)))];
+        names.forEach(n => { const opt = document.createElement('option'); opt.value = n; dl.appendChild(opt); });
+      }
+
+      function showLastBest(d, exercise) {
+        const el = document.getElementById('wo-lastbest');
+        if (!el) return;
+        const prev = d.prs[exercise];
+        if (!exercise || !prev) { el.style.display = 'none'; return; }
+        el.style.display = '';
+        el.innerHTML = `Last best: <span class="pr-highlight">${prev.kg}kg × ${prev.reps}</span> for <strong style="color:#bbb">${exercise}</strong>`;
+      }
+
+      function renderWorkoutToday(d) {
+        const wrap  = document.getElementById('workout-session-wrap');
+        const empty = document.getElementById('workout-session-empty');
+        if (!wrap) return;
+        const today = d.sessions.find(s => s.date === TODAY);
+        if (!today || !today.sets.length) {
+          wrap.innerHTML = '';
+          if (empty) { empty.style.display = ''; wrap.appendChild(empty); }
+          return;
+        }
+        if (empty) empty.style.display = 'none';
+        wrap.innerHTML = '';
+
+        // Group by exercise
+        const groups = {};
+        today.sets.forEach((set, idx) => {
+          if (!groups[set.exercise]) groups[set.exercise] = [];
+          groups[set.exercise].push({ ...set, idx });
+        });
+
+        Object.entries(groups).forEach(([ex, sets]) => {
+          const bestSet = sets.reduce((b, s) => s.kg > b.kg ? s : b, sets[0]);
+          const pr = d.prs[ex];
+          const isExPR = pr && bestSet.kg >= pr.kg && bestSet.reps >= pr.reps;
+
+          const grp = document.createElement('div');
+          grp.className = 'workout-exercise-group';
+          grp.innerHTML = `
+            <div class="workout-ex-header">
+              <span class="workout-ex-name">${ex}</span>
+              <span class="workout-ex-pr${isExPR ? ' show' : ''}">🏆 PR</span>
+            </div>
+            ${sets.map((s, i) => `
+              <div class="workout-set-row">
+                <span class="workout-set-num">Set ${i + 1}</span>
+                <span class="workout-set-data">${s.kg} kg × ${s.reps} reps</span>
+                <button class="workout-set-del" data-idx="${s.idx}" title="Remove">×</button>
+              </div>`).join('')}`;
+          wrap.appendChild(grp);
+        });
+
+        wrap.querySelectorAll('.workout-set-del').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const d2 = getWoData();
+            const t  = todaySets(d2);
+            t.sets.splice(+btn.dataset.idx, 1);
+            saveWo(d2);
+            renderWorkoutToday(d2);
+            renderWorkoutHistory(d2);
+          });
+        });
+      }
+
+      function renderWorkoutHistory(d) {
+        const wrap = document.getElementById('workout-history-wrap');
+        const list = document.getElementById('workout-history-list');
+        if (!wrap || !list) return;
+        const past = d.sessions.filter(s => s.date !== TODAY && s.sets.length).slice(-7).reverse();
+        if (!past.length) { wrap.style.display = 'none'; return; }
+        wrap.style.display = '';
+        list.innerHTML = '';
+        past.forEach(s => {
+          const groups = {};
+          s.sets.forEach(set => { if (!groups[set.exercise]) groups[set.exercise] = []; groups[set.exercise].push(set); });
+          const summary = Object.entries(groups).map(([ex, sets]) => {
+            const best = sets.reduce((b, x) => x.kg > b.kg ? x : b, sets[0]);
+            return `${ex}: ${sets.length} sets · best ${best.kg}kg×${best.reps}`;
+          }).join(' &nbsp;·&nbsp; ');
+          const el = document.createElement('div');
+          el.className = 'workout-history-session';
+          el.innerHTML = `<div class="workout-history-date">${s.date}</div><div class="workout-history-detail">${summary}</div>`;
+          list.appendChild(el);
+        });
+      }
+
+      const exInput   = document.getElementById('wo-exercise');
+      const kgInput   = document.getElementById('wo-weight');
+      const repsInput = document.getElementById('wo-reps');
+      const prMsg     = document.getElementById('workout-pr-msg');
+
+      exInput?.addEventListener('input', () => showLastBest(getWoData(), exInput.value.trim()));
+
+      function doLogSet() {
+        const ex   = exInput?.value?.trim();
+        const kg   = parseFloat(kgInput?.value);
+        const reps = parseInt(repsInput?.value, 10);
+        if (!ex || isNaN(kg) || isNaN(reps) || reps < 1) return;
+
+        const d     = getWoData();
+        const newPR = isPR(d, ex, kg, reps);
+        todaySets(d).sets.push({ exercise: ex, kg, reps });
+        updatePR(d, ex, kg, reps);
+        saveWo(d);
+
+        renderWorkoutToday(d);
+        renderWorkoutHistory(d);
+        refreshExerciseList(d);
+        showLastBest(d, ex);
+
+        if (newPR && prMsg) {
+          prMsg.style.display = '';
+          setTimeout(() => { if (prMsg) prMsg.style.display = 'none'; }, 3000);
+        }
+
+        if (kgInput)   kgInput.value   = '';
+        if (repsInput) repsInput.value = '';
+        if (exInput)   exInput.focus();
+      }
+
+      document.getElementById('wo-log-btn')?.addEventListener('click', doLogSet);
+      repsInput?.addEventListener('keydown', e => { if (e.key === 'Enter') doLogSet(); });
+
+      document.getElementById('workout-history-toggle')?.addEventListener('click', function() {
+        const list = document.getElementById('workout-history-list');
+        if (!list) return;
+        const open = list.style.display === 'none' || !list.style.display;
+        list.style.display = open ? '' : 'none';
+        this.textContent = open ? 'Hide' : 'Show';
+      });
+
+      /* ── Sleep ── */
+      function lsSleep()    { try { return JSON.parse(localStorage.getItem(LS_SLEEP) || '{}'); } catch(_) { return {}; } }
+      function saveSleep(d) { try { localStorage.setItem(LS_SLEEP, JSON.stringify(d)); } catch(_) {} }
+
+      const QUALITY_LABELS = ['','😞 Terrible','😞 Bad','😐 Poor','🙂 Ok','😊 Good','🔥 Great'];
+
+      let sleepHours   = lsSleep().hours   || 7;
+      let sleepQuality = lsSleep().quality || 0;
+
+      function renderSleepHours() {
+        const el = document.getElementById('sleep-hours-display');
+        if (el) el.textContent = sleepHours % 1 === 0 ? sleepHours + 'h' : sleepHours + 'h';
+      }
+
+      function renderSleepQuality() {
+        document.querySelectorAll('.sleep-quality-pill').forEach(p => {
+          p.classList.toggle('sel', +p.dataset.q === sleepQuality);
+        });
+      }
+
+      const pillsWrap = document.getElementById('sleep-quality-pills');
+      if (pillsWrap) {
+        [['😞 Terrible',1],['😞 Bad',2],['😐 Poor',3],['🙂 Ok',4],['😊 Good',5],['🔥 Great',6]]
+          .forEach(([label, q]) => {
+            const btn = document.createElement('button');
+            btn.className = 'sleep-quality-pill';
+            btn.dataset.q = q;
+            btn.textContent = label;
+            btn.addEventListener('click', () => { sleepQuality = q; renderSleepQuality(); });
+            pillsWrap.appendChild(btn);
+          });
+        renderSleepQuality();
+      }
+
+      document.getElementById('sleep-minus')?.addEventListener('click', () => { sleepHours = Math.max(0, +(sleepHours - 0.5).toFixed(1)); renderSleepHours(); });
+      document.getElementById('sleep-plus')?.addEventListener('click',  () => { sleepHours = Math.min(14, +(sleepHours + 0.5).toFixed(1)); renderSleepHours(); });
+
+      document.getElementById('sleep-save-btn')?.addEventListener('click', () => {
+        saveSleep({ date: TODAY, hours: sleepHours, quality: sleepQuality });
+        const msg = document.getElementById('sleep-saved-msg');
+        if (msg) {
+          msg.style.display = '';
+          msg.textContent = `✓ Saved — ${sleepHours}h · ${QUALITY_LABELS[sleepQuality] || 'No quality set'}`;
+          setTimeout(() => { if (msg) msg.style.display = 'none'; }, 3000);
+        }
+      });
+
+      // Restore saved sleep for today
+      const saved = lsSleep();
+      if (saved.date === TODAY) { sleepHours = saved.hours; sleepQuality = saved.quality; }
+      renderSleepHours();
+
+      /* ── Init (lazy) ── */
+      const sec = document.getElementById('section-movement');
+      if (sec) {
+        const initWo = () => {
+          const d = getWoData();
+          refreshExerciseList(d);
+          renderWorkoutToday(d);
+          renderWorkoutHistory(d);
+        };
+        new MutationObserver(() => { if (sec.classList.contains('active')) initWo(); })
+          .observe(sec, { attributes: true, attributeFilter: ['class'] });
+        if (sec.classList.contains('active')) initWo();
       }
     })();
 
