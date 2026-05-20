@@ -4313,7 +4313,7 @@
         const canvas=document.getElementById('fog-map-canvas');
         if(!canvas)return;
         const ctx=canvas.getContext('2d');
-        const CW=900,CH=700,R=140;
+        const CW=900,CH=700,R=120;
         const hr=new Date().getHours(),isNight=(hr<6||hr>=20);
 
         /* ── Image preload ── */
@@ -4342,12 +4342,12 @@
         /* ── Tiles ── */
         const TILES=[
           {id:'sitges',   label:'SITGES',    sub:"Plaza España · Gaby's",  x:450,y:350,unlocked:true,  bgKey:null},
-          {id:'platja',   label:'PLATJA',    sub:'Sitges Beach',            x:450,y:530,unlocked:true,  bgKey:null},
-          {id:'bcn',      label:'BARCELONA', sub:'Razzmatazz · Euroaula',   x:610,y:260,unlocked:false, bgKey:'bcn'},
-          {id:'vilanova', label:'VILANOVA',  sub:'Tren · Luena',            x:290,y:440,unlocked:false, bgKey:'vil'},
-          {id:'fog_nw',   label:'',          sub:'',                        x:290,y:260,unlocked:false, bgKey:'fogImg'},
-          {id:'fog_n',    label:'',          sub:'',                        x:450,y:170,unlocked:false, bgKey:'fogImg'},
-          {id:'fog_se',   label:'',          sub:'',                        x:610,y:440,unlocked:false, bgKey:'fogImg'},
+          {id:'platja',   label:'PLATJA',    sub:'Sitges Beach',            x:450,y:558,unlocked:true,  bgKey:null},
+          {id:'bcn',      label:'BARCELONA', sub:'Razzmatazz · Euroaula',   x:630,y:245,unlocked:false, bgKey:'bcn'},
+          {id:'vilanova', label:'VILANOVA',  sub:'Tren · Luena',            x:270,y:455,unlocked:false, bgKey:'vil'},
+          {id:'fog_nw',   label:'',          sub:'',                        x:270,y:245,unlocked:false, bgKey:'fogImg'},
+          {id:'fog_n',    label:'',          sub:'',                        x:450,y:142,unlocked:false, bgKey:'fogImg'},
+          {id:'fog_se',   label:'',          sub:'',                        x:630,y:455,unlocked:false, bgKey:'fogImg'},
         ];
 
         /* ── localStorage helpers ── */
