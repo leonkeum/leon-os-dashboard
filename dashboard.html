@@ -232,9 +232,108 @@
     .content::-webkit-scrollbar-track { background: transparent; }
     .content::-webkit-scrollbar-thumb { background: #222; border-radius: 2px; }
 
-    /* ── Section switching ── */
+    /* ── Section switching + entrance animation ── */
     .section { display: none; width: 100%; }
-    .section.active { display: flex; flex-direction: column; }
+    @keyframes section-in {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .section.active {
+      display: flex;
+      flex-direction: column;
+      animation: section-in 0.22s ease forwards;
+    }
+
+    /* ── Nav icon hover nudge ── */
+    .nav-icon { transition: opacity 0.12s, transform 0.14s; }
+    .nav-item:hover .nav-icon { transform: translateX(2px); }
+
+    /* ── Topbar completion rings ── */
+    .topbar-rings {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-right: 4px;
+    }
+
+    .ring-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      cursor: pointer;
+      opacity: 0.45;
+      transition: opacity 0.15s;
+    }
+    .ring-wrap:hover { opacity: 0.75; }
+    .ring-wrap.done  { opacity: 1; }
+
+    .ring-svg   { width: 22px; height: 22px; }
+    .ring-label { font-size: 7px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #444; }
+    .ring-wrap.done .ring-label { color: #666; }
+
+    /* ── Daily score badge pop ── */
+    @keyframes badge-pop { 0%{transform:scale(1)} 40%{transform:scale(1.14)} 100%{transform:scale(1)} }
+    .topbar-badge.pop { animation: badge-pop 0.28s ease; }
+
+    /* ── Sidebar streaks ── */
+    .sidebar-streaks {
+      margin-top: auto;
+      padding: 8px 7px 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .streak-row-item {
+      display: flex;
+      align-items: center;
+      padding: 7px 7px;
+      border-radius: 7px;
+      overflow: hidden;
+      white-space: nowrap;
+      transition: background 0.12s;
+    }
+
+    .streak-row-item:hover { background: #141414; }
+
+    .streak-row-icon { font-size: 14px; flex-shrink: 0; line-height: 1; }
+
+    .streak-row-text {
+      font-size: 11px;
+      color: #666;
+      white-space: nowrap;
+      overflow: hidden;
+      opacity: 0;
+      max-width: 0;
+      transition: opacity 0.16s ease, max-width 0.22s ease, margin-left 0.22s ease;
+      margin-left: 0;
+    }
+
+    .sidebar:hover .streak-row-text {
+      opacity: 1;
+      max-width: 130px;
+      margin-left: 8px;
+    }
+
+    .streak-row-num {
+      font-size: 12px;
+      font-weight: 700;
+      color: #666;
+      font-variant-numeric: tabular-nums;
+      margin-left: auto;
+      opacity: 0;
+      transition: opacity 0.16s ease;
+      flex-shrink: 0;
+      padding-left: 4px;
+    }
+
+    .sidebar:hover .streak-row-num { opacity: 1; }
+    .streak-row-num.hot { color: var(--amber); }
+
+    /* ── Workout PR glow ── */
+    @keyframes pr-glow { 0%{box-shadow:none} 40%{box-shadow:0 0 14px rgba(77,170,125,0.4)} 100%{box-shadow:none} }
+    .workout-exercise-group.pr-flash { animation: pr-glow 1.4s ease; }
 
     /* ── Placeholder (used by non-built sections) ── */
     .placeholder {
@@ -2542,6 +2641,25 @@
       </div>
     </nav>
 
+    <!-- Streaks widget -->
+    <div class="sidebar-streaks">
+      <div class="streak-row-item">
+        <span class="streak-row-icon">📋</span>
+        <span class="streak-row-text">GIFD streak</span>
+        <span class="streak-row-num" id="streak-gifd-num">—</span>
+      </div>
+      <div class="streak-row-item">
+        <span class="streak-row-icon">💪</span>
+        <span class="streak-row-text">Workout streak</span>
+        <span class="streak-row-num" id="streak-workout-num">—</span>
+      </div>
+      <div class="streak-row-item">
+        <span class="streak-row-icon">🍽</span>
+        <span class="streak-row-text">Nutrition streak</span>
+        <span class="streak-row-num" id="streak-nutrition-num">—</span>
+      </div>
+    </div>
+
   </aside>
 
   <div class="main">
@@ -2552,6 +2670,36 @@
       </div>
       <div class="topbar-right">
         <span class="topbar-clock" id="topbar-clock"></span>
+        <!-- Completion rings -->
+        <div class="topbar-rings" id="topbar-rings">
+          <div class="ring-wrap" id="ring-gifd" title="GIFD — log today's entry" onclick="document.querySelector('[data-section=life-os]').click()">
+            <svg class="ring-svg" viewBox="0 0 22 22">
+              <circle cx="11" cy="11" r="8" fill="none" stroke="#1e1e1e" stroke-width="2.5"/>
+              <circle id="ring-arc-gifd" cx="11" cy="11" r="8" fill="none" stroke="#4f7ec9" stroke-width="2.5"
+                stroke-linecap="round" stroke-dasharray="50.27" stroke-dashoffset="50.27"
+                transform="rotate(-90 11 11)" style="transition:stroke-dashoffset 0.5s ease,stroke 0.3s"/>
+            </svg>
+            <span class="ring-label">GIFD</span>
+          </div>
+          <div class="ring-wrap" id="ring-workout" title="Movement — log a workout" onclick="document.querySelector('[data-section=movement]').click()">
+            <svg class="ring-svg" viewBox="0 0 22 22">
+              <circle cx="11" cy="11" r="8" fill="none" stroke="#1e1e1e" stroke-width="2.5"/>
+              <circle id="ring-arc-workout" cx="11" cy="11" r="8" fill="none" stroke="#c94f4f" stroke-width="2.5"
+                stroke-linecap="round" stroke-dasharray="50.27" stroke-dashoffset="50.27"
+                transform="rotate(-90 11 11)" style="transition:stroke-dashoffset 0.5s ease,stroke 0.3s"/>
+            </svg>
+            <span class="ring-label">Lift</span>
+          </div>
+          <div class="ring-wrap" id="ring-nutrition" title="Nutrition — log a meal" onclick="document.querySelector('[data-section=nutrition]').click()">
+            <svg class="ring-svg" viewBox="0 0 22 22">
+              <circle cx="11" cy="11" r="8" fill="none" stroke="#1e1e1e" stroke-width="2.5"/>
+              <circle id="ring-arc-nutrition" cx="11" cy="11" r="8" fill="none" stroke="#4daa7d" stroke-width="2.5"
+                stroke-linecap="round" stroke-dasharray="50.27" stroke-dashoffset="50.27"
+                transform="rotate(-90 11 11)" style="transition:stroke-dashoffset 0.5s ease,stroke 0.3s"/>
+            </svg>
+            <span class="ring-label">Fuel</span>
+          </div>
+        </div>
         <span class="topbar-badge" id="daily-score-badge" style="display:none"></span>
       </div>
     </header>
@@ -3438,8 +3586,154 @@
         document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
         const target = document.getElementById(`section-${item.dataset.section}`);
         if (target) target.classList.add('active');
+        // Refresh score on every section visit
+        window.updateDailyScore?.();
       });
     });
+
+    /* ══════════════════════════════
+       GAMIFICATION — DAILY SCORE + STREAKS + RINGS
+    ══════════════════════════════ */
+    (function () {
+      const TODAY      = new Date().toISOString().slice(0, 10);
+      const LS_STREAKS = 'leon-streaks-v1';
+      const CIRC       = 50.27; // 2π × r(8)
+
+      /* ── What's logged today? ── */
+      function gifdLogged() {
+        try {
+          const entries = JSON.parse(localStorage.getItem('los-gifd-current') || '[]');
+          const e = entries.find(x => x.date === TODAY);
+          return !!(e && (e.desc || Object.values(e.good||{}).some(Boolean) || Object.values(e.bad||{}).some(Boolean)));
+        } catch(_) { return false; }
+      }
+
+      function workoutLogged() {
+        try {
+          const d = JSON.parse(localStorage.getItem('leon-workout-v3') || '{}');
+          const s = (d.sessions || []).find(x => x.date === TODAY);
+          return !!(s && s.sets && s.sets.length > 0);
+        } catch(_) { return false; }
+      }
+
+      function sleepLogged() {
+        try {
+          const d = JSON.parse(localStorage.getItem('leon-sleep-v1') || '{}');
+          return d.date === TODAY && d.hours > 0;
+        } catch(_) { return false; }
+      }
+
+      function nutritionLogged() {
+        try {
+          const d = JSON.parse(localStorage.getItem('leon-nutrition-v2') || '{}');
+          return d.date === TODAY && d.meals && d.meals.length > 0;
+        } catch(_) { return false; }
+      }
+
+      function gifdHabits() {
+        try {
+          const entries = JSON.parse(localStorage.getItem('los-gifd-current') || '[]');
+          const e = entries.find(x => x.date === TODAY);
+          if (!e) return { good: 0, bad: 0 };
+          return {
+            good: Object.values(e.good || {}).filter(Boolean).length,
+            bad:  Object.values(e.bad  || {}).filter(Boolean).length
+          };
+        } catch(_) { return { good: 0, bad: 0 }; }
+      }
+
+      /* ── Score calculation ── */
+      function calcScore() {
+        const { good, bad } = gifdHabits();
+        let s = 0;
+        if (gifdLogged())      s += 25;
+        if (workoutLogged())   s += 25;
+        if (sleepLogged())     s += 15;
+        if (nutritionLogged()) s += 15;
+        s += good * 4;
+        s -= bad  * 4;
+        return Math.max(0, Math.round(s));
+      }
+
+      /* ── Completion rings ── */
+      function setRing(id, filled, color) {
+        const arc  = document.getElementById(`ring-arc-${id}`);
+        const wrap = document.getElementById(`ring-${id}`);
+        if (arc) {
+          arc.style.strokeDashoffset = filled ? 0 : CIRC;
+          arc.style.stroke = color;
+        }
+        if (wrap) wrap.classList.toggle('done', filled);
+      }
+
+      /* ── Score badge ── */
+      function renderScoreBadge(score) {
+        const badge = document.getElementById('daily-score-badge');
+        if (!badge) return;
+        const prev     = parseInt(badge.dataset.score || '-1', 10);
+        const colorCls = score >= 70 ? 'green' : score >= 35 ? 'amber' : 'red';
+        badge.style.display = '';
+        badge.className     = `topbar-badge ${colorCls}`;
+        badge.textContent   = `DAY ${score}`;
+        badge.dataset.score = score;
+        if (score !== prev) {
+          badge.classList.remove('pop');
+          void badge.offsetWidth;
+          badge.classList.add('pop');
+        }
+      }
+
+      /* ── Streaks ── */
+      function loadStreaks() {
+        try { return JSON.parse(localStorage.getItem(LS_STREAKS) || '{}'); } catch(_) { return {}; }
+      }
+      function saveStreaks(s) { try { localStorage.setItem(LS_STREAKS, JSON.stringify(s)); } catch(_) {} }
+
+      function updateStreak(key, loggedToday) {
+        const streaks = loadStreaks();
+        const s = streaks[key] || { count: 0, lastDate: '' };
+        const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+
+        if (loggedToday && s.lastDate !== TODAY) {
+          s.count    = (s.lastDate === yesterday) ? s.count + 1 : 1;
+          s.lastDate = TODAY;
+          streaks[key] = s;
+          saveStreaks(streaks);
+        } else if (!loggedToday && s.lastDate < yesterday && s.lastDate !== '') {
+          // Streak broken — don't reset count yet, just leave it (show as lapsed)
+        }
+
+        return s.count;
+      }
+
+      function renderStreakNum(id, count) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.textContent = count > 0 ? `${count}d` : '—';
+        el.classList.toggle('hot', count >= 3);
+      }
+
+      /* ── Main refresh (called everywhere) ── */
+      window.updateDailyScore = function () {
+        const score  = calcScore();
+        const gl     = gifdLogged();
+        const wl     = workoutLogged();
+        const nl     = nutritionLogged();
+
+        renderScoreBadge(score);
+        setRing('gifd',      gl, '#4f7ec9');
+        setRing('workout',   wl, '#c94f4f');
+        setRing('nutrition', nl, '#4daa7d');
+
+        renderStreakNum('streak-gifd-num',      updateStreak('gifd',      gl));
+        renderStreakNum('streak-workout-num',   updateStreak('workout',   wl));
+        renderStreakNum('streak-nutrition-num', updateStreak('nutrition', nl));
+      };
+
+      /* Init + poll every 30s */
+      window.updateDailyScore();
+      setInterval(window.updateDailyScore, 30000);
+    })();
 
     /* ══════════════════════════════
        TIME OS — DYNAMIC CALENDAR + GABY UPLOAD
@@ -4745,6 +5039,7 @@
         entry.happiness = todayFeel;
         entry.desc      = desc;
         saveGIFD();
+        window.updateDailyScore?.();
       }
 
       function renderGIFDEntries() {
@@ -4848,6 +5143,7 @@
             }, 2000);
             renderGIFDEntries();
             loadChartLOS(() => renderGIFDCharts());
+            window.updateDailyScore?.();
           });
         }
 
@@ -6038,7 +6334,19 @@
         if (newPR && prMsg) {
           prMsg.style.display = '';
           setTimeout(() => { if (prMsg) prMsg.style.display = 'none'; }, 3000);
+          // PR glow on the exercise group
+          setTimeout(() => {
+            document.querySelectorAll('.workout-exercise-group').forEach(g => {
+              if (g.querySelector('.workout-ex-name')?.textContent === ex) {
+                g.classList.remove('pr-flash');
+                void g.offsetWidth;
+                g.classList.add('pr-flash');
+              }
+            });
+          }, 80);
         }
+
+        window.updateDailyScore?.();
 
         if (kgInput)   kgInput.value   = '';
         if (repsInput) repsInput.value = '';
@@ -6101,6 +6409,7 @@
           msg.textContent = `✓ Saved — ${sleepHours}h · ${QUALITY_LABELS[sleepQuality] || 'No quality set'}`;
           setTimeout(() => { if (msg) msg.style.display = 'none'; }, 3000);
         }
+        window.updateDailyScore?.();
       });
 
       // Restore saved sleep for today
@@ -6216,6 +6525,7 @@
         lsSave(d);
         renderTotals(d.totals);
         renderMeals(d);
+        window.updateDailyScore?.();
       }
 
       /* ── AI estimation ── */
