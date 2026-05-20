@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\keuul\\\\Desktop\\\\ClaudeCodeTest\" -Force)",
+      "Bash(Select-Object Name, PSIsContainer)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\keuul\\\\Desktop\\\\ClaudeCodeTest\" -Recurse -File)",
+      "Bash(Select-Object FullName, Length, LastWriteTime)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(gh api *)",
+      "Bash(Select-String -Pattern \"chico|manual|marca|whatsapp|2026\" -i)",
+      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\keuul\\\\Desktop\" -Force | ForEach-Object { $_.Name })",
+      "PowerShell(ffmpeg *)",
+      "PowerShell(pip show *)",
+      "Bash(python3 -c \"import cv2; print\\('cv2 ok'\\)\")",
+      "Bash(winget install *)",
+      "PowerShell(winget list *)",
+      "Bash(mkdir -p /c/Users/keuul/Desktop/ClaudeCodeTest/video_frames)",
+      "Bash(ffmpeg -i \"/c/Users/keuul/Downloads/Claudetestoptimizedweb.mp4\" -vf \"fps=2\" \"/c/Users/keuul/Desktop/ClaudeCodeTest/video_frames/frame_%03d.jpg\" -y)",
+      "Bash(npx --yes playwright --version)",
+      "PowerShell(Start-Process \"C:\\\\Users\\\\keuul\\\\Desktop\\\\ClaudeCodeTest\\\\dashboard.html\")",
+      "Bash(python3 *)",
+      "Bash(node --input-type=module)"
+    ]
+  }
+}

@@ -3,8 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard</title>
+  <title>Leon OS</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Leon OS">
+  <link rel="apple-touch-icon" href="icon-192.png">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});</script>
   <style>
     :root {
       --green:  #4daa7d;
@@ -2861,6 +2868,193 @@
     }
     .kc-input:focus, .kc-note-input:focus { box-shadow: var(--focus-ring); border-color: #2a2a2a; }
 
+    /* ── Today Dashboard ── */
+    .today-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .today-card {
+      background: var(--surface1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.12s;
+      position: relative;
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .today-card:hover { border-color: #272727; background: #131313; }
+
+    .today-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .today-card-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #444;
+    }
+
+    .today-card-status {
+      font-size: 9px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 10px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .today-card-status.done   { background: rgba(77,170,125,0.12); color: var(--green); }
+    .today-card-status.partial { background: rgba(201,160,50,0.12); color: var(--amber); }
+    .today-card-status.empty  { background: rgba(255,255,255,0.04); color: #555; }
+
+    .today-card-main {
+      font-size: 13px;
+      color: #bbb;
+      line-height: 1.5;
+      flex: 1;
+    }
+
+    .today-card-main strong { color: #ddd; }
+    .today-card-main em     { color: #777; font-style: normal; }
+
+    .today-card-cta {
+      font-size: 10px;
+      font-weight: 600;
+      color: #444;
+      letter-spacing: 0.04em;
+      margin-top: 2px;
+    }
+
+    .today-card:hover .today-card-cta { color: #666; }
+
+    /* Score bar */
+    .today-score-bar {
+      background: var(--surface1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .today-score-num {
+      font-size: 48px;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+      flex-shrink: 0;
+      transition: color 0.3s;
+    }
+
+    .today-score-num.green { color: var(--green); }
+    .today-score-num.amber { color: var(--amber); }
+    .today-score-num.red   { color: var(--red); }
+    .today-score-num.zero  { color: #333; }
+
+    .today-score-meta { flex: 1; }
+
+    .today-score-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #444;
+      margin-bottom: 6px;
+    }
+
+    .today-progress-track {
+      height: 4px;
+      background: #1a1a1a;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .today-progress-fill {
+      height: 4px;
+      border-radius: 2px;
+      transition: width 0.6s ease, background 0.3s;
+    }
+
+    .today-score-sub {
+      font-size: 11px;
+      color: #555;
+      margin-top: 5px;
+      line-height: 1.4;
+    }
+
+    /* Upcoming schedule strip */
+    .today-schedule-wrap {
+      background: var(--surface1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .today-schedule-header {
+      padding: 12px 18px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #444;
+      border-bottom: 1px solid var(--border2);
+    }
+
+    .today-schedule-items { display: flex; flex-direction: column; }
+
+    .today-sched-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 18px;
+      border-bottom: 1px solid #141414;
+      font-size: 13px;
+    }
+
+    .today-sched-item:last-child { border-bottom: none; }
+
+    .today-sched-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .today-sched-dot.red   { background: var(--red); }
+    .today-sched-dot.blue  { background: var(--blue); }
+    .today-sched-dot.green { background: var(--green); }
+    .today-sched-dot.gray  { background: #444; }
+    .today-sched-dot.purple{ background: var(--purple); }
+
+    .today-sched-time  { font-size: 11px; color: #555; width: 82px; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+    .today-sched-label { flex: 1; color: #ccc; }
+    .today-sched-dur   { font-size: 11px; color: #555; flex-shrink: 0; }
+
+    .today-schedule-empty {
+      padding: 18px;
+      font-size: 13px;
+      color: #2a2a2a;
+      text-align: center;
+    }
+
     /* ── Smooth resize on sections ── */
     .section.active { gap: 0; }
 
@@ -2888,6 +3082,12 @@
 
     <div class="nav-section-label">DAILY</div>
     <nav class="nav">
+      <div class="nav-item active" data-section="today">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M8 1.5L9.8 5.2l4.2.6-3 3 .7 4.2L8 11l-3.7 2 .7-4.2-3-3 4.2-.6z"/>
+        </svg>
+        <span class="nav-item-text">Today</span>
+      </div>
       <div class="nav-item" data-section="life-os">
         <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
           <path d="M3 2h10a1 1 0 011 1v10a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z"/>
@@ -2905,7 +3105,7 @@
 
     <div class="nav-section-label">SCHEDULE</div>
     <nav class="nav">
-      <div class="nav-item active" data-section="time-os">
+      <div class="nav-item" data-section="time-os">
         <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
           <rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M5 1v4M11 1v4M2 7h12"/>
         </svg>
@@ -2955,6 +3155,22 @@
         <span class="nav-item-text">Life Goals</span>
       </div>
     </nav>
+
+    <!-- Export + streaks -->
+    <div style="padding:4px 7px 0;overflow:hidden;white-space:nowrap">
+      <button onclick="window.exportLeonData?.()" style="
+        width:100%;height:28px;border-radius:6px;border:1px solid #1e1e1e;
+        background:transparent;color:#333;font-family:Inter,sans-serif;
+        font-size:10px;font-weight:600;letter-spacing:0.05em;cursor:pointer;
+        display:flex;align-items:center;gap:8px;padding:0 8px;
+        transition:border-color 0.15s,color 0.15s;
+        text-transform:uppercase;
+      " onmouseover="this.style.borderColor='#333';this.style.color='#777'"
+         onmouseout="this.style.borderColor='#1e1e1e';this.style.color='#333'">
+        <svg width="10" height="10" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 1v8M4 6l3 3 3-3M2 10v2h10v-2"/></svg>
+        <span style="opacity:0;transition:opacity 0.16s;white-space:nowrap" class="nav-item-text">Export data</span>
+      </button>
+    </div>
 
     <!-- Streaks widget -->
     <div class="sidebar-streaks">
@@ -3021,8 +3237,78 @@
 
     <main class="content">
 
+      <!-- ══ TODAY DASHBOARD ══ -->
+      <div id="section-today" class="section active">
+
+        <!-- Score bar -->
+        <div class="today-score-bar">
+          <div class="today-score-num zero" id="today-score-big">0</div>
+          <div class="today-score-meta">
+            <div class="today-score-label">Day Score</div>
+            <div class="today-progress-track">
+              <div class="today-progress-fill" id="today-progress-fill" style="width:0%"></div>
+            </div>
+            <div class="today-score-sub" id="today-score-sub">Start logging to build your score.</div>
+          </div>
+        </div>
+
+        <!-- 4 quadrant cards -->
+        <div class="today-grid">
+
+          <!-- GIFD -->
+          <div class="today-card" id="today-card-gifd" onclick="document.querySelector('[data-section=life-os]').click()">
+            <div class="today-card-header">
+              <span class="today-card-label">📋 GIFD</span>
+              <span class="today-card-status empty" id="today-gifd-status">Not logged</span>
+            </div>
+            <div class="today-card-main" id="today-gifd-body">Nothing logged yet. Write how today went.</div>
+            <div class="today-card-cta">Open GIFD →</div>
+          </div>
+
+          <!-- Workout -->
+          <div class="today-card" id="today-card-workout" onclick="document.querySelector('[data-section=movement]').click()">
+            <div class="today-card-header">
+              <span class="today-card-label">💪 Workout</span>
+              <span class="today-card-status empty" id="today-workout-status">Not logged</span>
+            </div>
+            <div class="today-card-main" id="today-workout-body">No sets logged. Open Movement to start.</div>
+            <div class="today-card-cta">Open Movement →</div>
+          </div>
+
+          <!-- Sleep -->
+          <div class="today-card" id="today-card-sleep" onclick="document.querySelector('[data-section=movement]').click()">
+            <div class="today-card-header">
+              <span class="today-card-label">😴 Sleep</span>
+              <span class="today-card-status empty" id="today-sleep-status">Not logged</span>
+            </div>
+            <div class="today-card-main" id="today-sleep-body">Log last night's sleep in Movement.</div>
+            <div class="today-card-cta">Log sleep →</div>
+          </div>
+
+          <!-- Nutrition -->
+          <div class="today-card" id="today-card-nutrition" onclick="document.querySelector('[data-section=nutrition]').click()">
+            <div class="today-card-header">
+              <span class="today-card-label">🍽 Nutrition</span>
+              <span class="today-card-status empty" id="today-nutrition-status">Not logged</span>
+            </div>
+            <div class="today-card-main" id="today-nutrition-body">No meals logged. Describe what you ate.</div>
+            <div class="today-card-cta">Open Nutrition →</div>
+          </div>
+
+        </div>
+
+        <!-- Upcoming schedule -->
+        <div class="today-schedule-wrap">
+          <div class="today-schedule-header">Today's Schedule</div>
+          <div class="today-schedule-items" id="today-schedule-items">
+            <div class="today-schedule-empty" id="today-schedule-empty">No events today.</div>
+          </div>
+        </div>
+
+      </div>
+
       <!-- ══ TIME OS ══ -->
-      <div id="section-time-os" class="section active">
+      <div id="section-time-os" class="section">
 
         <!-- Upload Gaby's Schedule -->
         <div class="gaby-upload-bar">
@@ -4015,7 +4301,10 @@
           streaks[key] = s;
           saveStreaks(streaks);
         } else if (!loggedToday && s.lastDate < yesterday && s.lastDate !== '') {
-          // Streak broken — don't reset count yet, just leave it (show as lapsed)
+          // Streak broken — reset to 0
+          s.count = 0;
+          streaks[key] = s;
+          saveStreaks(streaks);
         }
 
         return s.count;
@@ -4530,15 +4819,23 @@
       });
     });
 
-    /* ── Log session ── */
+    /* ── Log session (calisthenics practice — persisted) ── */
+    const LS_SESSIONS  = 'leon-skill-sessions';
     const toggleLogBtn = document.getElementById('toggle-log');
     const logForm      = document.getElementById('log-form');
     const logDateEl    = document.getElementById('log-date');
-    const sessions     = [];
 
-    logDateEl.value = new Date().toISOString().slice(0, 10);
+    // Load persisted sessions
+    let sessions = [];
+    try { sessions = JSON.parse(localStorage.getItem(LS_SESSIONS) || '[]'); } catch(_) {}
 
-    toggleLogBtn.addEventListener('click', () => {
+    function saveSessions() {
+      try { localStorage.setItem(LS_SESSIONS, JSON.stringify(sessions)); } catch(_) {}
+    }
+
+    if (logDateEl) logDateEl.value = new Date().toISOString().slice(0, 10);
+
+    toggleLogBtn?.addEventListener('click', () => {
       const open = logForm.classList.toggle('open');
       toggleLogBtn.textContent = open ? '✕ Cancel' : '+ Log session';
     });
@@ -4552,13 +4849,14 @@
       });
     });
 
-    document.getElementById('log-submit').addEventListener('click', () => {
-      const date  = logDateEl.value;
-      const skill = document.getElementById('log-skill').value;
-      const dur   = document.getElementById('log-dur').value;
+    document.getElementById('log-submit')?.addEventListener('click', () => {
+      const date  = logDateEl?.value;
+      const skill = document.getElementById('log-skill')?.value;
+      const dur   = document.getElementById('log-dur')?.value;
       if (!date || !skill || !dur) return;
 
       sessions.unshift({ date, skill, dur: +dur, feel: selectedFeel || 'OK' });
+      saveSessions();
       renderSessions();
 
       document.getElementById('log-skill').value = '';
@@ -4572,10 +4870,11 @@
     function renderSessions() {
       const list  = document.getElementById('session-list');
       const noMsg = document.getElementById('no-sessions-msg');
+      if (!list) return;
       list.querySelectorAll('.session-item').forEach(el => el.remove());
-      noMsg.style.display = sessions.length ? 'none' : '';
+      if (noMsg) noMsg.style.display = sessions.length ? 'none' : '';
 
-      sessions.forEach(s => {
+      sessions.slice(0, 20).forEach(s => {
         const d    = new Date(s.date + 'T00:00:00');
         const dStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         const fc   = s.feel.toLowerCase().replace(/\s+/g, '-');
@@ -4589,6 +4888,8 @@
         list.appendChild(el);
       });
     }
+
+    renderSessions(); // show persisted sessions on load
 
     /* ══════════════════════════════
        SCHOOL
@@ -6955,6 +7256,317 @@
       renderTotals(d.totals);
       renderMeals(d);
     })();
+
+    /* ══════════════════════════════
+       TODAY DASHBOARD
+    ══════════════════════════════ */
+    (function () {
+      const TODAY = new Date().toISOString().slice(0, 10);
+
+      /* ── Helpers: read each section's data ── */
+      function getGIFD() {
+        try {
+          const entries = JSON.parse(localStorage.getItem('los-gifd-current') || '[]');
+          return entries.find(e => e.date === TODAY) || null;
+        } catch(_) { return null; }
+      }
+
+      function getWorkout() {
+        try {
+          const d = JSON.parse(localStorage.getItem('leon-workout-v3') || '{}');
+          return (d.sessions || []).find(s => s.date === TODAY) || null;
+        } catch(_) { return null; }
+      }
+
+      function getSleep() {
+        try {
+          const d = JSON.parse(localStorage.getItem('leon-sleep-v1') || '{}');
+          return d.date === TODAY ? d : null;
+        } catch(_) { return null; }
+      }
+
+      function getNutrition() {
+        try {
+          const d = JSON.parse(localStorage.getItem('leon-nutrition-v2') || '{}');
+          return d.date === TODAY ? d : null;
+        } catch(_) { return null; }
+      }
+
+      function getCalendar() {
+        try {
+          const blocks = JSON.parse(localStorage.getItem('leon-calendar-v2') || 'null');
+          if (!blocks) return [];
+          const dayMap = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+          const todayName = dayMap[new Date().getDay()];
+          return blocks.filter(b =>
+            (b.date === TODAY) || (!b.date && b.day === todayName)
+          ).sort((a, b) => (a.start || '').localeCompare(b.start || ''));
+        } catch(_) { return []; }
+      }
+
+      /* ── Render ── */
+      function render() {
+        const gifd  = getGIFD();
+        const wo    = getWorkout();
+        const sleep = getSleep();
+        const nutr  = getNutrition();
+
+        // Score sync
+        const score = parseInt(document.getElementById('daily-score-badge')?.dataset.score || '0', 10);
+        const scoreBig  = document.getElementById('today-score-big');
+        const scoreFill = document.getElementById('today-progress-fill');
+        const scoreSub  = document.getElementById('today-score-sub');
+
+        if (scoreBig) {
+          const cls = score >= 70 ? 'green' : score >= 35 ? 'amber' : score > 0 ? 'red' : 'zero';
+          scoreBig.textContent = score;
+          scoreBig.className = `today-score-num ${cls}`;
+        }
+        if (scoreFill) {
+          const pct = Math.min(100, score);
+          const col = score >= 70 ? 'var(--green)' : score >= 35 ? 'var(--amber)' : 'var(--red)';
+          scoreFill.style.width = pct + '%';
+          scoreFill.style.background = pct > 0 ? col : '#1a1a1a';
+        }
+
+        // Score sub-text
+        const parts = [];
+        if (gifd)  parts.push('GIFD ✓');
+        if (wo)    parts.push('Workout ✓');
+        if (sleep) parts.push('Sleep ✓');
+        if (nutr)  parts.push('Nutrition ✓');
+        if (scoreSub) {
+          scoreSub.textContent = parts.length
+            ? parts.join(' · ')
+            : 'Start logging to build your score.';
+        }
+
+        // GIFD card
+        const gifdStatus = document.getElementById('today-gifd-status');
+        const gifdBody   = document.getElementById('today-gifd-body');
+        if (gifd) {
+          const good = Object.values(gifd.good || {}).filter(Boolean).length;
+          const bad  = Object.values(gifd.bad  || {}).filter(Boolean).length;
+          const sc   = good - bad;
+          if (gifdStatus) { gifdStatus.textContent = `Score ${sc > 0 ? '+' : ''}${sc}`; gifdStatus.className = `today-card-status ${sc > 0 ? 'done' : sc < 0 ? 'partial' : 'partial'}`; }
+          if (gifdBody)   {
+            const desc = gifd.desc ? `"${gifd.desc.slice(0, 80)}${gifd.desc.length > 80 ? '…' : ''}"` : '';
+            gifdBody.innerHTML = [
+              desc ? `<em>${desc}</em>` : '',
+              good || bad ? `<strong>${good} good · ${bad} bad habit${bad !== 1 ? 's' : ''}</strong>` : ''
+            ].filter(Boolean).join('<br>') || 'Entry started.';
+          }
+        } else {
+          if (gifdStatus) { gifdStatus.textContent = 'Not logged'; gifdStatus.className = 'today-card-status empty'; }
+          if (gifdBody)   gifdBody.innerHTML = 'Nothing logged yet. Write how today went.';
+        }
+
+        // Workout card
+        const woStatus = document.getElementById('today-workout-status');
+        const woBody   = document.getElementById('today-workout-body');
+        if (wo && wo.sets && wo.sets.length) {
+          const groups = {};
+          wo.sets.forEach(s => { if (!groups[s.exercise]) groups[s.exercise] = []; groups[s.exercise].push(s); });
+          const names = Object.keys(groups);
+          if (woStatus) { woStatus.textContent = `${wo.sets.length} set${wo.sets.length !== 1 ? 's' : ''}`; woStatus.className = 'today-card-status done'; }
+          if (woBody)   woBody.innerHTML = names.slice(0, 3).map(ex => {
+            const best = groups[ex].reduce((b, s) => s.kg > b.kg ? s : b, groups[ex][0]);
+            return `<strong>${ex}</strong> <em>${best.kg}kg × ${best.reps}</em>`;
+          }).join('<br>') + (names.length > 3 ? `<br><em>+${names.length - 3} more</em>` : '');
+        } else {
+          if (woStatus) { woStatus.textContent = 'Not logged'; woStatus.className = 'today-card-status empty'; }
+          if (woBody)   woBody.innerHTML = 'No sets logged. Open Movement to start.';
+        }
+
+        // Sleep card
+        const sleepStatus = document.getElementById('today-sleep-status');
+        const sleepBody   = document.getElementById('today-sleep-body');
+        const qLabels     = ['','😞 Terrible','😞 Bad','😐 Poor','🙂 Ok','😊 Good','🔥 Great'];
+        if (sleep && sleep.hours) {
+          if (sleepStatus) { sleepStatus.textContent = `${sleep.hours}h`; sleepStatus.className = 'today-card-status done'; }
+          if (sleepBody)   sleepBody.innerHTML = `<strong>${sleep.hours}h</strong> slept · ${qLabels[sleep.quality] || 'No quality'}`;
+        } else {
+          if (sleepStatus) { sleepStatus.textContent = 'Not logged'; sleepStatus.className = 'today-card-status empty'; }
+          if (sleepBody)   sleepBody.innerHTML = 'Log last night\'s sleep in Movement.';
+        }
+
+        // Nutrition card
+        const nutrStatus = document.getElementById('today-nutrition-status');
+        const nutrBody   = document.getElementById('today-nutrition-body');
+        if (nutr && nutr.meals && nutr.meals.length) {
+          const t = nutr.totals || {};
+          if (nutrStatus) { nutrStatus.textContent = `${Math.round(t.calories || 0)} kcal`; nutrStatus.className = 'today-card-status done'; }
+          if (nutrBody)   nutrBody.innerHTML = `<strong>${Math.round(t.calories || 0)} kcal</strong><br><em>P ${Math.round(t.protein||0)}g · C ${Math.round(t.carbs||0)}g · F ${Math.round(t.fat||0)}g</em>`;
+        } else {
+          if (nutrStatus) { nutrStatus.textContent = 'Not logged'; nutrStatus.className = 'today-card-status empty'; }
+          if (nutrBody)   nutrBody.innerHTML = 'No meals logged. Describe what you ate.';
+        }
+
+        // Schedule strip
+        const schedWrap  = document.getElementById('today-schedule-items');
+        const schedEmpty = document.getElementById('today-schedule-empty');
+        if (schedWrap) {
+          schedWrap.innerHTML = '';
+          const events = getCalendar();
+          if (!events.length) {
+            const emp = document.createElement('div');
+            emp.className = 'today-schedule-empty';
+            emp.textContent = 'No events today.';
+            schedWrap.appendChild(emp);
+          } else {
+            const now = new Date().getHours() * 60 + new Date().getMinutes();
+            events.slice(0, 6).forEach(ev => {
+              const [h, m] = (ev.start || '00:00').split(':').map(Number);
+              const evMin = h * 60 + m;
+              const past  = evMin < now - 60;
+              const row   = document.createElement('div');
+              row.className = 'today-sched-item';
+              const [eh, em2] = (ev.end || '00:00').split(':').map(Number);
+              const dur = (() => {
+                let d = (eh * 60 + em2) - evMin;
+                if (d <= 0) d += 1440;
+                const h2 = Math.floor(d / 60), m2 = d % 60;
+                return m2 ? `${h2}h${m2}m` : `${h2}h`;
+              })();
+              row.innerHTML = `
+                <div class="today-sched-dot ${ev.color || 'gray'}"></div>
+                <span class="today-sched-time" style="${past ? 'opacity:0.4' : ''}">${ev.start}–${ev.end}</span>
+                <span class="today-sched-label" style="${past ? 'opacity:0.4;text-decoration:line-through' : ''}">${ev.label}</span>
+                <span class="today-sched-dur">${dur}</span>`;
+              schedWrap.appendChild(row);
+            });
+          }
+        }
+      }
+
+      // Expose so updateDailyScore() calls refresh today too
+      window.refreshTodayDash = render;
+
+      // Lazy init when Today section becomes active
+      const sec = document.getElementById('section-today');
+      if (sec) {
+        new MutationObserver(() => {
+          if (sec.classList.contains('active')) render();
+        }).observe(sec, { attributes: true, attributeFilter: ['class'] });
+        if (sec.classList.contains('active')) render();
+      }
+    })();
+
+    /* ══════════════════════════════
+       PHASE 9a — EDITABLE MACRO GOALS
+    ══════════════════════════════ */
+    (function () {
+      const LS_GOALS = 'leon-macro-goals';
+      const DEF      = { protein: 160, carbs: 250, fat: 80 };
+
+      function loadGoals() {
+        try { return { ...DEF, ...JSON.parse(localStorage.getItem(LS_GOALS) || '{}') }; } catch(_) { return DEF; }
+      }
+      function saveGoals(g) { try { localStorage.setItem(LS_GOALS, JSON.stringify(g)); } catch(_) {} }
+
+      // Replace the static text nodes in the nutrition totals with editable spans
+      function makeEditable(numId, key, goals) {
+        const el = document.getElementById(numId);
+        if (!el) return;
+        el.textContent = `0/${goals[key]}g`;
+        // Make the goal part (after /) clickable to edit
+        el.title = 'Click goal number to edit';
+        el.style.cursor = 'default';
+      }
+
+      const goals = loadGoals();
+
+      // Patch into the existing nutr-nums-* elements — make them show current goals
+      ['protein','carbs','fat'].forEach(k => {
+        const numsEl = document.getElementById(`nutr-nums-${k}`);
+        if (!numsEl) return;
+        // Re-render with current goal
+        const cur = numsEl.textContent.split('/')[0] || '0';
+        numsEl.innerHTML = `<span>${cur}</span>/<span class="goal-edit" data-key="${k}" contenteditable="true" title="Click to edit goal" style="cursor:text;outline:none">${goals[k]}</span>g`;
+        const goalSpan = numsEl.querySelector('.goal-edit');
+        goalSpan.addEventListener('focus', () => {
+          const r = document.createRange(); r.selectNodeContents(goalSpan);
+          window.getSelection().removeAllRanges(); window.getSelection().addRange(r);
+        });
+        goalSpan.addEventListener('blur', () => {
+          const v = parseInt(goalSpan.textContent, 10);
+          if (!isNaN(v) && v > 0) {
+            goals[k] = v; saveGoals(goals);
+            // Recalculate bar
+            const fill = document.getElementById(`nutr-bar-${k}`);
+            const curVal = parseFloat(numsEl.querySelector('span').textContent) || 0;
+            if (fill) fill.style.width = Math.min(100, (curVal / v) * 100) + '%';
+          } else {
+            goalSpan.textContent = goals[k];
+          }
+        });
+        goalSpan.addEventListener('keydown', e => {
+          if (e.key === 'Enter') { e.preventDefault(); goalSpan.blur(); }
+          if (e.key === 'Escape') { goalSpan.textContent = goals[k]; goalSpan.blur(); }
+        });
+      });
+    })();
+
+    /* ══════════════════════════════
+       PHASE 9b — TOUCH SIDEBAR FIX
+    ══════════════════════════════ */
+    (function () {
+      // On touch-only devices, the CSS :hover never fires persistently.
+      // Add a tap-to-toggle for the sidebar logo dot.
+      const sidebar = document.querySelector('.sidebar');
+      const logoDot = document.querySelector('.sidebar-logo-dot');
+      if (!sidebar || !logoDot) return;
+
+      // Only activate for touch devices
+      if (window.matchMedia('(hover: none)').matches) {
+        logoDot.style.cursor = 'pointer';
+        logoDot.title = 'Tap to expand/collapse sidebar';
+        let expanded = false;
+        logoDot.addEventListener('click', e => {
+          e.stopPropagation();
+          expanded = !expanded;
+          sidebar.style.width      = expanded ? '220px' : '';
+          sidebar.style.transition = 'width 0.28s cubic-bezier(0.4,0,0.2,1)';
+          // Show/hide text
+          sidebar.querySelectorAll('.nav-item-text, .nav-section-label, .sidebar-logo-text, .streak-row-text, .streak-row-num').forEach(el => {
+            el.style.opacity = expanded ? '1' : '';
+          });
+          sidebar.querySelectorAll('.nav-item').forEach(el => {
+            el.style.justifyContent = expanded ? 'flex-start' : '';
+            el.style.gap            = expanded ? '9px' : '';
+            el.style.padding        = expanded ? '10px 10px' : '';
+          });
+        });
+      }
+    })();
+
+    /* ══════════════════════════════
+       PHASE 9c — DATA EXPORT
+    ══════════════════════════════ */
+    window.exportLeonData = function () {
+      const data = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && (k.startsWith('leon-') || k.startsWith('los-') || k === 'anthropic_api_key' && false)) {
+          try { data[k] = JSON.parse(localStorage.getItem(k)); } catch(_) { data[k] = localStorage.getItem(k); }
+        }
+      }
+      data._exported = new Date().toISOString();
+      data._version  = '6.0';
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `leon-os-backup-${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    };
+
+    /* Hook updateDailyScore to also refresh Today dashboard */
+    const _origUpdateScore = window.updateDailyScore;
+    window.updateDailyScore = function () {
+      _origUpdateScore?.();
+      window.refreshTodayDash?.();
+    };
 
   </script>
 

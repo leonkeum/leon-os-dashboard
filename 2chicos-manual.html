@@ -1,0 +1,1536 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manual de Marca — 2.chicos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #000000;
+    --white: #FFFFFF;
+    --gold: #D4A017;
+    --gold-light: #E8C04A;
+    --gold-dark: #A07810;
+    --gray: #1a1a1a;
+    --gray2: #2a2a2a;
+    --gray3: #888888;
+    --font-h: 'Montserrat', sans-serif;
+    --font-b: 'Inter', sans-serif;
+  }
+
+  html, body { width: 100%; height: 100%; background: #111; overflow: hidden; }
+
+  /* ── Deck ── */
+  #deck {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .slide {
+    position: absolute;
+    width: min(100vw, 177.78vh);
+    height: min(56.25vw, 100vh);
+    background: var(--black);
+    overflow: hidden;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity .45s ease;
+  }
+  .slide.active { display: flex; }
+  .slide.visible { opacity: 1; }
+
+  /* ── Nav ── */
+  #nav {
+    position: fixed;
+    bottom: 18px; left: 50%;
+    transform: translateX(-50%);
+    display: flex; align-items: center; gap: 16px;
+    z-index: 100;
+    background: rgba(0,0,0,.6);
+    padding: 8px 20px;
+    border-radius: 40px;
+    border: 1px solid rgba(212,160,23,.25);
+    backdrop-filter: blur(8px);
+  }
+  #nav button {
+    background: none; border: none; cursor: pointer;
+    color: var(--gold); font-size: 18px; line-height: 1;
+    padding: 4px 10px; border-radius: 6px;
+    transition: background .2s;
+  }
+  #nav button:hover { background: rgba(212,160,23,.15); }
+  #counter {
+    font-family: var(--font-h); font-size: 12px; font-weight: 600;
+    color: var(--white); letter-spacing: .1em; min-width: 48px; text-align: center;
+  }
+  .dot-strip { display: flex; gap: 5px; align-items: center; }
+  .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: rgba(255,255,255,.25); cursor: pointer;
+    transition: background .2s, transform .2s;
+  }
+  .dot.on { background: var(--gold); transform: scale(1.3); }
+
+  /* ── Shared slide utilities ── */
+  .slide-bg-black { background: var(--black); }
+  .slide-bg-white { background: var(--white); }
+  .slide-bg-gold  { background: var(--gold); }
+  .slide-bg-gray  { background: var(--gray); }
+
+  .logo-img { display: block; }
+
+  .tag {
+    font-family: var(--font-h); font-size: .6em; font-weight: 700;
+    letter-spacing: .2em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: .6em;
+  }
+  .tag-white { color: var(--white); }
+  .tag-black { color: var(--black); }
+
+  .slide-num {
+    position: absolute; bottom: 5%; right: 6%;
+    font-family: var(--font-h); font-size: .65em; font-weight: 700;
+    color: rgba(255,255,255,.2); letter-spacing: .1em;
+  }
+  .slide-num-dark { color: rgba(0,0,0,.15); }
+
+  .divider {
+    width: 48px; height: 2px; background: var(--gold); margin: .8em 0;
+  }
+  .divider-white { background: var(--white); }
+  .divider-black { background: var(--black); }
+
+  /* ══════════════════════════════════════
+     SLIDE 1 – PORTADA
+  ══════════════════════════════════════ */
+  #s1 {
+    background: var(--black);
+    justify-content: center; align-items: center;
+  }
+  #s1 .logo-wrap {
+    display: flex; flex-direction: column; align-items: center; gap: 2em;
+  }
+  #s1 img { width: min(32vw, 58vh); }
+  #s1 .brand-line {
+    font-family: var(--font-h); font-size: .72em; font-weight: 300;
+    letter-spacing: .35em; text-transform: uppercase;
+    color: var(--gold); text-align: center;
+  }
+  #s1 .manual-label {
+    font-family: var(--font-h); font-size: 2em; font-weight: 800;
+    color: var(--white); letter-spacing: .12em; text-transform: uppercase;
+    text-align: center;
+  }
+  #s1 .year {
+    font-family: var(--font-h); font-size: .6em; font-weight: 400;
+    color: var(--gray3); letter-spacing: .2em;
+  }
+
+  /* ══════════════════════════════════════
+     SLIDE 2 – ÍNDICE
+  ══════════════════════════════════════ */
+  #s2 { padding: 5% 8%; flex-direction: row; gap: 8%; }
+  #s2 .idx-left {
+    flex: 0 0 auto; display: flex; flex-direction: column;
+    justify-content: center; gap: .3em;
+  }
+  #s2 .idx-title {
+    font-family: var(--font-h); font-size: 3.2em; font-weight: 900;
+    color: var(--white); line-height: 1; text-transform: uppercase;
+  }
+  #s2 .idx-title span { color: var(--gold); }
+  #s2 .idx-right {
+    flex: 1; display: flex; flex-direction: column;
+    justify-content: center; gap: .45em;
+  }
+  #s2 .idx-row {
+    display: flex; align-items: baseline; gap: .6em;
+    font-family: var(--font-b); font-size: .72em; color: rgba(255,255,255,.7);
+    border-bottom: 1px solid rgba(255,255,255,.07); padding-bottom: .4em;
+  }
+  #s2 .idx-num {
+    font-family: var(--font-h); font-weight: 700; color: var(--gold);
+    font-size: .85em; flex: 0 0 2.4em;
+  }
+  #s2 .idx-label { flex: 1; }
+  #s2 .idx-page {
+    font-family: var(--font-h); font-weight: 600; font-size: .75em;
+    color: rgba(255,255,255,.35);
+  }
+
+  /* ══════════════════════════════════════
+     SLIDES 3–5 – MISIÓN / VISIÓN / VALORES
+  ══════════════════════════════════════ */
+  .mvv-slide { flex-direction: row; }
+  .mvv-aside {
+    width: 38%; height: 100%; background: var(--gold);
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: flex-start;
+    padding: 0 6%;
+    gap: .5em;
+  }
+  .mvv-aside .mvv-es {
+    font-family: var(--font-h); font-size: 3.5em; font-weight: 900;
+    color: var(--black); text-transform: uppercase; line-height: 1;
+  }
+  .mvv-aside .mvv-en {
+    font-family: var(--font-h); font-size: .75em; font-weight: 500;
+    color: rgba(0,0,0,.5); letter-spacing: .15em; text-transform: uppercase;
+  }
+  .mvv-content {
+    flex: 1; padding: 6%; display: flex; flex-direction: column;
+    justify-content: center; gap: 1em;
+  }
+  .mvv-content p {
+    font-family: var(--font-b); font-size: .8em; font-weight: 400;
+    color: rgba(255,255,255,.8); line-height: 1.8;
+  }
+
+  /* Valores */
+  #s5 .vals-grid {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    gap: 1.5%; width: 90%; margin-top: 1em;
+  }
+  #s5 .val-card {
+    background: var(--gray2); border-radius: 6px; padding: 8% 6%;
+    display: flex; flex-direction: column; align-items: center;
+    gap: .5em; text-align: center;
+  }
+  #s5 .val-icon { font-size: 1.6em; }
+  #s5 .val-name {
+    font-family: var(--font-h); font-size: .7em; font-weight: 700;
+    color: var(--gold); text-transform: uppercase; letter-spacing: .05em;
+  }
+  #s5 .val-desc {
+    font-family: var(--font-b); font-size: .6em; color: rgba(255,255,255,.55);
+    line-height: 1.5;
+  }
+  #s5 .mvv-content { gap: 1.2em; }
+
+  /* ══════════════════════════════════════
+     SLIDE 6 – BMC
+  ══════════════════════════════════════ */
+  #s6 { padding: 3.5% 5%; flex-direction: column; gap: 2%; }
+  #s6 .bmc-title {
+    font-family: var(--font-h); font-size: 1.1em; font-weight: 800;
+    color: var(--white); text-transform: uppercase; letter-spacing: .2em;
+    text-align: center;
+  }
+  #s6 .bmc-title span { color: var(--gold); }
+  #s6 .bmc-grid {
+    width: 100%; flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: .6%;
+  }
+  #s6 .bc {
+    background: var(--gray2);
+    border-radius: 5px; padding: 4% 5%;
+    display: flex; flex-direction: column; gap: .3em;
+    border-left: 2px solid var(--gold);
+    overflow: hidden;
+  }
+  #s6 .bc.tall { grid-row: 1 / 3; }
+  #s6 .bc.wide { grid-column: span 2; }
+  #s6 .bc-label {
+    font-family: var(--font-h); font-size: .52em; font-weight: 700;
+    color: var(--gold); text-transform: uppercase; letter-spacing: .08em;
+  }
+  #s6 .bc-items {
+    font-family: var(--font-b); font-size: .58em; color: rgba(255,255,255,.7);
+    line-height: 1.6;
+  }
+
+  /* ══════════════════════════════════════
+     SLIDE 7 – ORIGEN
+  ══════════════════════════════════════ */
+  #s7 { flex-direction: row; }
+  #s7 .origen-left {
+    width: 45%; height: 100%;
+    background: linear-gradient(135deg, #1a1200 0%, var(--black) 100%);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  #s7 .origen-left::before {
+    content: '2';
+    position: absolute;
+    font-family: var(--font-h); font-size: 30em; font-weight: 900;
+    color: rgba(212,160,23,.04); line-height: 1;
+    top: -10%; left: -10%;
+  }
+  #s7 .origen-left img { width: 55%; position: relative; z-index: 1; }
+  #s7 .origen-right {
+    flex: 1; padding: 7% 8%; display: flex; flex-direction: column;
+    justify-content: center; gap: 1.2em;
+  }
+  #s7 .origen-right h2 {
+    font-family: var(--font-h); font-size: 1.8em; font-weight: 900;
+    color: var(--white); text-transform: uppercase; line-height: 1.1;
+  }
+  #s7 .origen-right h2 span { color: var(--gold); }
+  #s7 .origen-right p {
+    font-family: var(--font-b); font-size: .75em; color: rgba(255,255,255,.75);
+    line-height: 1.9;
+  }
+
+  /* ══════════════════════════════════════
+     SLIDES 8–10 – ESLOGAN
+  ══════════════════════════════════════ */
+  #s8 {
+    justify-content: center; align-items: center;
+    background: radial-gradient(circle at 50% 50%, #1a1200 0%, var(--black) 70%);
+  }
+  #s8 .esl-main {
+    font-family: var(--font-h); font-size: 3.8em; font-weight: 900;
+    color: var(--white); text-align: center; text-transform: uppercase;
+    line-height: 1.1; letter-spacing: .05em;
+  }
+  #s8 .esl-main .gold { color: var(--gold); }
+  #s8 .esl-sub {
+    font-family: var(--font-h); font-size: .75em; font-weight: 400;
+    color: var(--gray3); letter-spacing: .3em; text-align: center;
+    text-transform: uppercase; margin-top: 1em;
+  }
+
+  #s9 { flex-direction: row; }
+  #s9 .esl9-left {
+    width: 40%; background: var(--gold); height: 100%;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 6% 7%; gap: 1em;
+  }
+  #s9 .esl9-left h2 {
+    font-family: var(--font-h); font-size: 2em; font-weight: 900;
+    color: var(--black); text-transform: uppercase; line-height: 1.1;
+  }
+  #s9 .esl9-left p {
+    font-family: var(--font-b); font-size: .7em; color: rgba(0,0,0,.65);
+    line-height: 1.7;
+  }
+  #s9 .esl9-right {
+    flex: 1; padding: 6% 7%; display: flex; flex-direction: column;
+    justify-content: center; gap: 1.4em;
+  }
+  .esl-word-row { display: flex; align-items: flex-start; gap: 1em; }
+  .esl-word {
+    font-family: var(--font-h); font-size: .75em; font-weight: 800;
+    color: var(--gold); text-transform: uppercase; letter-spacing: .05em;
+    flex: 0 0 7em;
+  }
+  .esl-def {
+    font-family: var(--font-b); font-size: .68em; color: rgba(255,255,255,.65);
+    line-height: 1.6; flex: 1; padding-top: .05em;
+  }
+
+  #s10 {
+    background: var(--white);
+    justify-content: center; align-items: center;
+    flex-direction: column; gap: 1.5em; padding: 0 12%;
+  }
+  #s10 .pos-label {
+    font-family: var(--font-h); font-size: .65em; font-weight: 700;
+    letter-spacing: .25em; color: var(--gold); text-transform: uppercase;
+  }
+  #s10 .pos-statement {
+    font-family: var(--font-h); font-size: 1.9em; font-weight: 900;
+    color: var(--black); text-align: center; line-height: 1.25;
+  }
+  #s10 .pos-desc {
+    font-family: var(--font-b); font-size: .72em; color: rgba(0,0,0,.55);
+    text-align: center; line-height: 1.8; max-width: 70%;
+  }
+  #s10 .slide-num-dark { color: rgba(0,0,0,.12); }
+
+  /* ══════════════════════════════════════
+     SLIDES 11–12 – LOGOTIPO
+  ══════════════════════════════════════ */
+  #s11 { flex-direction: row; }
+  #s11 .logo-panel {
+    flex: 1; height: 100%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: .8em;
+  }
+  #s11 .logo-panel.dark { background: var(--black); border-right: 1px solid #222; }
+  #s11 .logo-panel.light { background: #f5f0e8; }
+  #s11 .logo-panel img { width: 60%; }
+  #s11 .panel-label {
+    font-family: var(--font-h); font-size: .55em; font-weight: 700;
+    letter-spacing: .15em; text-transform: uppercase;
+  }
+  #s11 .logo-panel.dark .panel-label { color: rgba(255,255,255,.35); }
+  #s11 .logo-panel.light .panel-label { color: rgba(0,0,0,.35); }
+
+  #s12 { flex-direction: column; gap: 0; padding: 4% 6%; }
+  #s12 .logo12-title {
+    font-family: var(--font-h); font-size: .65em; font-weight: 700;
+    color: var(--gold); letter-spacing: .2em; text-transform: uppercase;
+    margin-bottom: 1em;
+  }
+  #s12 .logo-variants {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 2%; flex: 1;
+  }
+  #s12 .var-card {
+    background: var(--gray2); border-radius: 8px;
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: .8em; padding: 5%;
+  }
+  #s12 .var-card.inv { background: #f5f0e8; }
+  #s12 .var-card img { max-width: 70%; max-height: 45%; object-fit: contain; }
+  #s12 .var-card .var-name {
+    font-family: var(--font-h); font-size: .55em; font-weight: 700;
+    letter-spacing: .12em; text-transform: uppercase;
+  }
+  #s12 .var-card .var-name.light { color: rgba(255,255,255,.4); }
+  #s12 .var-card.inv .var-name { color: rgba(0,0,0,.35); }
+
+  /* ══════════════════════════════════════
+     SLIDES 13–14 – COLORES
+  ══════════════════════════════════════ */
+  #s13 { flex-direction: column; padding: 4% 7%; gap: 3%; }
+  #s13 .col-title {
+    font-family: var(--font-h); font-size: 1em; font-weight: 800;
+    color: var(--white); text-transform: uppercase; letter-spacing: .2em;
+  }
+  #s13 .col-title span { color: var(--gold); }
+  #s13 .swatches {
+    display: grid; grid-template-columns: repeat(3,1fr); gap: 2.5%; flex: 1;
+  }
+  .swatch-card {
+    border-radius: 10px; overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .swatch-color { flex: 1; min-height: 55%; }
+  .swatch-info {
+    background: var(--gray2); padding: 6% 7%;
+    display: flex; flex-direction: column; gap: .35em;
+  }
+  .swatch-name {
+    font-family: var(--font-h); font-size: .7em; font-weight: 700;
+    color: var(--white); text-transform: uppercase; letter-spacing: .08em;
+  }
+  .swatch-hex {
+    font-family: var(--font-h); font-size: .6em; font-weight: 600;
+    color: var(--gold);
+  }
+  .swatch-rgb {
+    font-family: var(--font-b); font-size: .55em; color: rgba(255,255,255,.4);
+    line-height: 1.5;
+  }
+
+  #s14 { flex-direction: row; }
+  #s14 .col14-left {
+    width: 35%; background: var(--gold); height: 100%;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 6% 7%; gap: 1em;
+  }
+  #s14 .col14-left h2 {
+    font-family: var(--font-h); font-size: 2em; font-weight: 900;
+    color: var(--black); text-transform: uppercase; line-height: 1.1;
+  }
+  #s14 .col14-left p {
+    font-family: var(--font-b); font-size: .65em; color: rgba(0,0,0,.6);
+    line-height: 1.7;
+  }
+  #s14 .col14-right {
+    flex: 1; padding: 6% 7%; display: flex; flex-direction: column;
+    justify-content: center; gap: 1.4em;
+  }
+  .col-purpose {
+    display: flex; align-items: flex-start; gap: 1em;
+  }
+  .col-dot {
+    width: 14px; height: 14px; border-radius: 50%;
+    flex-shrink: 0; margin-top: .1em;
+  }
+  .col-purpose-text h4 {
+    font-family: var(--font-h); font-size: .68em; font-weight: 700;
+    color: var(--white); text-transform: uppercase; letter-spacing: .05em;
+  }
+  .col-purpose-text p {
+    font-family: var(--font-b); font-size: .6em; color: rgba(255,255,255,.55);
+    line-height: 1.6; margin-top: .2em;
+  }
+
+  /* ══════════════════════════════════════
+     SLIDES 15–18 – TIPOGRAFÍA
+  ══════════════════════════════════════ */
+  .typo-slide { flex-direction: row; }
+  .typo-aside {
+    width: 32%; height: 100%; background: var(--gray2);
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 0 6%; gap: .5em;
+  }
+  .typo-aside .t-label {
+    font-family: var(--font-h); font-size: .6em; font-weight: 700;
+    color: var(--gold); letter-spacing: .2em; text-transform: uppercase;
+  }
+  .typo-aside .t-family {
+    font-family: var(--font-h); font-size: 2.2em; font-weight: 900;
+    color: var(--white); text-transform: uppercase; line-height: 1;
+  }
+  .typo-aside .t-style {
+    font-family: var(--font-b); font-size: .62em; color: rgba(255,255,255,.4);
+  }
+  .typo-content {
+    flex: 1; padding: 5% 6%; display: flex; flex-direction: column;
+    justify-content: center; gap: 1em;
+  }
+  .t-specimen {
+    display: flex; align-items: baseline; gap: 1em;
+    border-bottom: 1px solid rgba(255,255,255,.08); padding-bottom: .7em;
+  }
+  .t-spec-label {
+    font-family: var(--font-h); font-size: .5em; font-weight: 700;
+    color: var(--gold); letter-spacing: .1em; text-transform: uppercase;
+    flex: 0 0 5.5em;
+  }
+  .t-spec-text {
+    color: var(--white); flex: 1; line-height: 1;
+  }
+  #s16 .weights-grid {
+    display: grid; grid-template-columns: repeat(3,1fr); gap: 2%;
+    width: 88%; flex: 1;
+  }
+  #s16 .wt-card {
+    background: var(--gray2); border-radius: 6px; padding: 7% 6%;
+    display: flex; flex-direction: column; gap: .5em;
+  }
+  #s16 .wt-name {
+    font-family: var(--font-h); font-size: .55em; font-weight: 700;
+    color: var(--gold); letter-spacing: .12em; text-transform: uppercase;
+  }
+  #s16 .wt-sample {
+    font-family: var(--font-h); font-size: 1.6em; color: var(--white); line-height: 1.1;
+  }
+  #s16 .wt-use {
+    font-family: var(--font-b); font-size: .52em; color: rgba(255,255,255,.45); line-height: 1.5;
+  }
+
+  /* Hierarchy slide */
+  #s18 { flex-direction: column; padding: 4% 7%; gap: 2%; }
+  #s18 .hier-title {
+    font-family: var(--font-h); font-size: .65em; font-weight: 700;
+    color: var(--gold); letter-spacing: .2em; text-transform: uppercase;
+  }
+  #s18 .hier-rows {
+    display: flex; flex-direction: column; gap: .6em; flex: 1; justify-content: center;
+  }
+  .hier-row {
+    display: grid; grid-template-columns: 8em 1fr 8em 8em;
+    align-items: center; gap: 1.5em;
+    border-bottom: 1px solid rgba(255,255,255,.07); padding-bottom: .55em;
+  }
+  .hier-level {
+    font-family: var(--font-h); font-size: .52em; font-weight: 700;
+    color: var(--gold); letter-spacing: .1em; text-transform: uppercase;
+  }
+  .hier-sample { color: var(--white); line-height: 1; }
+  .hier-detail {
+    font-family: var(--font-b); font-size: .52em; color: rgba(255,255,255,.4);
+    text-align: right;
+  }
+
+  /* ══════════════════════════════════════
+     SLIDES 19–20 – REJILLA
+  ══════════════════════════════════════ */
+  #s19 { flex-direction: column; padding: 3.5% 6%; gap: 2%; }
+  #s19 .rej-title {
+    font-family: var(--font-h); font-size: .65em; font-weight: 700;
+    color: var(--gold); letter-spacing: .2em; text-transform: uppercase;
+  }
+  #s19 .rej-wrap {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  #s19 img { height: 78%; position: relative; z-index: 2; }
+  #s19 .grid-overlay {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(212,160,23,.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(212,160,23,.08) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  #s19 .meas {
+    position: absolute; font-family: var(--font-h); font-size: .45em;
+    font-weight: 600; color: var(--gold); opacity: .7;
+  }
+
+  #s20 { flex-direction: column; padding: 4% 7%; gap: 3%; }
+  #s20 .rej20-title {
+    font-family: var(--font-h); font-size: .65em; font-weight: 700;
+    color: var(--gold); letter-spacing: .2em; text-transform: uppercase;
+  }
+  #s20 .clear-demo {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .clear-box {
+    position: relative; display: inline-flex;
+    align-items: center; justify-content: center;
+  }
+  .clear-border {
+    position: absolute; inset: -40px;
+    border: 2px dashed rgba(212,160,23,.4);
+    pointer-events: none;
+  }
+  .clear-arrows {
+    position: absolute;
+    font-family: var(--font-h); font-size: .5em; font-weight: 600;
+    color: var(--gold); opacity: .7;
+  }
+  .clear-arrows.top { top: -52px; left: 50%; transform: translateX(-50%); }
+  .clear-arrows.bot { bottom: -52px; left: 50%; transform: translateX(-50%); }
+  .clear-arrows.lft { left: -70px; top: 50%; transform: translateY(-50%); }
+  .clear-arrows.rgt { right: -70px; top: 50%; transform: translateY(-50%); }
+  #s20 img { height: 240px; }
+  #s20 .clear-rule {
+    font-family: var(--font-b); font-size: .65em; color: rgba(255,255,255,.55);
+    text-align: center;
+  }
+
+  /* ══════════════════════════════════════
+     SLIDE 21 – DISEÑO RRSS
+  ══════════════════════════════════════ */
+  #s21 { flex-direction: row; }
+  #s21 .rrss-left {
+    width: 35%; background: var(--gray2); height: 100%;
+    padding: 6% 6%; display: flex; flex-direction: column;
+    justify-content: center; gap: 1em;
+  }
+  #s21 .rrss-left h2 {
+    font-family: var(--font-h); font-size: 1.6em; font-weight: 900;
+    color: var(--white); text-transform: uppercase; line-height: 1.1;
+  }
+  #s21 .rrss-left h2 span { color: var(--gold); }
+  #s21 .rrss-left p {
+    font-family: var(--font-b); font-size: .65em; color: rgba(255,255,255,.6); line-height: 1.7;
+  }
+  #s21 .rrss-right {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    padding: 4%;
+  }
+  .phone-mock {
+    width: 160px; background: #111; border-radius: 28px;
+    border: 3px solid #333; overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,.6);
+    position: relative;
+  }
+  .phone-top { height: 20px; background: #1a1a1a; display: flex; align-items: center; justify-content: center; }
+  .phone-notch { width: 40px; height: 10px; background: #111; border-radius: 6px; }
+  .ig-header {
+    background: #0a0a0a; padding: 8px 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .ig-avatar { width: 28px; height: 28px; border-radius: 50%; overflow: hidden; border: 1.5px solid var(--gold); }
+  .ig-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .ig-handle { font-family: var(--font-h); font-size: 6px; font-weight: 700; color: var(--white); }
+  .ig-follow { font-family: var(--font-h); font-size: 5.5px; font-weight: 700; color: var(--gold); margin-left: auto; }
+  .ig-post { aspect-ratio: 1; background: #1a1100; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+  .ig-post img { width: 100%; height: 100%; object-fit: cover; }
+  .ig-actions { padding: 6px 10px; display: flex; gap: 8px; background: #0a0a0a; }
+  .ig-act-icon { font-size: 10px; }
+  .ig-caption { padding: 4px 10px 8px; background: #0a0a0a; }
+  .ig-caption p { font-family: var(--font-b); font-size: 5px; color: rgba(255,255,255,.6); line-height: 1.5; }
+  .ig-caption p span { color: var(--gold); font-weight: 700; }
+
+  .post-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 8px; margin-left: 20px;
+  }
+  .post-card {
+    width: 110px; aspect-ratio: 1;
+    border-radius: 6px; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .post-card .pc-bg {
+    position: absolute; inset: 0;
+  }
+  .post-card .pc-logo {
+    position: relative; z-index: 1; width: 45%;
+  }
+  .post-card .pc-text {
+    position: absolute; bottom: 6px; left: 6px; right: 6px;
+    font-family: var(--font-h); font-size: 8px; font-weight: 700;
+    color: var(--white); text-transform: uppercase; letter-spacing: .04em;
+    line-height: 1.2;
+  }
+
+  /* ══════════════════════════════════════
+     SLIDE 22 – MARCA SOBRE FOTOGRAFÍAS
+  ══════════════════════════════════════ */
+  #s22 { flex-direction: column; padding: 4% 6%; gap: 2%; }
+  #s22 .msf-title {
+    font-family: var(--font-h); font-size: .65em; font-weight: 700;
+    color: var(--gold); letter-spacing: .2em; text-transform: uppercase;
+  }
+  #s22 .msf-grid {
+    display: grid; grid-template-columns: repeat(3,1fr); gap: 2%; flex: 1;
+  }
+  .photo-card {
+    border-radius: 8px; overflow: hidden; position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .photo-card .ph-bg {
+    position: absolute; inset: 0;
+    background-size: cover; background-position: center;
+  }
+  .photo-card .ph-overlay { position: absolute; inset: 0; }
+  .photo-card img { position: relative; z-index: 2; width: 55%; }
+  .photo-card .ph-label {
+    position: absolute; bottom: 8px; right: 10px;
+    font-family: var(--font-h); font-size: .5em; font-weight: 700;
+    z-index: 3; letter-spacing: .08em; text-transform: uppercase;
+  }
+  .ph-ok { color: #4daa7d; }
+  .ph-bad { color: #c94f4f; }
+
+  /* ══════════════════════════════════════
+     SLIDES 23–24 – NORMAS DE USO
+  ══════════════════════════════════════ */
+  #s23 { flex-direction: column; padding: 4% 7%; gap: 2.5%; }
+  #s24 { flex-direction: column; padding: 4% 7%; gap: 2.5%; }
+  .normas-title {
+    font-family: var(--font-h); font-size: .65em; font-weight: 700;
+    letter-spacing: .2em; text-transform: uppercase;
+  }
+  .normas-grid {
+    display: grid; grid-template-columns: repeat(4,1fr); gap: 1.5%; flex: 1;
+  }
+  .norma-card {
+    border-radius: 8px; overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .norma-preview {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    position: relative; padding: 10%;
+  }
+  .norma-preview img { max-width: 65%; max-height: 65%; object-fit: contain; }
+  .norma-badge {
+    position: absolute; top: 8px; right: 8px;
+    font-family: var(--font-h); font-size: .55em; font-weight: 700;
+    padding: 2px 7px; border-radius: 20px; letter-spacing: .05em;
+  }
+  .badge-ok { background: rgba(77,170,125,.15); color: #4daa7d; border: 1px solid #4daa7d; }
+  .badge-no { background: rgba(201,79,79,.15); color: #c94f4f; border: 1px solid #c94f4f; }
+  .norma-desc {
+    background: var(--gray2); padding: 5% 7%;
+    font-family: var(--font-b); font-size: .52em; color: rgba(255,255,255,.55);
+    line-height: 1.5; text-align: center;
+  }
+
+  /* ══════════════════════════════════════
+     SLIDE 25 – CONTRAPORTADA
+  ══════════════════════════════════════ */
+  #s25 {
+    background: var(--black);
+    justify-content: center; align-items: center;
+    flex-direction: column; gap: 1.8em;
+  }
+  #s25 img { width: min(22vw, 40vh); }
+  #s25 .cp-tagline {
+    font-family: var(--font-h); font-size: .68em; font-weight: 300;
+    color: var(--gold); letter-spacing: .3em; text-transform: uppercase;
+    text-align: center;
+  }
+  #s25 .cp-divider { width: 1px; height: 40px; background: rgba(212,160,23,.3); }
+  #s25 .cp-contact {
+    display: flex; flex-direction: column; align-items: center; gap: .4em;
+  }
+  #s25 .cp-contact a, #s25 .cp-contact span {
+    font-family: var(--font-b); font-size: .65em; color: rgba(255,255,255,.5);
+    letter-spacing: .05em; text-decoration: none;
+  }
+  #s25 .cp-contact a:hover { color: var(--gold); }
+  #s25 .cp-year {
+    position: absolute; bottom: 5%; left: 50%; transform: translateX(-50%);
+    font-family: var(--font-h); font-size: .5em; font-weight: 600;
+    color: rgba(255,255,255,.15); letter-spacing: .2em;
+  }
+</style>
+</head>
+<body>
+
+<div id="deck">
+
+  <!-- ═══════════════════════════════════
+       SLIDE 1 — PORTADA
+  ═══════════════════════════════════ -->
+  <div class="slide" id="s1">
+    <div class="logo-wrap">
+      <img src="./2chicos-logo.jpg" alt="2.chicos logo" class="logo-img">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:.5em;margin-top:.5em;">
+        <div class="manual-label">Manual de Marca</div>
+        <div class="brand-line">Identidad visual & lineamientos</div>
+        <div class="year">2026</div>
+      </div>
+    </div>
+    <div class="slide-num">01</div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       SLIDE 2 — ÍNDICE
+  ═══════════════════════════════════ -->
+  <div class="slide" id="s2">
+    <div class="idx-left">
+      <div class="idx-title">Índi<span>ce</span></div>
+      <div class="divider"></div>
+    </div>
+    <div class="idx-right">
+      <div class="idx-row"><span class="idx-num">01</span><span class="idx-label">Misión, Visión & Valores</span><span class="idx-page">3–5</span></div>
+      <div class="idx-row"><span class="idx-num">02</span><span class="idx-label">Business Model Canvas</span><span class="idx-page">6</span></div>
+      <div class="idx-row"><span class="idx-num">03</span><span class="idx-label">Origen 2.chicos</span><span class="idx-page">7</span></div>
+      <div class="idx-row"><span class="idx-num">04</span><span class="idx-label">Eslogan</span><span class="idx-page">8–10</span></div>
+      <div class="idx-row"><span class="idx-num">05</span><span class="idx-label">Logotipo</span><span class="idx-page">11–12</span></div>
+      <div class="idx-row"><span class="idx-num">06</span><span class="idx-label">Colores y sus propósitos</span><span class="idx-page">13–14</span></div>
+      <div class="idx-row"><span class="idx-num">07</span><span class="idx-label">Tipografía</span><span class="idx-page">15–18</span></div>
+      <div class="idx-row"><span class="idx-num">08</span><span class="idx-label">Rejilla de construcción</span><span class="idx-page">19–20</span></div>
+      <div class="idx-row"><span class="idx-num">09</span><span class="idx-label">Diseño de RRSS</span><span class="idx-page">21</span></div>
+      <div class="idx-row"><span class="idx-num">10</span><span class="idx-label">Marca sobre fotografías</span><span class="idx-page">22</span></div>
+      <div class="idx-row"><span class="idx-num">11</span><span class="idx-label">Normas de uso</span><span class="idx-page">23–24</span></div>
+    </div>
+    <div class="slide-num">02</div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       SLIDE 3 — MISIÓN
+  ═══════════════════════════════════ -->
+  <div class="slide mvv-slide" id="s3">
+    <div class="mvv-aside">
+      <div class="mvv-es">Misión</div>
+      <div class="mvv-en">Mission</div>
+    </div>
+    <div class="mvv-content">
+      <div class="tag">Nuestro propósito</div>
+      <div class="divider"></div>
+      <p>Potenciar la presencia digital de marcas y negocios a través de estrategias de marketing innovadoras, impulsadas por Inteligencia Artificial, para generar resultados reales y medibles.</p>
+      <p>Creemos que cada negocio, sin importar su tamaño, merece una estrategia de marketing de alto impacto. Estamos aquí para hacerlo posible.</p>
+    </div>
+    <div class="slide-num">03</div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       SLIDE 4 — VISIÓN
+  ═══════════════════════════════════ -->
+  <div class="slide mvv-slide" id="s4">
+    <div class="mvv-aside" style="background:#1a1200;border-right:3px solid var(--gold);">
+      <div class="mvv-es" style="color:var(--gold);">Visión</div>
+      <div class="mvv-en" style="color:rgba(212,160,23,.4);">Vision</div>
+    </div>
+    <div class="mvv-content">
+      <div class="tag">Hacia dónde vamos</div>
+      <div class="divider"></div>
+      <p>Ser la agencia de marketing con IA de referencia para emprendedores y PYMEs, democratizando el acceso a herramientas de alto impacto que antes solo estaban al alcance de las grandes marcas.</p>
+      <p>Visualizamos un ecosistema digital donde la tecnología y la creatividad trabajan juntas para transformar negocios reales.</p>
+    </div>
+    <div class="slide-num">04</div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       SLIDE 5 — VALORES
+  ═══════════════════════════════════ -->
+  <div class="slide" id="s5">
+    <div class="mvv-content" style="width:100%;padding:4% 7%;gap:1em;">
+      <div class="tag">Lo que nos define</div>
+      <div style="display:flex;align-items:center;gap:1em;">
+        <div style="font-family:var(--font-h);font-size:2em;font-weight:900;color:var(--white);text-transform:uppercase;">Valores</div>
+        <div class="divider" style="flex:1;width:auto;"></div>
+      </div>
+      <div class="vals-grid">
+        <div class="val-card">
+          <div class="val-icon">⚡</div>
+          <div class="val-name">Innovación</div>
+          <div class="val-desc">Siempre a la vanguardia de las herramientas y tendencias digitales.</div>
+        </div>
+        <div class="val-card">
+          <div class="val-icon">◎</div>
+          <div class="val-name">Transparencia</div>
+          <div class="val-desc">Comunicación honesta, directa y sin letra pequeña.</div>
+        </div>
+        <div class="val-card">
+          <div class="val-icon">▲</div>
+          <div class="val-name">Resultados</div>
+          <div class="val-desc">Lo que no se mide, no mejora. Datos sobre promesas.</div>
+        </div>
+        <div class="val-card">
+          <div class="val-icon">✦</div>
+          <div class="val-name">Cercanía</div>
+          <div class="val-desc">Trato personal y cercano. No somos corporativos.</div>
+        </div>
+        <div class="val-card">
+          <div class="val-icon">◆</div>
+          <div class="val-name">Excelencia</div>
+          <div class="val-desc">Cada detalle importa. Entregamos calidad en todo lo que hacemos.</div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">05</div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       SLIDE 6 — BMC
+  ═══════════════════════════════════ -->
+  <div class="slide" id="s6">
+    <div class="bmc-title">Business Model <span>Canvas</span></div>
+    <div class="bmc-grid">
+      <!-- Col 1: Socios clave (tall) -->
+      <div class="bc tall">
+        <div class="bc-label">Socios Clave</div>
+        <div class="bc-items">• Plataformas IA (ChatGPT, MidJourney, Meta AI)<br>• Plataformas publicitarias (Meta Ads, Google Ads)<br>• Proveedores de diseño y edición<br>• Clientes recurrentes como partners</div>
+      </div>
+      <!-- Col 2–3: Actividades + Recursos -->
+      <div class="bc">
+        <div class="bc-label">Actividades Clave</div>
+        <div class="bc-items">• Gestión de redes sociales<br>• Creación de contenido con IA<br>• Estrategia y análisis de datos<br>• Campañas de publicidad pagada<br>• Branding y diseño</div>
+      </div>
+      <div class="bc">
+        <div class="bc-label">Recursos Clave</div>
+        <div class="bc-items">• 2 personas especializadas<br>• Herramientas de IA<br>• Software creativo<br>• Conocimiento y metodologías<br>• Red de contactos</div>
+      </div>
+      <!-- Col 4 (center): Propuesta de valor (tall) -->
+      <div class="bc tall">
+        <div class="bc-label">Propuesta de Valor</div>
+        <div class="bc-items">• Marketing con IA accesible para PYMEs<br>• Resultados medibles y transparentes<br>• Acompañamiento personalizado<br>• Velocidad y eficiencia con IA<br>• Precio justo, calidad premium</div>
+      </div>
+      <!-- Col 5 top: Relación -->
+      <div class="bc">
+        <div class="bc-label">Relación con Clientes</div>
+        <div class="bc-items">• Atención personalizada<br>• Reportes mensuales<br>• Canal directo (WhatsApp)<br>• Onboarding de marca</div>
+      </div>
+      <!-- Col 5 bot: Canales -->
+      <div class="bc">
+        <div class="bc-label">Canales</div>
+        <div class="bc-items">• Instagram @2.chicos<br>• WhatsApp directo<br>• Boca a boca<br>• Referidos</div>
+      </div>
+      <!-- Row 2: Segmentos (wide) -->
+      <div class="bc wide" style="grid-column:2/4;">
+        <div class="bc-label">Segmentos de Clientes</div>
+        <div class="bc-items">• Emprendedores y pequeños negocios locales &nbsp;|&nbsp; PYMEs que quieren crecer en redes &nbsp;|&nbsp; Marcas personales &nbsp;|&nbsp; Tiendas online</div>
+      </div>
+      <!-- Costes -->
+      <div class="bc" style="background:#1a1200;border-left-color:#A07810;">
+        <div class="bc-label">Estructura de Costes</div>
+        <div class="bc-items">• Herramientas IA y diseño<br>• Inversión en publicidad propia<br>• Tiempo y recursos humanos</div>
+      </div>
+      <!-- Ingresos -->
+      <div class="bc" style="background:#001a08;border-left-color:#4daa7d;">
+        <div class="bc-label">Fuentes de Ingresos</div>
+        <div class="bc-items">• Gestión mensual de RRSS<br>• Campañas publicitarias<br>• Packs de branding y contenido<br>• Asesorías puntuales</div>
+      </div>
+    </div>
+    <div class="slide-num">06</div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       SLIDE 7 — ORIGEN
+  ═══════════════════════════════════ -->
+  <div class="slide" id="s7">
+    <div class="origen-left">
+      <img src="./2chicos-logo.jpg" alt="2.chicos">
+    </div>
+    <div class="origen-right">
+      <div class="tag">Nuestra historia</div>
+      <h2>Origen<br><span>2.chicos</span></h2>
+      <div class="divider"></div>
+      <p>2.chicos nació de la unión de dos personas con una misma convicción: que la Inteligencia Artificial estaba cambiando las reglas del marketing, y que los pequeños negocios merecían beneficiarse de ello.</p>
+      <p>Lo que empezó como un proyecto entre amigos se convirtió en una agencia comprometida con ofrecer estrategias digitales de alto impacto, accesibles y profundamente personalizadas para cada cliente.</p>
+      <p>El nombre lo dice todo: somos 2 chicos que decidieron hacer las cosas de manera diferente.</p>
+    </div>
+    <div class="slide-num">07</div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       SLIDE 8 — ESLOGAN (I)
+  ═══════════════════════════════════ -->
+  <div class="slide" id="s8">
+    <div style="position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,#1a1200 0%,#000 70%);"></div>
+    <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:1em;">
+      <div class="tag" style="letter-spacing:.3em;">Nuestro Eslogan</div>
+      <div class="esl-main">Agencia de<br><span class="gold">Marketing</span><br>con IA</div>
+      <div class="esl-sub">2.chicos · @2.chicos</div>
+    </div>
+    <div class="slide-num">08</div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       SLIDE 9 — ESLOGAN (II)
+  ═══════════════════════════════════ -->
+  <div class="slide" id="s9">
+    <div class="esl9-left">
+      <h2>¿Qué<br>significa?</h2>
+      <p>Cada palabra de nuestro eslogan fue elegida con intención. Juntas definen exactamente lo que somos y lo que ofrecemos.</p>
+    </div>
+    <div class="esl9-right">
+      <div class="esl-word-row">
+        <div class="esl-word">Agencia</div>
+        <div class="esl-def">No somos freelancers. Somos un equipo con procesos, metodología y visión estratégica que trabaja como una agencia profesional.</div>
+      </div>
+      <div class="esl-word-row">
+        <div class="esl-word">de Marketing</div>
+        <div class="esl-def">Nos especializamos en hacer crecer marcas: contenido, publicidad, branding y presencia digital son nuestro campo.</div>
+      </div>
+      <div class="esl-word-row">
+        <div class="esl-word">con IA</div>
+        <div class="esl-def">La Inteligencia Artificial es nuestro diferencial. Nos permite trabajar más rápido, con mayor precisión y mejores resultados que las agencias tradicionales.</div>
+      </div>
+    </div>
+    <div class="slide-num">09</div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       SLIDE 10 — POSICIONAMIENTO
+  ═══════════════════════════════════ -->
+  <div class="slide" id="s10">
+    <div class="pos-label">Posicionamiento de Marca</div>
+    <div class="divider" style="background:var(--gold);"></div>
+    <div class="pos-statement" style="color:var(--black);">
+      "Marketing de alto impacto,<br>accesible para todos."
+    </div>
+    <div class="pos-desc">
+      2.chicos ocupa el espacio entre las grandes agencias inalcanzables y los freelancers sin estructura. Somos la opción inteligente para negocios que quieren crecer de verdad en el entorno digital.
+    </div>
+    <div class="slide-num slide-num-dark">10</div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       SLIDE 11 — LOGOTIPO (I)
+  ═══════════════════════════════════ -->
+  <div class="slide" id="s11">
+    <div class="logo-panel dark">
+      <img src="./2chicos-logo.jpg" alt="Logo versión oscura">
+      <div class="panel-label">Versión oscura — Principal</div>
+    </div>
+    <div class="logo-panel light">
+      <div style="background:var(--black);border-radius:12px;padding:6%;display:flex;align-items:center;justify-content:center;width:70%;">
+        <img src="./2chicos-logo.jpg" alt="Logo" style="width:100%;">
+      </div>
+      <div class="panel-label">Sobre fondo neutro</div>
+    </div>
+    <div class="slide-num">11</div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       SLIDE 12 — LOGOTIPO (II)
+  ═══════════════════════════════════ -->
+  <div class="slide" id="s12">
+    <div class="logo12-title">Variaciones del Logotipo</div>
+    <div class="logo-variants">
+      <div class="var-card">
+        <img src="./2chicos-logo.jpg" alt="Principal">
+        <div class="var-name light">Principal (oscuro)</div>
+      </div>
+      <div class="var-card" style="background:#f5f0e8;">
+        <div style="background:var(--black);border-radius:10px;padding:6%;display:flex;align-items:center;justify-content:center;width:70%;">
+          <img src="./2chicos-logo.jpg" alt="Sobre beige" style="width:100%;">
+        </div>
+        <div class="var-name" style="color:rgba(0,0,0,.4);">Sobre fondo claro</div>
+      </div>
+      <div class="var-card" style="background:var(--gold);">
+        <div style="background:var(--black);border-radius:10px;padding:6%;display:flex;align-items:center;justify-content:center;width:70%;">
+          <img src="./2chicos-logo.jpg" alt="Sobre dorado" style="width:100%;">
+        </div>
+        <div class="var-name" style="color:rgba(0,0,0,.5);">Sobre dorado</div>
+      </div>
+    </div>
+    <div class="slide-num">12</div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       SLIDE 13 — COLORES (I)
+  ═══════════════════════════════════ -->
+  <div class="slide" id="s13">
+    <div class="col-title">Paleta de <span>Colores</span></div>
+    <div class="swatches">
+      <div class="swatch-card">
+        <div class="swatch-color" style="background:#000000;border:1px solid #333;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Negro</div>
+          <div class="swatch-hex">#000000</div>
+          <div class="swatch-rgb">RGB 0, 0, 0<br>CMYK 0, 0, 0, 100</div>
+        </div>
+      </div>
+      <div class="swatch-card">
+        <div class="swatch-color" style="background:#D4A017;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Dorado</div>
+          <div class="swatch-hex">#D4A017</div>
+          <div class="swatch-rgb">RGB 212, 160, 23<br>CMYK 0, 25, 89, 17</div>
+        </div>
+      </div>
+      <div class="swatch-card">
+        <div class="swatch-color" style="background:#FFFFFF;border:1px solid #333;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Blanco</div>
+          <div class="swatch-hex">#FFFFFF</div>
+          <div class="swatch-rgb">RGB 255, 255, 255<br>CMYK 0, 0, 0, 0</div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">13</div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       SLIDE 14 — COLORES (II)
+  ═══════════════════════════════════ -->
+  <div class="slide" id="s14">
+    <div class="col14-left">
+      <h2>Colores &<br>propósitos</h2>
+      <p>Cada color de la paleta de 2.chicos fue elegido con intención. Juntos comunican autoridad, calidad y claridad.</p>
+    </div>
+    <div class="col14-right">
+      <div class="col-purpose">
+        <div class="col-dot" style="background:#000;border:1.5px solid #555;"></div>
+        <div class="col-purpose-text">
+          <h4>Negro — Autoridad & Elegancia</h4>
+          <p>El negro es la base de la identidad. Transmite profesionalismo, sofisticación y contraste. Se usa en fondos principales y como base del logotipo.</p>
+        </div>
+      </div>
+      <div class="col-purpose">
+        <div class="col-dot" style="background:#D4A017;"></div>
+        <div class="col-purpose-text">
+          <h4>Dorado — Éxito & Calidad Premium</h4>
+          <p>El dorado es el color de acento y diferenciación. Evoca resultados, valor y excelencia. Se usa para destacar elementos clave, íconos y llamadas a la acción.</p>
+        </div>
+      </div>
+      <div class="col-purpose">
+        <div class="col-dot" style="background:#fff;border:1.5px solid #444;"></div>
+        <div class="col-purpose-text">
+          <h4>Blanco — Claridad & Confianza</h4>
+          <p>El blanco asegura legibilidad y limpieza visual. Se usa para texto sobre fondos oscuros, espacios negativos y elementos secundarios del logotipo.</p>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">14</div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       SLIDE 15 — TIPOGRAFÍA MONTSERRAT
+  ═══════════════════════════════════ -->
+  <div class="slide typo-slide" id="s15">
+    <div class="typo-aside">
+      <div class="t-label">Tipografía principal</div>
+      <div class="t-family">Mont<br>serrat</div>
+      <div class="t-style">Sans-serif · Geométrica</div>
+    </div>
+    <div class="typo-content">
+      <div class="tag">Abecedario</div>
+      <div style="font-family:'Montserrat',sans-serif;font-size:1.8em;font-weight:800;color:var(--white);line-height:1.2;letter-spacing:.05em;">
+        A B C D E F G H I J<br>K L M N O P Q R S T<br>U V W X Y Z
+      </div>
+      <div style="font-family:'Montserrat',sans-serif;font-size:1.1em;font-weight:400;color:rgba(255,255,255,.5);letter-spacing:.08em;">
+        a b c d e f g h i j k l m n o p q r s t u v w x y z
+      </div>
+      <div style="font-family:'Montserrat',sans-serif;font-size:1em;font-weight:400;color:rgba(255,255,255,.4);letter-spacing:.05em;">
+        0 1 2 3 4 5 6 7 8 9 &nbsp;! ? @ . , ; : ( )
+      </div>
+    </div>
+    <div class="slide-num">15</div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       SLIDE 16 — PESOS MONTSERRAT
+  ═══════════════════════════════════ -->
+  <div class="slide" id="s16" style="flex-direction:column;padding:4% 6%;gap:2%;">
+    <div style="font-family:var(--font-h);font-size:.65em;font-weight:700;color:var(--gold);letter-spacing:.2em;text-transform:uppercase;">Pesos tipográficos — Montserrat</div>
+    <div class="weights-grid">
+      <div class="wt-card">
+        <div class="wt-name">Black 900</div>
+        <div class="wt-sample" style="font-weight:900;">2.chicos</div>
+        <div class="wt-use">Títulos principales, portadas, logotipos</div>
+      </div>
+      <div class="wt-card">
+        <div class="wt-name">Bold 700</div>
+        <div class="wt-sample" style="font-weight:700;">2.chicos</div>
+        <div class="wt-use">Subtítulos, etiquetas, destacados</div>
+      </div>
+      <div class="wt-card">
+        <div class="wt-name">SemiBold 600</div>
+        <div class="wt-sample" style="font-weight:600;">2.chicos</div>
+        <div class="wt-use">Navegación, botones, datos</div>
+      </div>
+      <div class="wt-card">
+        <div class="wt-name">Medium 500</div>
+        <div class="wt-sample" style="font-weight:500;">2.chicos</div>
+        <div class="wt-use">Subtítulos secundarios</div>
+      </div>
+      <div class="wt-card">
+        <div class="wt-name">Regular 400</div>
+        <div class="wt-sample" style="font-weight:400;">2.chicos</div>
+        <div class="wt-use">Cuerpo de texto, descripciones</div>
+      </div>
+      <div class="wt-card">
+        <div class="wt-name">Light 300</div>
+        <div class="wt-sample" style="font-weight:300;">2.chicos</div>
+        <div class="wt-use">Taglines, texto decorativo</div>
+      </div>
+    </div>
+    <div class="slide-num">16</div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       SLIDE 17 — TIPOGRAFÍA INTER
+  ═══════════════════════════════════ -->
+  <div class="slide typo-slide" id="s17">
+    <div class="typo-aside" style="background:#1a1200;">
+      <div class="t-label">Tipografía secundaria</div>
+      <div class="t-family">Inter</div>
+      <div class="t-style">Sans-serif · Humanista</div>
+    </div>
+    <div class="typo-content">
+      <div class="tag">Abecedario</div>
+      <div style="font-family:'Inter',sans-serif;font-size:1.8em;font-weight:600;color:var(--white);line-height:1.2;letter-spacing:.03em;">
+        A B C D E F G H I J<br>K L M N O P Q R S T<br>U V W X Y Z
+      </div>
+      <div style="font-family:'Inter',sans-serif;font-size:1.1em;font-weight:400;color:rgba(255,255,255,.5);">
+        a b c d e f g h i j k l m n o p q r s t u v w x y z
+      </div>
+      <div style="font-family:'Inter',sans-serif;font-size:1em;font-weight:400;color:rgba(255,255,255,.4);">
+        0 1 2 3 4 5 6 7 8 9 &nbsp;! ? @ . , ; : ( )
+      </div>
+      <div style="font-family:'Inter',sans-serif;font-size:.7em;color:rgba(255,255,255,.35);line-height:1.7;">
+        Inter se utiliza para cuerpo de texto, descripciones largas, captions y párrafos donde se requiere máxima legibilidad.
+      </div>
+    </div>
+    <div class="slide-num">17</div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       SLIDE 18 — JERARQUÍA TIPOGRÁFICA
+  ═══════════════════════════════════ -->
+  <div class="slide" id="s18">
+    <div class="hier-title">Jerarquía Tipográfica</div>
+    <div class="hier-rows">
+      <div class="hier-row">
+        <div class="hier-level">H1 Título</div>
+        <div class="hier-sample" style="font-family:'Montserrat',sans-serif;font-size:2.2em;font-weight:900;">2.chicos</div>
+        <div class="hier-detail">Montserrat 900</div>
+        <div class="hier-detail">48–72px</div>
+      </div>
+      <div class="hier-row">
+        <div class="hier-level">H2 Subtítulo</div>
+        <div class="hier-sample" style="font-family:'Montserrat',sans-serif;font-size:1.5em;font-weight:700;">Agencia de Marketing</div>
+        <div class="hier-detail">Montserrat 700</div>
+        <div class="hier-detail">32–40px</div>
+      </div>
+      <div class="hier-row">
+        <div class="hier-level">H3 Sección</div>
+        <div class="hier-sample" style="font-family:'Montserrat',sans-serif;font-size:1.1em;font-weight:600;">Nuestros servicios</div>
+        <div class="hier-detail">Montserrat 600</div>
+        <div class="hier-detail">20–28px</div>
+      </div>
+      <div class="hier-row">
+        <div class="hier-level">Body</div>
+        <div class="hier-sample" style="font-family:'Inter',sans-serif;font-size:.85em;font-weight:400;color:rgba(255,255,255,.75);">Estrategias de marketing digital con IA para tu negocio.</div>
+        <div class="hier-detail">Inter 400</div>
+        <div class="hier-detail">14–16px</div>
+      </div>
+      <div class="hier-row">
+        <div class="hier-level">Caption</div>
+        <div class="hier-sample" style="font-family:'Inter',sans-serif;font-size:.65em;font-weight:400;color:rgba(255,255,255,.4);">@2.chicos · Agencia de Marketing con IA</div>
+        <div class="hier-detail">Inter 400</div>
+        <div class="hier-detail">10–12px</div>
+      </div>
+    </div>
+    <div class="slide-num">18</div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       SLIDE 19 — REJILLA DE CONSTRUCCIÓN
+  ═══════════════════════════════════ -->
+  <div class="slide" id="s19">
+    <div class="rej-title">Rejilla de Construcción del Logotipo</div>
+    <div class="rej-wrap">
+      <div class="grid-overlay"></div>
+      <img src="./2chicos-logo.jpg" alt="Logo construcción">
+      <!-- Measurement labels -->
+      <svg style="position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none;" viewBox="0 0 800 460">
+        <!-- Horizontal guide -->
+        <line x1="200" y1="230" x2="600" y2="230" stroke="rgba(212,160,23,.3)" stroke-width="1" stroke-dasharray="4,4"/>
+        <!-- Vertical center -->
+        <line x1="400" y1="80" x2="400" y2="380" stroke="rgba(212,160,23,.3)" stroke-width="1" stroke-dasharray="4,4"/>
+        <!-- Width arrow -->
+        <line x1="205" y1="395" x2="595" y2="395" stroke="rgba(212,160,23,.5)" stroke-width="1" marker-start="url(#arr)" marker-end="url(#arr)"/>
+        <text x="400" y="410" text-anchor="middle" fill="rgba(212,160,23,.7)" font-family="Montserrat" font-size="11" font-weight="700">Ancho logo completo: 1X</text>
+        <!-- Height arrow -->
+        <line x1="175" y1="85" x2="175" y2="375" stroke="rgba(212,160,23,.5)" stroke-width="1"/>
+        <text x="165" y="235" text-anchor="middle" fill="rgba(212,160,23,.7)" font-family="Montserrat" font-size="11" font-weight="700" transform="rotate(-90,165,230)">Alto: 1X</text>
+        <defs>
+          <marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L6,3 z" fill="rgba(212,160,23,.5)"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+    <div class="slide-num">19</div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       SLIDE 20 — ZONA DE EXCLUSIÓN
+  ═══════════════════════════════════ -->
+  <div class="slide" id="s20">
+    <div class="rej20-title">Zona de Exclusión — Clear Space</div>
+    <div class="clear-demo">
+      <div class="clear-box">
+        <div class="clear-border"></div>
+        <div class="clear-arrows top">↕ X</div>
+        <div class="clear-arrows bot">↕ X</div>
+        <div class="clear-arrows lft">↔ X</div>
+        <div class="clear-arrows rgt">↔ X</div>
+        <img src="./2chicos-logo.jpg" alt="Logo">
+      </div>
+    </div>
+    <div class="clear-rule">La zona de exclusión mínima es igual a la altura de la letra "X" en el logotipo.<br>No debe haber ningún otro elemento dentro de esta zona.</div>
+    <div class="slide-num">20</div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       SLIDE 21 — DISEÑO RRSS
+  ═══════════════════════════════════ -->
+  <div class="slide" id="s21">
+    <div class="rrss-left">
+      <div class="tag">Redes Sociales</div>
+      <h2>Diseño<br>de <span>RRSS</span></h2>
+      <div class="divider"></div>
+      <p>La presencia de 2.chicos en redes sociales mantiene la coherencia visual de la marca: fondo negro, acento dorado, tipografía Montserrat y el logotipo como firma.</p>
+      <p>Handle principal: <strong style="color:var(--gold);">@2.chicos</strong></p>
+    </div>
+    <div class="rrss-right">
+      <!-- Phone mockup -->
+      <div class="phone-mock">
+        <div class="phone-top"><div class="phone-notch"></div></div>
+        <div class="ig-header">
+          <div class="ig-avatar"><img src="./2chicos-logo.jpg" alt="avatar"></div>
+          <div class="ig-handle">2.chicos</div>
+          <div class="ig-follow">Seguir</div>
+        </div>
+        <div class="ig-post">
+          <div style="width:100%;height:100%;background:linear-gradient(135deg,#1a1200,#000);display:flex;align-items:center;justify-content:center;">
+            <img src="./2chicos-logo.jpg" alt="post" style="width:55%;">
+          </div>
+        </div>
+        <div class="ig-actions">
+          <span class="ig-act-icon">♡</span>
+          <span class="ig-act-icon">💬</span>
+          <span class="ig-act-icon">✈</span>
+        </div>
+        <div class="ig-caption">
+          <p><span>@2.chicos</span> Agencia de Marketing con IA 🤖✨ #marketing #IA</p>
+        </div>
+      </div>
+      <!-- Post grid -->
+      <div class="post-grid">
+        <div class="post-card" style="background:linear-gradient(135deg,#1a1200,#000);">
+          <img src="./2chicos-logo.jpg" class="pc-logo" alt="">
+        </div>
+        <div class="post-card" style="background:var(--gold);">
+          <div style="font-family:'Montserrat',sans-serif;font-size:14px;font-weight:900;color:#000;text-align:center;line-height:1.2;padding:10px;">Marketing<br>con IA</div>
+        </div>
+        <div class="post-card" style="background:#111;border:1px solid #333;">
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;padding:8px;">
+            <div style="font-family:'Montserrat',sans-serif;font-size:9px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.05em;">Servicio</div>
+            <div style="font-family:'Montserrat',sans-serif;font-size:12px;font-weight:900;color:var(--white);text-align:center;line-height:1.1;">Gestión<br>de RRSS</div>
+          </div>
+        </div>
+        <div class="post-card" style="background:linear-gradient(135deg,#D4A017,#A07810);">
+          <div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:900;color:#000;text-align:center;line-height:1.2;padding:8px;">Resultados<br>Reales</div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">21</div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       SLIDE 22 — MARCA SOBRE FOTOGRAFÍAS
+  ═══════════════════════════════════ -->
+  <div class="slide" id="s22">
+    <div class="msf-title">Marca sobre Fotografías</div>
+    <div class="msf-grid">
+      <!-- OK: Dark photo -->
+      <div class="photo-card">
+        <div class="ph-bg" style="background:linear-gradient(135deg,#0d0d0d 0%,#1a1100 100%);"></div>
+        <div class="ph-overlay" style="background:rgba(0,0,0,.3);"></div>
+        <img src="./2chicos-logo.jpg" alt="logo">
+        <div class="ph-label ph-ok">✓ Correcto</div>
+      </div>
+      <!-- OK: Dark overlay -->
+      <div class="photo-card">
+        <div class="ph-bg" style="background:linear-gradient(160deg,#1a1000 0%,#000 60%,#111 100%);"></div>
+        <div class="ph-overlay" style="background:linear-gradient(to top,rgba(0,0,0,.8),rgba(0,0,0,.2));"></div>
+        <img src="./2chicos-logo.jpg" alt="logo">
+        <div class="ph-label ph-ok">✓ Correcto</div>
+      </div>
+      <!-- NOT OK: Light background -->
+      <div class="photo-card" style="background:#f0ece0;">
+        <div class="ph-bg" style="background:#f0ece0;"></div>
+        <img src="./2chicos-logo.jpg" alt="logo" style="filter:none;opacity:.4;">
+        <div class="ph-label ph-bad" style="background:rgba(201,79,79,.2);border-radius:4px;padding:2px 6px;">✗ Incorrecto</div>
+      </div>
+    </div>
+    <div style="font-family:var(--font-b);font-size:.6em;color:rgba(255,255,255,.4);text-align:center;margin-top:1em;">
+      Usar el logo principalmente sobre fondos oscuros. Si se usa sobre foto, aplicar una capa oscura de al menos 40% de opacidad.
+    </div>
+    <div class="slide-num">22</div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       SLIDE 23 — NORMAS CORRECTAS
+  ═══════════════════════════════════ -->
+  <div class="slide" id="s23">
+    <div class="normas-title" style="color:#4daa7d;">✓ Usos Correctos del Logotipo</div>
+    <div class="normas-grid">
+      <div class="norma-card">
+        <div class="norma-preview" style="background:#000;">
+          <img src="./2chicos-logo.jpg" alt="">
+          <div class="norma-badge badge-ok">✓</div>
+        </div>
+        <div class="norma-desc">Logo sobre fondo negro (uso principal)</div>
+      </div>
+      <div class="norma-card">
+        <div class="norma-preview" style="background:#1a1200;">
+          <img src="./2chicos-logo.jpg" alt="">
+          <div class="norma-badge badge-ok">✓</div>
+        </div>
+        <div class="norma-desc">Logo sobre fondo oscuro derivado</div>
+      </div>
+      <div class="norma-card">
+        <div class="norma-preview" style="background:#D4A017;padding:8%;">
+          <div style="background:#000;border-radius:8px;padding:8%;display:flex;align-items:center;justify-content:center;width:80%;">
+            <img src="./2chicos-logo.jpg" alt="" style="width:100%;">
+          </div>
+          <div class="norma-badge badge-ok">✓</div>
+        </div>
+        <div class="norma-desc">Logo en caja negra sobre dorado</div>
+      </div>
+      <div class="norma-card">
+        <div class="norma-preview" style="background:#111;padding:12%;">
+          <img src="./2chicos-logo.jpg" alt="" style="max-width:80%;">
+          <div class="norma-badge badge-ok">✓</div>
+        </div>
+        <div class="norma-desc">Con suficiente espacio de respiro</div>
+      </div>
+    </div>
+    <div class="slide-num">23</div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       SLIDE 24 — NORMAS INCORRECTAS
+  ═══════════════════════════════════ -->
+  <div class="slide" id="s24">
+    <div class="normas-title" style="color:#c94f4f;">✗ Usos Incorrectos del Logotipo</div>
+    <div class="normas-grid">
+      <div class="norma-card">
+        <div class="norma-preview" style="background:#f5f0e8;">
+          <img src="./2chicos-logo.jpg" alt="" style="opacity:.5;">
+          <div class="norma-badge badge-no">✗</div>
+        </div>
+        <div class="norma-desc">No usar sobre fondos claros sin caja</div>
+      </div>
+      <div class="norma-card">
+        <div class="norma-preview" style="background:#000;">
+          <img src="./2chicos-logo.jpg" alt="" style="transform:rotate(15deg);">
+          <div class="norma-badge badge-no">✗</div>
+        </div>
+        <div class="norma-desc">No rotar el logotipo</div>
+      </div>
+      <div class="norma-card">
+        <div class="norma-preview" style="background:#000;">
+          <img src="./2chicos-logo.jpg" alt="" style="transform:scaleX(1.5);filter:saturate(0);">
+          <div class="norma-badge badge-no">✗</div>
+        </div>
+        <div class="norma-desc">No deformar ni escalar de forma desproporcionada</div>
+      </div>
+      <div class="norma-card">
+        <div class="norma-preview" style="background:linear-gradient(135deg,#e74c3c,#3498db);">
+          <img src="./2chicos-logo.jpg" alt="" style="opacity:.6;">
+          <div class="norma-badge badge-no">✗</div>
+        </div>
+        <div class="norma-desc">No usar sobre fondos de color ajenos a la paleta</div>
+      </div>
+    </div>
+    <div class="slide-num">24</div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       SLIDE 25 — CONTRAPORTADA
+  ═══════════════════════════════════ -->
+  <div class="slide" id="s25">
+    <img src="./2chicos-logo.jpg" alt="2.chicos">
+    <div class="cp-tagline">Agencia de Marketing con IA</div>
+    <div class="cp-divider"></div>
+    <div class="cp-contact">
+      <span>Instagram: @2.chicos</span>
+      <span>2026 · Todos los derechos reservados</span>
+    </div>
+    <div class="cp-year">MANUAL DE MARCA · 2026</div>
+  </div>
+
+</div><!-- /deck -->
+
+<!-- Navigation -->
+<div id="nav">
+  <button id="btn-prev" title="Anterior (←)">&#8592;</button>
+  <span id="counter">1 / 25</span>
+  <button id="btn-next" title="Siguiente (→)">&#8594;</button>
+  <div class="dot-strip" id="dots"></div>
+</div>
+
+<script>
+  const TOTAL = 25;
+  let current = 1;
+
+  // Build dots
+  const dotStrip = document.getElementById('dots');
+  for (let i = 1; i <= TOTAL; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 1 ? ' on' : '');
+    d.title = 'Diapositiva ' + i;
+    d.addEventListener('click', () => goTo(i));
+    dotStrip.appendChild(d);
+  }
+
+  function goTo(n) {
+    const prev = document.getElementById('s' + current);
+    prev.classList.remove('visible');
+    setTimeout(() => { prev.classList.remove('active'); }, 450);
+
+    current = Math.max(1, Math.min(TOTAL, n));
+
+    const next = document.getElementById('s' + current);
+    next.classList.add('active');
+    requestAnimationFrame(() => requestAnimationFrame(() => next.classList.add('visible')));
+
+    document.getElementById('counter').textContent = current + ' / ' + TOTAL;
+    document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('on', i + 1 === current));
+  }
+
+  // Init first slide
+  const first = document.getElementById('s1');
+  first.classList.add('active');
+  requestAnimationFrame(() => requestAnimationFrame(() => first.classList.add('visible')));
+
+  document.getElementById('btn-prev').addEventListener('click', () => goTo(current - 1));
+  document.getElementById('btn-next').addEventListener('click', () => goTo(current + 1));
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goTo(current + 1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   goTo(current - 1);
+  });
+
+  // Touch swipe
+  let tx = 0;
+  document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 50) goTo(current + (dx < 0 ? 1 : -1));
+  }, { passive: true });
+</script>
+</body>
+</html>
