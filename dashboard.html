@@ -2568,6 +2568,173 @@
     }
 
     /* ══════════════════════════════
+       SLEEP OS
+    ══════════════════════════════ */
+    .sleep-os-card {
+      background: #111;
+      border: 1px solid #1e1e1e;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .sleep-entry-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .sleep-time-field { display: flex; flex-direction: column; gap: 6px; }
+
+    .sleep-time-input {
+      height: 40px;
+      background: #0d0d0d;
+      border: 1px solid #222;
+      border-radius: 7px;
+      color: #ddd;
+      font-family: 'Inter', sans-serif;
+      font-size: 17px;
+      font-weight: 600;
+      padding: 0 10px;
+      outline: none;
+      width: 112px;
+      font-variant-numeric: tabular-nums;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .sleep-time-input:focus { border-color: #2e2e2e; box-shadow: var(--focus-ring); }
+
+    .sleep-time-arrow { font-size: 20px; color: #2a2a2a; padding-bottom: 9px; }
+
+    .sleep-fallin-row { display: flex; align-items: center; gap: 8px; height: 40px; }
+    #sleep-fallin-display { font-size: 13px; font-weight: 600; color: #888; width: 50px; text-align: center; font-variant-numeric: tabular-nums; }
+
+    .sleep-summary-row {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      padding: 14px 0 0;
+      border-top: 1px solid #181818;
+      flex-wrap: wrap;
+    }
+
+    .sleep-sum-item { display: flex; flex-direction: column; gap: 3px; }
+    .sleep-sum-num { font-size: 22px; font-weight: 700; color: #ccc; font-variant-numeric: tabular-nums; line-height: 1; }
+    .sleep-sum-label { font-size: 9px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: #444; }
+
+    .sleep-chart-wrap { height: 100px; position: relative; }
+
+    .sleep-ai-row { display: flex; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
+    .sleep-ai-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 14px; border-radius: 7px; border: 1px solid #222;
+      background: transparent; color: #666;
+      font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: border-color 0.15s, color 0.15s, background 0.15s; flex-shrink: 0;
+    }
+    .sleep-ai-btn:hover { border-color: #333; color: #bbb; background: #141414; }
+    .sleep-ai-btn:disabled { opacity: 0.4; cursor: default; }
+
+    .sleep-ai-result {
+      flex: 1; font-size: 12px; color: #999; line-height: 1.65;
+      padding: 10px 14px; background: #0d0d0d; border: 1px solid #1a1a1a;
+      border-radius: 7px; min-width: 200px;
+    }
+
+    /* ══════════════════════════════
+       PROTEIN RING
+    ══════════════════════════════ */
+    .protein-hero-card {
+      background: #111;
+      border: 1px solid #1e1e1e;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 12px;
+    }
+
+    .protein-ring-layout { display: flex; gap: 24px; align-items: center; }
+
+    .protein-ring-wrap { position: relative; width: 176px; height: 176px; flex-shrink: 0; }
+    .protein-ring-svg  { width: 176px; height: 176px; }
+
+    .protein-ring-inner {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    }
+
+    .protein-ring-num {
+      font-size: 38px; font-weight: 700; line-height: 1;
+      color: var(--green); font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
+      transition: color 0.3s;
+    }
+    .protein-ring-num.done { color: #fff; }
+    .protein-ring-unit  { font-size: 13px; color: #555; font-variant-numeric: tabular-nums; }
+    .protein-ring-label { font-size: 8px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #2e2e2e; margin-top: 2px; }
+
+    .protein-right { flex: 1; display: flex; flex-direction: column; gap: 12px; min-width: 180px; }
+
+    .protein-streak-row { display: flex; align-items: center; gap: 7px; }
+    .protein-streak-num   { font-size: 22px; font-weight: 700; color: #e0e0e0; font-variant-numeric: tabular-nums; }
+    .protein-streak-label { font-size: 11px; color: #555; }
+
+    .protein-presets { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+
+    .protein-preset-btn {
+      display: flex; flex-direction: column; align-items: flex-start;
+      padding: 9px 12px 7px; border-radius: 8px; border: 1px solid #1e1e1e;
+      background: #0d0d0d; cursor: pointer; font-family: 'Inter', sans-serif;
+      gap: 1px; text-align: left;
+      transition: border-color 0.12s, background 0.12s, transform 0.08s;
+    }
+    .protein-preset-btn:hover  { border-color: #2a2a2a; background: #131313; }
+    .protein-preset-btn:active { transform: scale(0.96); }
+    .protein-preset-btn .pname { font-size: 11px; color: #888; font-weight: 500; }
+    .protein-preset-btn .pgrams { font-size: 14px; font-weight: 700; color: var(--green); font-variant-numeric: tabular-nums; }
+
+    .protein-kcal-row { font-size: 11px; color: #555; display: flex; gap: 8px; align-items: center; font-variant-numeric: tabular-nums; }
+
+    .protein-goal-edit-row { display: flex; align-items: center; gap: 8px; margin-top: 2px; }
+    .protein-goal-input {
+      width: 60px; height: 28px; background: #0d0d0d; border: 1px solid #1e1e1e;
+      border-radius: 5px; color: #bbb; font-family: 'Inter', sans-serif;
+      font-size: 13px; font-weight: 600; padding: 0 8px; outline: none; text-align: center;
+      font-variant-numeric: tabular-nums; transition: border-color 0.15s;
+    }
+    .protein-goal-input:focus { border-color: #2a2a2a; }
+
+    /* ── Today quick-log ── */
+    .today-quicklog { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
+
+    .today-ql-btn {
+      padding: 5px 11px; border-radius: 6px; border: 1px solid #1e1e1e;
+      background: #0d0d0d; color: #777;
+      font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
+      cursor: pointer; transition: border-color 0.12s, color 0.12s, background 0.12s;
+    }
+    .today-ql-btn:hover { border-color: #333; color: var(--green); background: rgba(77,170,125,0.06); }
+
+    .today-sleep-inputs { display: flex; align-items: center; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+    .today-sleep-time {
+      height: 30px; background: #0d0d0d; border: 1px solid #1e1e1e; border-radius: 6px;
+      color: #bbb; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+      padding: 0 6px; outline: none; width: 82px; font-variant-numeric: tabular-nums;
+      transition: border-color 0.15s;
+    }
+    .today-sleep-time:focus { border-color: #2a2a2a; }
+    .today-ql-save {
+      height: 30px; padding: 0 12px; border-radius: 6px; border: none;
+      background: #1e1e1e; color: #aaa;
+      font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
+      cursor: pointer; transition: background 0.15s, color 0.15s;
+    }
+    .today-ql-save:hover { background: #2a2a2a; color: #e0e0e0; }
+    .today-sep { font-size: 13px; color: #2a2a2a; }
+
+    /* ══════════════════════════════
        PHASE 6 — GLOBAL POLISH
     ══════════════════════════════ */
 
@@ -3276,23 +3443,40 @@
           </div>
 
           <!-- Sleep -->
-          <div class="today-card" id="today-card-sleep" onclick="document.querySelector('[data-section=movement]').click()">
+          <div class="today-card" id="today-card-sleep">
             <div class="today-card-header">
               <span class="today-card-label">😴 Sleep</span>
               <span class="today-card-status empty" id="today-sleep-status">Not logged</span>
             </div>
-            <div class="today-card-main" id="today-sleep-body">Log last night's sleep in Movement.</div>
-            <div class="today-card-cta">Log sleep →</div>
+            <div class="today-card-main" id="today-sleep-body">Log last night below — or open Sleep OS.</div>
+            <!-- Inline quick-log (hidden once logged) -->
+            <div id="today-sleep-quicklog">
+              <div class="today-sleep-inputs">
+                <span class="today-sep">🛏</span>
+                <input type="time" class="today-sleep-time" id="today-bed" value="23:00" title="Bedtime">
+                <span class="today-sep">→</span>
+                <input type="time" class="today-sleep-time" id="today-wake" value="07:30" title="Wake time">
+                <button class="today-ql-save" id="today-sleep-save">Save</button>
+              </div>
+            </div>
+            <div class="today-card-cta" onclick="document.querySelector('[data-section=movement]').click()" style="cursor:pointer">Open Sleep OS →</div>
           </div>
 
           <!-- Nutrition -->
-          <div class="today-card" id="today-card-nutrition" onclick="document.querySelector('[data-section=nutrition]').click()">
+          <div class="today-card" id="today-card-nutrition">
             <div class="today-card-header">
-              <span class="today-card-label">🍽 Nutrition</span>
+              <span class="today-card-label">🥩 Protein</span>
               <span class="today-card-status empty" id="today-nutrition-status">Not logged</span>
             </div>
-            <div class="today-card-main" id="today-nutrition-body">No meals logged. Describe what you ate.</div>
-            <div class="today-card-cta">Open Nutrition →</div>
+            <div class="today-card-main" id="today-nutrition-body">Hit your protein goal.</div>
+            <!-- Protein quick-add -->
+            <div class="today-quicklog" id="today-protein-ql">
+              <button class="today-ql-btn" data-p="30" onclick="window.quickAddProtein?.(30,'🍗 Chicken',event)">🍗 +30g</button>
+              <button class="today-ql-btn" data-p="25" onclick="window.quickAddProtein?.(25,'💪 Whey',event)">💪 +25g</button>
+              <button class="today-ql-btn" data-p="12" onclick="window.quickAddProtein?.(12,'🥚 Eggs',event)">🥚 +12g</button>
+              <button class="today-ql-btn" data-p="25" onclick="window.quickAddProtein?.(25,'🐟 Tuna',event)">🐟 +25g</button>
+            </div>
+            <div class="today-card-cta" onclick="document.querySelector('[data-section=nutrition]').click()" style="cursor:pointer">Open Nutrition →</div>
           </div>
 
         </div>
@@ -3513,26 +3697,67 @@
           <div id="workout-history-list" style="display:none"></div>
         </div>
 
-        <!-- ── Sleep Logger ── -->
-        <div class="section-label" style="margin-top:20px">Sleep Last Night</div>
+        <!-- ── Sleep OS ── -->
+        <div class="section-label" style="margin-top:20px">Sleep OS</div>
 
-        <div class="sleep-log-card">
-          <div class="sleep-log-row">
-            <div class="sleep-field">
-              <div class="sleep-label">Hours slept</div>
-              <div class="sleep-hours-row">
-                <button class="sleep-adj-btn" id="sleep-minus">−</button>
-                <span class="sleep-hours-num" id="sleep-hours-display">7h</span>
-                <button class="sleep-adj-btn" id="sleep-plus">+</button>
+        <div class="sleep-os-card">
+          <!-- Inputs: bedtime / wake / fall-asleep time / quality -->
+          <div class="sleep-entry-row">
+            <div class="sleep-time-field">
+              <div class="sleep-label">Bedtime</div>
+              <input type="time" class="sleep-time-input" id="sleep-bedtime" value="23:00">
+            </div>
+            <div class="sleep-time-arrow">→</div>
+            <div class="sleep-time-field">
+              <div class="sleep-label">Wake up</div>
+              <input type="time" class="sleep-time-input" id="sleep-waketime" value="07:30">
+            </div>
+            <div class="sleep-time-field">
+              <div class="sleep-label">Fall asleep in</div>
+              <div class="sleep-fallin-row">
+                <button class="sleep-adj-btn" id="sleep-fallin-minus">−</button>
+                <span id="sleep-fallin-display">15 min</span>
+                <button class="sleep-adj-btn" id="sleep-fallin-plus">+</button>
               </div>
             </div>
-            <div class="sleep-field sleep-quality-field">
+            <div class="sleep-time-field">
               <div class="sleep-label">Quality</div>
               <div class="sleep-quality-pills" id="sleep-quality-pills"></div>
             </div>
-            <button class="form-submit" id="sleep-save-btn" style="align-self:flex-end">Save</button>
           </div>
-          <div class="sleep-saved-msg" id="sleep-saved-msg" style="display:none"></div>
+
+          <!-- Calculated summary + Save -->
+          <div class="sleep-summary-row">
+            <div class="sleep-sum-item">
+              <div class="sleep-sum-num" id="sleep-sum-inbed">—</div>
+              <div class="sleep-sum-label">In bed</div>
+            </div>
+            <div class="sleep-sum-item">
+              <div class="sleep-sum-num" id="sleep-sum-actual" style="color:var(--green)">—</div>
+              <div class="sleep-sum-label">Actual sleep</div>
+            </div>
+            <div class="sleep-sum-item">
+              <div class="sleep-sum-num" id="sleep-sum-debt" style="color:var(--amber)">—</div>
+              <div class="sleep-sum-label">7-day debt</div>
+            </div>
+            <div style="margin-left:auto">
+              <button class="form-submit" id="sleep-save-btn">Save night</button>
+            </div>
+          </div>
+
+          <!-- 7-day chart -->
+          <div class="sleep-chart-wrap">
+            <canvas id="sleep-week-chart"></canvas>
+          </div>
+
+          <!-- AI analysis -->
+          <div class="sleep-ai-row">
+            <button class="sleep-ai-btn" id="sleep-ai-btn">✦ AI Sleep Analysis</button>
+            <div class="sleep-ai-result" id="sleep-ai-result" style="display:none"></div>
+            <div class="nutrition-thinking" id="sleep-thinking" style="display:none">
+              <div class="think-dot"></div><div class="think-dot"></div><div class="think-dot"></div>&nbsp;Analysing…
+            </div>
+          </div>
         </div>
 
       </div>
@@ -4073,74 +4298,94 @@
       <!-- ══ NUTRITION ══ -->
       <div id="section-nutrition" class="section">
 
-        <div class="section-label">Nutrition — AI Macro Tracker</div>
+        <div class="section-label">Nutrition — Protein Focus</div>
+
+        <!-- Protein ring + quick presets -->
+        <div class="protein-hero-card">
+          <div class="protein-ring-layout">
+            <!-- Ring -->
+            <div class="protein-ring-wrap">
+              <svg class="protein-ring-svg" viewBox="0 0 200 200">
+                <circle cx="100" cy="100" r="82" fill="none" stroke="#1a1a1a" stroke-width="16"/>
+                <circle id="protein-arc" cx="100" cy="100" r="82" fill="none" stroke="#4daa7d" stroke-width="16"
+                  stroke-linecap="round" stroke-dasharray="515.22" stroke-dashoffset="515.22"
+                  transform="rotate(-90 100 100)" style="transition:stroke-dashoffset 0.7s ease,stroke 0.4s"/>
+              </svg>
+              <div class="protein-ring-inner">
+                <div class="protein-ring-num" id="protein-ring-num">0</div>
+                <div class="protein-ring-unit">/ <span id="protein-goal-display">160</span>g</div>
+                <div class="protein-ring-label">Protein</div>
+              </div>
+            </div>
+
+            <!-- Presets + streak -->
+            <div class="protein-right">
+              <div class="protein-streak-row">
+                <span style="font-size:18px">🔥</span>
+                <span class="protein-streak-num" id="protein-streak">0</span>
+                <span class="protein-streak-label">day protein streak</span>
+              </div>
+
+              <div class="protein-presets">
+                <button class="protein-preset-btn" data-p="30"><span class="pname">🍗 Chicken</span><span class="pgrams">+30g</span></button>
+                <button class="protein-preset-btn" data-p="12"><span class="pname">🥚 2 Eggs</span><span class="pgrams">+12g</span></button>
+                <button class="protein-preset-btn" data-p="25"><span class="pname">💪 Whey</span><span class="pgrams">+25g</span></button>
+                <button class="protein-preset-btn" data-p="25"><span class="pname">🐟 Tuna</span><span class="pgrams">+25g</span></button>
+                <button class="protein-preset-btn" data-p="15"><span class="pname">🫙 Yogurt</span><span class="pgrams">+15g</span></button>
+                <button class="protein-preset-btn" data-p="50"><span class="pname">🥩 Steak</span><span class="pgrams">+50g</span></button>
+              </div>
+
+              <div class="protein-kcal-row">
+                <span>Total kcal today:</span>
+                <strong id="protein-kcal-total" style="color:#888">0</strong>
+              </div>
+
+              <div class="protein-goal-edit-row">
+                <span style="font-size:11px;color:#555">Goal:</span>
+                <input type="number" class="protein-goal-input" id="protein-goal-input" value="160" min="50" max="400">
+                <span style="font-size:11px;color:#555">g / day</span>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <!-- AI meal input -->
         <div class="nutrition-ai-card">
-          <div class="nutrition-ai-label">What did you eat?</div>
+          <div class="nutrition-ai-label">Log a meal</div>
           <textarea class="nutrition-ai-textarea" id="nutr-ai-input"
-            placeholder="e.g. 2 chicken breasts, a bowl of white rice and some broccoli — describe naturally, AI handles the rest..."></textarea>
+            placeholder="Describe what you ate — e.g. 2 chicken breasts with rice and salad. AI estimates the protein automatically..."></textarea>
 
           <div class="nutrition-btn-row">
             <button class="nutrition-ai-btn" id="nutr-ai-btn">✦ Estimate with AI</button>
-            <button class="nutrition-manual-btn" id="nutr-manual-btn">+ Enter manually</button>
+            <button class="nutrition-manual-btn" id="nutr-manual-btn">+ Enter g manually</button>
             <div class="nutrition-thinking" id="nutr-thinking">
               <div class="think-dot"></div><div class="think-dot"></div><div class="think-dot"></div>
-              &nbsp;Estimating macros...
+              &nbsp;Estimating…
             </div>
           </div>
 
-          <!-- API key entry -->
           <div class="nutrition-apikey-wrap" id="nutr-apikey-wrap">
-            <div style="font-size:11px;color:#666">Paste your Anthropic API key to enable AI estimation:</div>
+            <div style="font-size:11px;color:#666">Paste your Anthropic API key to enable AI:</div>
             <div style="display:flex;gap:8px">
               <input type="password" class="form-input" id="nutr-apikey-input" placeholder="sk-ant-..." style="flex:1">
               <button class="form-submit" id="nutr-apikey-save">Save key</button>
             </div>
-            <div style="font-size:10px;color:#444">Stored locally in your browser only.</div>
+            <div style="font-size:10px;color:#444">Stored locally only.</div>
           </div>
 
-          <!-- Manual entry form -->
           <div class="nutrition-manual-form" id="nutr-manual-form">
-            <input type="text"   class="form-input" id="nutr-manual-desc"    placeholder="Meal name"   style="flex:2;min-width:130px">
-            <input type="number" class="form-input" id="nutr-manual-protein" placeholder="Protein g"   min="0" style="flex:1;min-width:72px">
-            <input type="number" class="form-input" id="nutr-manual-carbs"   placeholder="Carbs g"     min="0" style="flex:1;min-width:72px">
-            <input type="number" class="form-input" id="nutr-manual-fat"     placeholder="Fat g"       min="0" style="flex:1;min-width:60px">
-            <input type="number" class="form-input" id="nutr-manual-cals"    placeholder="kcal (opt)"  min="0" style="flex:1;min-width:72px">
-            <button class="form-submit" id="nutr-manual-submit">Add meal</button>
+            <input type="text"   class="form-input" id="nutr-manual-desc"    placeholder="Meal name" style="flex:2;min-width:130px">
+            <input type="number" class="form-input" id="nutr-manual-protein" placeholder="Protein g" min="0" style="flex:1;min-width:72px">
+            <input type="number" class="form-input" id="nutr-manual-cals"    placeholder="kcal (opt)" min="0" style="flex:1;min-width:72px">
+            <button class="form-submit" id="nutr-manual-submit">Add</button>
           </div>
         </div>
 
-        <!-- Today's macro totals -->
-        <div class="nutrition-totals-card">
-          <div class="nutrition-totals-header">
-            <span class="nutrition-totals-title">Today's Totals</span>
-            <span>
-              <span class="nutrition-totals-cals" id="nutr-calories">0</span>
-              <span class="nutrition-totals-cals-label">kcal</span>
-            </span>
-          </div>
-          <div class="nutrition-macro-row">
-            <span class="nutrition-macro-name">Protein</span>
-            <div class="nutrition-macro-bar-track">
-              <div class="nutrition-macro-bar-fill protein" id="nutr-bar-protein" style="width:0%"></div>
-            </div>
-            <span class="nutrition-macro-nums" id="nutr-nums-protein">0/160g</span>
-          </div>
-          <div class="nutrition-macro-row">
-            <span class="nutrition-macro-name">Carbs</span>
-            <div class="nutrition-macro-bar-track">
-              <div class="nutrition-macro-bar-fill carbs" id="nutr-bar-carbs" style="width:0%"></div>
-            </div>
-            <span class="nutrition-macro-nums" id="nutr-nums-carbs">0/250g</span>
-          </div>
-          <div class="nutrition-macro-row">
-            <span class="nutrition-macro-name">Fat</span>
-            <div class="nutrition-macro-bar-track">
-              <div class="nutrition-macro-bar-fill fat" id="nutr-bar-fat" style="width:0%"></div>
-            </div>
-            <span class="nutrition-macro-nums" id="nutr-nums-fat">0/80g</span>
-          </div>
+        <!-- Hidden bars still needed for JS compatibility -->
+        <div style="display:none">
+          <div id="nutr-bar-protein"></div><div id="nutr-bar-carbs"></div><div id="nutr-bar-fat"></div>
+          <span id="nutr-nums-protein"></span><span id="nutr-nums-carbs"></span><span id="nutr-nums-fat"></span>
+          <span id="nutr-calories"></span>
         </div>
 
         <!-- Meal log -->
@@ -4150,7 +4395,7 @@
             <button class="log-btn" id="nutr-reset" style="font-size:10px;padding:4px 10px">Clear today</button>
           </div>
           <div id="nutr-meals"></div>
-          <div class="nutrition-empty" id="nutr-empty">No meals logged yet — describe a meal above to get started.</div>
+          <div class="nutrition-empty" id="nutr-empty">No meals logged yet — describe a meal or tap a preset above.</div>
         </div>
 
       </div>
@@ -6980,58 +7225,226 @@
         this.textContent = open ? 'Hide' : 'Show';
       });
 
-      /* ── Sleep ── */
-      function lsSleep()    { try { return JSON.parse(localStorage.getItem(LS_SLEEP) || '{}'); } catch(_) { return {}; } }
-      function saveSleep(d) { try { localStorage.setItem(LS_SLEEP, JSON.stringify(d)); } catch(_) {} }
+      /* ── Sleep OS ── */
+      const LS_SLEEP2 = 'leon-sleep-v2';
 
-      const QUALITY_LABELS = ['','😞 Terrible','😞 Bad','😐 Poor','🙂 Ok','😊 Good','🔥 Great'];
+      function lsSleep2() { try { return JSON.parse(localStorage.getItem(LS_SLEEP2) || '{"entries":[]}'); } catch(_) { return {entries:[]}; } }
+      function saveSleep2(d) { try { localStorage.setItem(LS_SLEEP2, JSON.stringify(d)); } catch(_) {} }
 
-      let sleepHours   = lsSleep().hours   || 7;
-      let sleepQuality = lsSleep().quality || 0;
-
-      function renderSleepHours() {
-        const el = document.getElementById('sleep-hours-display');
-        if (el) el.textContent = sleepHours % 1 === 0 ? sleepHours + 'h' : sleepHours + 'h';
+      // Also keep v1 compatibility (gamification reads v1)
+      function writeSleepV1(hours, quality) {
+        try { localStorage.setItem(LS_SLEEP, JSON.stringify({ date: TODAY, hours, quality })); } catch(_) {}
       }
 
-      function renderSleepQuality() {
-        document.querySelectorAll('.sleep-quality-pill').forEach(p => {
-          p.classList.toggle('sel', +p.dataset.q === sleepQuality);
-        });
+      function timeDiffHours(bed, wake) {
+        if (!bed || !wake) return 0;
+        const [bh, bm] = bed.split(':').map(Number);
+        const [wh, wm] = wake.split(':').map(Number);
+        let diff = (wh * 60 + wm) - (bh * 60 + bm);
+        if (diff <= 0) diff += 1440; // crosses midnight
+        return +(diff / 60).toFixed(2);
       }
 
+      function fmtHours(h) {
+        if (!h || h <= 0) return '—';
+        const hrs = Math.floor(h), mins = Math.round((h - hrs) * 60);
+        return mins ? `${hrs}h ${mins}m` : `${hrs}h`;
+      }
+
+      function calcSleepDebt(entries) {
+        const GOAL = 8;
+        const last7 = entries.slice(-7);
+        const debt = last7.reduce((acc, e) => acc + Math.max(0, GOAL - (e.actual || 0)), 0);
+        return +debt.toFixed(1);
+      }
+
+      function updateSleepSummary() {
+        const bed      = document.getElementById('sleep-bedtime')?.value;
+        const wake     = document.getElementById('sleep-waketime')?.value;
+        const fallin   = parseInt(document.getElementById('sleep-fallin-display')?.textContent) || 15;
+        const inBed    = timeDiffHours(bed, wake);
+        const actual   = Math.max(0, inBed - fallin / 60);
+        const data     = lsSleep2();
+        const debt     = calcSleepDebt(data.entries);
+
+        const inBedEl  = document.getElementById('sleep-sum-inbed');
+        const actEl    = document.getElementById('sleep-sum-actual');
+        const debtEl   = document.getElementById('sleep-sum-debt');
+        if (inBedEl) inBedEl.textContent  = fmtHours(inBed);
+        if (actEl)   { actEl.textContent  = fmtHours(actual); actEl.style.color = actual >= 7 ? 'var(--green)' : actual >= 6 ? 'var(--amber)' : 'var(--red)'; }
+        if (debtEl)  { debtEl.textContent = debt > 0 ? `-${debt}h` : '0h'; debtEl.style.color = debt > 5 ? 'var(--red)' : debt > 2 ? 'var(--amber)' : 'var(--green)'; }
+        return { inBed, actual, fallin };
+      }
+
+      // Fall-asleep minutes +/-
+      let fallInMins = 15;
+      document.getElementById('sleep-fallin-minus')?.addEventListener('click', () => {
+        fallInMins = Math.max(0, fallInMins - 5);
+        const el = document.getElementById('sleep-fallin-display');
+        if (el) el.textContent = fallInMins + ' min';
+        updateSleepSummary();
+      });
+      document.getElementById('sleep-fallin-plus')?.addEventListener('click', () => {
+        fallInMins = Math.min(120, fallInMins + 5);
+        const el = document.getElementById('sleep-fallin-display');
+        if (el) el.textContent = fallInMins + ' min';
+        updateSleepSummary();
+      });
+
+      document.getElementById('sleep-bedtime')?.addEventListener('change', updateSleepSummary);
+      document.getElementById('sleep-waketime')?.addEventListener('change', updateSleepSummary);
+
+      // Quality pills
+      let sleepQuality = 0;
       const pillsWrap = document.getElementById('sleep-quality-pills');
       if (pillsWrap) {
-        [['😞 Terrible',1],['😞 Bad',2],['😐 Poor',3],['🙂 Ok',4],['😊 Good',5],['🔥 Great',6]]
-          .forEach(([label, q]) => {
+        [['😞',1],['🙁',2],['😐',3],['🙂',4],['😊',5]]
+          .forEach(([emoji, q]) => {
             const btn = document.createElement('button');
             btn.className = 'sleep-quality-pill';
             btn.dataset.q = q;
-            btn.textContent = label;
-            btn.addEventListener('click', () => { sleepQuality = q; renderSleepQuality(); });
+            btn.textContent = emoji;
+            btn.title = ['','Terrible','Bad','Ok','Good','Great'][q];
+            btn.addEventListener('click', () => {
+              sleepQuality = q;
+              document.querySelectorAll('.sleep-quality-pill').forEach(p => p.classList.toggle('sel', +p.dataset.q === q));
+            });
             pillsWrap.appendChild(btn);
           });
-        renderSleepQuality();
       }
 
-      document.getElementById('sleep-minus')?.addEventListener('click', () => { sleepHours = Math.max(0, +(sleepHours - 0.5).toFixed(1)); renderSleepHours(); });
-      document.getElementById('sleep-plus')?.addEventListener('click',  () => { sleepHours = Math.min(14, +(sleepHours + 0.5).toFixed(1)); renderSleepHours(); });
-
+      // Save
       document.getElementById('sleep-save-btn')?.addEventListener('click', () => {
-        saveSleep({ date: TODAY, hours: sleepHours, quality: sleepQuality });
-        const msg = document.getElementById('sleep-saved-msg');
-        if (msg) {
-          msg.style.display = '';
-          msg.textContent = `✓ Saved — ${sleepHours}h · ${QUALITY_LABELS[sleepQuality] || 'No quality set'}`;
-          setTimeout(() => { if (msg) msg.style.display = 'none'; }, 3000);
-        }
+        const bed   = document.getElementById('sleep-bedtime')?.value;
+        const wake  = document.getElementById('sleep-waketime')?.value;
+        if (!bed || !wake) return;
+        const { inBed, actual } = updateSleepSummary();
+        const data = lsSleep2();
+        // Remove existing entry for today if present
+        data.entries = data.entries.filter(e => e.date !== TODAY);
+        data.entries.push({ date: TODAY, bedtime: bed, waketime: wake, fallInMins, quality: sleepQuality, inBed: +inBed.toFixed(2), actual: +actual.toFixed(2) });
+        // Keep max 90 days
+        if (data.entries.length > 90) data.entries = data.entries.slice(-90);
+        saveSleep2(data);
+        writeSleepV1(actual, sleepQuality); // keep v1 for gamification
+        renderSleepChart();
         window.updateDailyScore?.();
+        const btn = document.getElementById('sleep-save-btn');
+        if (btn) { btn.textContent = '✓ Saved!'; setTimeout(() => { btn.textContent = 'Save night'; }, 2000); }
       });
 
-      // Restore saved sleep for today
-      const saved = lsSleep();
-      if (saved.date === TODAY) { sleepHours = saved.hours; sleepQuality = saved.quality; }
-      renderSleepHours();
+      // 7-day chart
+      let sleepChart = null;
+      function renderSleepChart() {
+        if (!window.Chart) return;
+        const data   = lsSleep2();
+        const last7  = [];
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
+          const entry = data.entries.find(e => e.date === d);
+          last7.push({ date: d.slice(5), actual: entry?.actual || 0, inBed: entry?.inBed || 0 });
+        }
+        const canvas = document.getElementById('sleep-week-chart');
+        if (!canvas) return;
+        if (sleepChart) { sleepChart.destroy(); sleepChart = null; }
+        sleepChart = new Chart(canvas.getContext('2d'), {
+          type: 'bar',
+          data: {
+            labels: last7.map(d => d.date),
+            datasets: [
+              { label: 'In Bed', data: last7.map(d => d.inBed),   backgroundColor: 'rgba(79,126,201,0.18)', borderRadius: 4 },
+              { label: 'Asleep', data: last7.map(d => d.actual),  backgroundColor: 'rgba(77,170,125,0.5)',  borderRadius: 4 }
+            ]
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false },
+              annotation: { annotations: { goal: { type:'line', yMin:8, yMax:8, borderColor:'rgba(255,255,255,0.1)', borderWidth:1, borderDash:[4,4] } } }
+            },
+            scales: {
+              x: { stacked: false, grid: { color:'#161616' }, border: { color:'#1e1e1e' }, ticks: { color:'#333', font:{ size:9 } } },
+              y: { grid: { color:'#161616' }, border: { color:'#1e1e1e' }, ticks: { color:'#333', font:{ size:9 }, callback: v => v + 'h' }, suggestedMax: 9 }
+            }
+          }
+        });
+      }
+
+      // AI analysis
+      document.getElementById('sleep-ai-btn')?.addEventListener('click', async () => {
+        const apiKey = localStorage.getItem('anthropic_api_key');
+        const resultEl   = document.getElementById('sleep-ai-result');
+        const thinkingEl = document.getElementById('sleep-thinking');
+        const btn        = document.getElementById('sleep-ai-btn');
+        if (!apiKey) { if (resultEl) { resultEl.style.display=''; resultEl.textContent='Add your Anthropic API key in Nutrition to enable AI analysis.'; } return; }
+
+        const data = lsSleep2();
+        const last7 = data.entries.slice(-7);
+        if (!last7.length) { if (resultEl) { resultEl.style.display=''; resultEl.textContent='Log at least one night first.'; } return; }
+
+        const summary = last7.map(e => `${e.date}: ${e.actual}h sleep (${e.inBed}h in bed, quality ${e.quality}/5)`).join('\n');
+        if (btn) btn.disabled = true;
+        if (thinkingEl) thinkingEl.classList.add('show');
+        if (resultEl) resultEl.style.display = 'none';
+
+        try {
+          const resp = await fetch('https://api.anthropic.com/v1/messages', {
+            method:'POST',
+            headers:{'x-api-key':apiKey,'anthropic-version':'2023-06-01','content-type':'application/json','anthropic-dangerous-direct-browser-access':'true'},
+            body: JSON.stringify({
+              model:'claude-haiku-4-5-20251001', max_tokens:256,
+              system:'You are a concise sleep coach. Analyse the sleep data and give 2-3 short, actionable insights. Be direct and specific. Max 3 sentences.',
+              messages:[{role:'user',content:`My sleep last 7 days:\n${summary}\nGive brief insights.`}]
+            })
+          });
+          if (!resp.ok) throw new Error(resp.status);
+          const d = await resp.json();
+          if (resultEl) { resultEl.textContent = d.content[0].text.trim(); resultEl.style.display=''; }
+        } catch(err) {
+          if (resultEl) { resultEl.textContent = 'Analysis failed. Try again.'; resultEl.style.display=''; }
+        } finally {
+          if (btn) btn.disabled = false;
+          if (thinkingEl) thinkingEl.classList.remove('show');
+        }
+      });
+
+      // Restore today's entry if exists
+      (function initSleepOS() {
+        const data    = lsSleep2();
+        const tonight = data.entries.find(e => e.date === TODAY);
+        if (tonight) {
+          const bed = document.getElementById('sleep-bedtime');
+          const wk  = document.getElementById('sleep-waketime');
+          if (bed) bed.value = tonight.bedtime || '23:00';
+          if (wk)  wk.value  = tonight.waketime || '07:30';
+          fallInMins = tonight.fallInMins || 15;
+          const fd = document.getElementById('sleep-fallin-display');
+          if (fd) fd.textContent = fallInMins + ' min';
+          sleepQuality = tonight.quality || 0;
+          document.querySelectorAll('.sleep-quality-pill').forEach(p => p.classList.toggle('sel', +p.dataset.q === sleepQuality));
+        }
+        updateSleepSummary();
+      })();
+
+      // Export for Today dashboard quick-log
+      window.saveSleepQuick = function(bedtime, waketime) {
+        const inBed  = timeDiffHours(bedtime, waketime);
+        const actual = Math.max(0, inBed - 15/60);
+        const data   = lsSleep2();
+        data.entries = data.entries.filter(e => e.date !== TODAY);
+        data.entries.push({ date: TODAY, bedtime, waketime, fallInMins: 15, quality: 0, inBed: +inBed.toFixed(2), actual: +actual.toFixed(2) });
+        if (data.entries.length > 90) data.entries = data.entries.slice(-90);
+        saveSleep2(data);
+        writeSleepV1(actual, 0);
+        // Sync the Sleep OS inputs
+        const b = document.getElementById('sleep-bedtime'); if (b) b.value = bedtime;
+        const w = document.getElementById('sleep-waketime'); if (w) w.value = waketime;
+        updateSleepSummary();
+        window.updateDailyScore?.();
+      };
+
+      // Load chart lazily when section opens (Chart.js already loaded by Life OS)
+      function tryRenderSleepChart() { if (window.Chart) renderSleepChart(); else setTimeout(tryRenderSleepChart, 500); }
+      tryRenderSleepChart();
 
       /* ── Init (lazy) ── */
       const sec = document.getElementById('section-movement');
@@ -7054,6 +7467,9 @@
     (function () {
       const LS_KEY = 'leon-nutrition-v2';
       const TODAY  = new Date().toISOString().slice(0, 10);
+      // Load protein goal (editable)
+      const LS_NUTR_GOALS = 'leon-macro-goals';
+      function getProteinGoal() { try { return JSON.parse(localStorage.getItem(LS_NUTR_GOALS)||'{}').protein || 160; } catch(_) { return 160; } }
       const GOALS  = { protein: 160, carbs: 250, fat: 80 };
 
       const emptyDay = () => ({ date: TODAY, meals: [], totals: { protein:0, carbs:0, fat:0, calories:0 } });
@@ -7079,15 +7495,49 @@
         });
       }
 
+      // ── Protein ring ──
+      const CIRC_P = 515.22; // 2π × 82
+
+      function getProteinStreak() {
+        try {
+          const s = JSON.parse(localStorage.getItem('leon-streaks-v1') || '{}');
+          return (s.nutrition || {}).count || 0;
+        } catch(_) { return 0; }
+      }
+
+      function renderProteinRing(protein) {
+        const goal = getProteinGoal();
+        const pct  = Math.min(1, protein / goal);
+        const arc  = document.getElementById('protein-arc');
+        const num  = document.getElementById('protein-ring-num');
+        const goalSpan = document.getElementById('protein-goal-display');
+        const kcalEl   = document.getElementById('protein-kcal-total');
+        const streakEl = document.getElementById('protein-streak');
+
+        if (arc) {
+          arc.style.strokeDashoffset = CIRC_P - pct * CIRC_P;
+          arc.style.stroke = pct >= 1 ? '#fff' : 'var(--green)';
+        }
+        if (num) { num.textContent = Math.round(protein); num.classList.toggle('done', pct >= 1); }
+        if (goalSpan) goalSpan.textContent = goal;
+        if (streakEl) streakEl.textContent = getProteinStreak();
+      }
+
       function renderTotals(t) {
         const calEl = document.getElementById('nutr-calories');
         if (calEl) calEl.textContent = Math.round(t.calories) || 0;
+        // Update hidden compat bars
         ['protein','carbs','fat'].forEach(k => {
           const fill = document.getElementById(`nutr-bar-${k}`);
           const nums = document.getElementById(`nutr-nums-${k}`);
           if (fill) fill.style.width = Math.min(100, ((t[k]||0)/GOALS[k])*100) + '%';
           if (nums) nums.textContent = `${Math.round(t[k]||0)}/${GOALS[k]}g`;
         });
+        // Protein ring
+        renderProteinRing(t.protein || 0);
+        // Kcal in protein right panel
+        const kcalEl = document.getElementById('protein-kcal-total');
+        if (kcalEl) kcalEl.textContent = Math.round(t.calories || 0);
       }
 
       function renderMeals(d) {
@@ -7143,6 +7593,40 @@
         renderMeals(d);
         window.updateDailyScore?.();
       }
+
+      // ── Protein presets ──
+      document.querySelectorAll('.protein-preset-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const p   = parseInt(btn.dataset.p, 10);
+          const lbl = btn.querySelector('.pname')?.textContent || 'Quick add';
+          addMeal({ description: lbl, protein: p, carbs: 0, fat: 0, calories: Math.round(p * 4) });
+          // Pop animation
+          btn.classList.remove('pop'); void btn.offsetWidth; btn.classList.add('pop');
+        });
+      });
+
+      // Editable protein goal
+      const pgInput = document.getElementById('protein-goal-input');
+      if (pgInput) {
+        try { pgInput.value = JSON.parse(localStorage.getItem(LS_NUTR_GOALS)||'{}').protein || 160; } catch(_) {}
+        pgInput.addEventListener('change', () => {
+          const v = parseInt(pgInput.value, 10);
+          if (!isNaN(v) && v >= 50) {
+            try {
+              const g = JSON.parse(localStorage.getItem(LS_NUTR_GOALS)||'{}');
+              g.protein = v; localStorage.setItem(LS_NUTR_GOALS, JSON.stringify(g));
+            } catch(_) {}
+            const d = lsLoad(); renderTotals(d.totals);
+          }
+        });
+      }
+
+      // Quick-add from Today dashboard
+      window.quickAddProtein = function(grams, label, event) {
+        if (event) { event.stopPropagation(); event.preventDefault(); }
+        addMeal({ description: label || `+${grams}g protein`, protein: grams, carbs: 0, fat: 0, calories: grams * 4 });
+        window.refreshTodayDash?.();
+      };
 
       /* ── AI estimation ── */
       const textarea  = document.getElementById('nutr-ai-input');
@@ -7279,6 +7763,12 @@
       }
 
       function getSleep() {
+        // Read from v2 first (Sleep OS), fall back to v1
+        try {
+          const d2 = JSON.parse(localStorage.getItem('leon-sleep-v2') || '{"entries":[]}');
+          const entry = d2.entries.find(e => e.date === TODAY);
+          if (entry) return { date: TODAY, hours: entry.actual, quality: entry.quality, bedtime: entry.bedtime, waketime: entry.waketime };
+        } catch(_) {}
         try {
           const d = JSON.parse(localStorage.getItem('leon-sleep-v1') || '{}');
           return d.date === TODAY ? d : null;
@@ -7379,27 +7869,38 @@
         }
 
         // Sleep card
-        const sleepStatus = document.getElementById('today-sleep-status');
-        const sleepBody   = document.getElementById('today-sleep-body');
-        const qLabels     = ['','😞 Terrible','😞 Bad','😐 Poor','🙂 Ok','😊 Good','🔥 Great'];
+        const sleepStatus  = document.getElementById('today-sleep-status');
+        const sleepBody    = document.getElementById('today-sleep-body');
+        const sleepQL      = document.getElementById('today-sleep-quicklog');
         if (sleep && sleep.hours) {
-          if (sleepStatus) { sleepStatus.textContent = `${sleep.hours}h`; sleepStatus.className = 'today-card-status done'; }
-          if (sleepBody)   sleepBody.innerHTML = `<strong>${sleep.hours}h</strong> slept · ${qLabels[sleep.quality] || 'No quality'}`;
+          const hrs = +sleep.hours.toFixed(1);
+          const col = hrs >= 7 ? 'var(--green)' : hrs >= 6 ? 'var(--amber)' : 'var(--red)';
+          if (sleepStatus) { sleepStatus.textContent = `${hrs}h`; sleepStatus.className = 'today-card-status done'; sleepStatus.style.color = col; }
+          if (sleepBody)   sleepBody.innerHTML = `<strong style="color:${col}">${hrs}h</strong> asleep${sleep.bedtime ? ` · ${sleep.bedtime}→${sleep.waketime}` : ''}`;
+          if (sleepQL)     sleepQL.style.display = 'none';
         } else {
-          if (sleepStatus) { sleepStatus.textContent = 'Not logged'; sleepStatus.className = 'today-card-status empty'; }
-          if (sleepBody)   sleepBody.innerHTML = 'Log last night\'s sleep in Movement.';
+          if (sleepStatus) { sleepStatus.textContent = 'Not logged'; sleepStatus.className = 'today-card-status empty'; sleepStatus.style.color = ''; }
+          if (sleepBody)   sleepBody.innerHTML = 'Log last night below:';
+          if (sleepQL)     sleepQL.style.display = '';
         }
 
-        // Nutrition card
+        // Nutrition / Protein card
         const nutrStatus = document.getElementById('today-nutrition-status');
         const nutrBody   = document.getElementById('today-nutrition-body');
+        const proteinQL  = document.getElementById('today-protein-ql');
+        const proteinGoal = (() => { try { return JSON.parse(localStorage.getItem('leon-macro-goals')||'{}').protein || 160; } catch(_) { return 160; } })();
         if (nutr && nutr.meals && nutr.meals.length) {
-          const t = nutr.totals || {};
-          if (nutrStatus) { nutrStatus.textContent = `${Math.round(t.calories || 0)} kcal`; nutrStatus.className = 'today-card-status done'; }
-          if (nutrBody)   nutrBody.innerHTML = `<strong>${Math.round(t.calories || 0)} kcal</strong><br><em>P ${Math.round(t.protein||0)}g · C ${Math.round(t.carbs||0)}g · F ${Math.round(t.fat||0)}g</em>`;
+          const t    = nutr.totals || {};
+          const prot = Math.round(t.protein || 0);
+          const pct  = Math.min(100, Math.round((prot / proteinGoal) * 100));
+          const col  = pct >= 100 ? 'var(--green)' : pct >= 60 ? 'var(--amber)' : 'var(--red)';
+          if (nutrStatus) { nutrStatus.textContent = `${prot}g protein`; nutrStatus.className = `today-card-status ${pct >= 100 ? 'done' : 'partial'}`; }
+          if (nutrBody)   nutrBody.innerHTML = `<strong style="color:${col}">${prot}g</strong> / ${proteinGoal}g protein · ${Math.round(t.calories||0)} kcal`;
+          if (proteinQL && pct >= 100) proteinQL.style.opacity = '0.4';
         } else {
           if (nutrStatus) { nutrStatus.textContent = 'Not logged'; nutrStatus.className = 'today-card-status empty'; }
-          if (nutrBody)   nutrBody.innerHTML = 'No meals logged. Describe what you ate.';
+          if (nutrBody)   nutrBody.innerHTML = `Hit ${proteinGoal}g protein today — quick-add below:`;
+          if (proteinQL)  proteinQL.style.opacity = '1';
         }
 
         // Schedule strip
@@ -7441,6 +7942,18 @@
 
       // Expose so updateDailyScore() calls refresh today too
       window.refreshTodayDash = render;
+
+      // Today sleep quick-log save button
+      document.getElementById('today-sleep-save')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const bed  = document.getElementById('today-bed')?.value;
+        const wake = document.getElementById('today-wake')?.value;
+        if (!bed || !wake) return;
+        window.saveSleepQuick?.(bed, wake);
+        render();
+        const btn = e.target;
+        btn.textContent = '✓'; setTimeout(() => { btn.textContent = 'Save'; }, 1500);
+      });
 
       // Lazy init when Today section becomes active
       const sec = document.getElementById('section-today');
