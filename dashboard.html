@@ -2560,6 +2560,321 @@
       text-align: center;
     }
 
+    /* ══════════════════════════════
+       PHASE 6 — GLOBAL POLISH
+    ══════════════════════════════ */
+
+    /* Extended tokens */
+    :root {
+      --surface1: #111111;
+      --surface2: #181818;
+      --surface3: #1e1e1e;
+      --radius-sm:  7px;
+      --radius-md: 12px;
+      --radius-lg: 14px;
+      --focus-ring: 0 0 0 2px rgba(77,170,125,0.15);
+    }
+
+    /* ── Content area ── */
+    .content { padding: 30px 36px; }
+    .content::-webkit-scrollbar { width: 3px; }
+    .content::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }
+    .content::-webkit-scrollbar-thumb:hover { background: #383838; }
+
+    /* ── Section labels ── */
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      color: #3a3a3a;
+      margin-bottom: 14px;
+    }
+
+    /* ── Form inputs — bigger + focus ring ── */
+    .form-input, .form-select {
+      height: 38px;
+      border-radius: var(--radius-sm);
+      border-color: #222;
+      font-size: 13px;
+      padding: 0 12px;
+      color: #ccc;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .form-input:focus, .form-select:focus {
+      border-color: #2e2e2e;
+      box-shadow: var(--focus-ring);
+      color: #ddd;
+    }
+    .form-input::placeholder { color: #2a2a2a; }
+    .form-select option { background: #111; color: #ccc; }
+
+    /* ── Form submit — accent colour ── */
+    .form-submit {
+      height: 36px;
+      padding: 0 20px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+      background: #1c1c1c;
+      color: #bbb;
+      letter-spacing: 0.03em;
+      border: 1px solid #272727;
+      transition: background 0.15s, color 0.15s, border-color 0.15s, box-shadow 0.15s;
+    }
+    .form-submit:hover {
+      background: #242424;
+      color: #e8e8e8;
+      border-color: #333;
+      box-shadow: 0 0 0 1px #2a2a2a;
+    }
+
+    /* ── Log / secondary buttons ── */
+    .log-btn, .add-assign-btn, .add-snap-btn {
+      height: 30px;
+      padding: 0 13px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      border-color: #272727;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+    .log-btn:hover, .add-assign-btn:hover, .add-snap-btn:hover {
+      background: #161616;
+      border-color: #333;
+      color: #ccc;
+    }
+
+    /* ── Universal card radius + hover ── */
+    .stat-card, .skill-card, .log-section,
+    .sp-card, .goal-card, .los-card,
+    .kanban-col, .chicos-chart-wrap, .chicos-stat,
+    .school-stat, .week-grid-wrap,
+    .sp-add-wrap, .lg-add-wrap, .add-assign-wrap,
+    .workout-log-card, .workout-exercise-group,
+    .workout-history-wrap, .sleep-log-card,
+    .nutrition-ai-card, .nutrition-totals-card,
+    .nutrition-log-wrap, .stacks-wrap,
+    .gifd-today-card, .assign-card {
+      border-radius: var(--radius-md);
+      transition: border-color 0.15s;
+    }
+
+    .stat-card:hover, .skill-card:hover,
+    .sp-card:hover, .goal-card:hover,
+    .los-card:hover, .chicos-stat:hover,
+    .school-stat:hover {
+      border-color: #272727;
+    }
+
+    /* ── Card grid gaps ── */
+    .stat-cards   { gap: 14px; }
+    .skill-grid   { gap: 14px; }
+    .school-stats { gap: 14px; }
+    .sp-grid      { gap: 16px; }
+    .goals-grid   { gap: 14px; }
+    .chicos-stats { gap: 12px; }
+    .stim-row     { gap: 14px; }
+
+    /* ── Numbers — tabular + optical ── */
+    .sc-hours, .ss-number, .sp-score,
+    .gifd-live-score, .streak-number,
+    .cs-value, .stim-num, .sleep-hours-num,
+    .topbar-clock, .gifd-score {
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: "tnum";
+    }
+
+    /* ── Stat card numbers bigger ── */
+    .sc-hours { font-size: 36px; letter-spacing: -0.01em; }
+
+    /* ── School stat ── */
+    .ss-number { font-size: 42px; letter-spacing: -0.02em; }
+
+    /* ── Skill card textarea ── */
+    .skill-notes {
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      padding: 8px 10px;
+      resize: none;
+    }
+    .skill-notes:focus {
+      border-color: #2a2a2a;
+      box-shadow: var(--focus-ring);
+    }
+
+    /* ── Goal textarea ── */
+    .goal-notes {
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      padding: 8px 10px;
+    }
+    .goal-notes:focus {
+      border-color: #2a2a2a;
+      box-shadow: var(--focus-ring);
+    }
+
+    /* ── Life OS tabs ── */
+    .los-tabs { gap: 4px; margin-bottom: 18px; padding: 4px; background: #0d0d0d; border-radius: 9px; border: 1px solid #191919; }
+    .los-tab  {
+      border-radius: 6px;
+      padding: 7px 16px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #444;
+      transition: background 0.14s, color 0.14s;
+    }
+    .los-tab:hover  { color: #777; background: #141414; }
+    .los-tab.active { background: #1e1e1e; color: #e0e0e0; box-shadow: 0 1px 3px rgba(0,0,0,0.4); }
+
+    /* ── Los card ── */
+    .los-card { border-radius: var(--radius-md); padding: 18px; }
+    .los-card-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: #444;
+      margin-bottom: 14px;
+    }
+
+    /* ── Topbar ── */
+    .topbar-greeting { font-size: 15px; font-weight: 600; color: #ddd; }
+    .topbar-date     { font-size: 12px; color: #3a3a3a; }
+    .topbar-clock    { color: #555; letter-spacing: 0.04em; }
+
+    /* ── Week calendar grid ── */
+    .week-grid-wrap { border-radius: var(--radius-md); }
+
+    /* ── Time blocks ── */
+    .tb { border-radius: 6px; }
+    .tb-label { font-size: 9.5px; letter-spacing: 0.04em; }
+
+    /* ── Kanban ── */
+    .kanban-col  { border-radius: var(--radius-md); }
+    .kanban-card { border-radius: 8px; padding: 11px 12px 9px; transition: border-color 0.12s, box-shadow 0.12s; }
+    .kanban-card:hover { border-color: #2a2a2a; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+    .kc-title { font-size: 13px; line-height: 1.45; }
+    .kc-note  { font-size: 11px; line-height: 1.5; color: #666; }
+
+    /* ── Assignment cards ── */
+    .assign-card { border-radius: 10px; padding: 12px 16px; }
+    .assign-title { font-size: 13px; }
+    .assign-due   { font-size: 11px; }
+
+    /* ── Side project cards ── */
+    .sp-card-top { padding: 20px 20px 16px; }
+    .sp-details  { padding: 16px 20px 12px; }
+    .sp-concept  { line-height: 1.6; }
+
+    /* ── GIFD hero ── */
+    .gifd-today-card   { border-radius: var(--radius-lg); }
+    .gifd-habits-col   { border-radius: 10px; }
+    .gifd-habit-chip   { border-radius: 9px; font-size: 13px; }
+    .gifd-journal-textarea {
+      border-radius: 10px;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+    .gifd-journal-textarea::placeholder { color: #222; }
+    .gifd-save-btn {
+      border-radius: 9px;
+      background: #161616;
+      border: 1px solid #242424;
+      font-size: 13px;
+      letter-spacing: 0.03em;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .gifd-save-btn:hover {
+      background: #1e1e1e;
+      border-color: #333;
+      color: #e0e0e0;
+    }
+
+    /* ── Nutrition section ── */
+    .nutrition-ai-card     { border-radius: var(--radius-md); }
+    .nutrition-totals-card { border-radius: var(--radius-md); }
+    .nutrition-log-wrap    { border-radius: var(--radius-md); }
+    .nutrition-ai-textarea {
+      min-height: 90px;
+      border-color: #1e1e1e;
+      font-size: 14px;
+    }
+    .nutrition-ai-textarea:focus {
+      border-color: #2a2a2a;
+      box-shadow: var(--focus-ring);
+    }
+    .nutrition-ai-btn {
+      height: 36px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      letter-spacing: 0.03em;
+    }
+    .nutrition-manual-btn { height: 36px; border-radius: var(--radius-sm); }
+
+    /* ── Workout logger ── */
+    .workout-log-card { border-radius: var(--radius-md); }
+    .workout-ex-input, .workout-num-input {
+      height: 38px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+    }
+    .workout-exercise-group { border-radius: var(--radius-md); }
+    .workout-history-wrap   { border-radius: var(--radius-md); }
+    .workout-set-row { padding: 8px 16px; font-size: 13px; }
+    .workout-ex-name { font-size: 14px; font-weight: 600; }
+
+    /* ── Sleep logger ── */
+    .sleep-log-card { border-radius: var(--radius-md); }
+    .sleep-quality-pill {
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      border-radius: 6px;
+    }
+    .sleep-adj-btn { border-radius: var(--radius-sm); }
+
+    /* ── Chicos stat cards ── */
+    .chicos-stat   { border-radius: var(--radius-md); }
+    .cs-value      { font-size: 28px; }
+    .chicos-chart-wrap { border-radius: var(--radius-md); }
+
+    /* ── School ── */
+    .school-stat { border-radius: var(--radius-md); }
+
+    /* ── Streak items in sidebar ── */
+    .streak-row-item { border-radius: var(--radius-sm); }
+
+    /* ── Topbar badge ── */
+    .topbar-badge {
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 10px;
+      letter-spacing: 0.06em;
+    }
+
+    /* ── Kanban col add form inputs ── */
+    .kc-input, .kc-note-input {
+      border-radius: 6px;
+      font-size: 12px;
+      padding: 7px 10px;
+    }
+    .kc-input:focus, .kc-note-input:focus { box-shadow: var(--focus-ring); border-color: #2a2a2a; }
+
+    /* ── Smooth resize on sections ── */
+    .section.active { gap: 0; }
+
+    /* ── Gaby upload area ── */
+    .gaby-upload-bar { margin-bottom: 20px; gap: 12px; }
+    .gaby-upload-btn {
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      height: 36px;
+      padding: 0 16px;
+      letter-spacing: 0.02em;
+    }
+
   </style>
 </head>
 <body>
