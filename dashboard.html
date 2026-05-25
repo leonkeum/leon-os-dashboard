@@ -354,6 +354,34 @@
         </div>
       </div>
 
+      <!-- Cal add event modal (shared, outside grid) -->
+      <div class="cal-modal-overlay" id="cal-add-modal">
+        <div class="cal-modal">
+          <div class="cal-modal-header">
+            <span class="cal-modal-title">Add event</span>
+            <button class="cal-modal-close" id="cal-modal-close">×</button>
+          </div>
+          <input class="cal-modal-input" id="cal-modal-lbl" placeholder="Title">
+          <div class="cal-modal-colors">
+            <button class="cal-modal-color col-red selected" data-color="red"></button>
+            <button class="cal-modal-color col-blue"         data-color="blue"></button>
+            <button class="cal-modal-color col-green"        data-color="green"></button>
+            <button class="cal-modal-color col-purple"       data-color="purple"></button>
+            <button class="cal-modal-color col-gray"         data-color="gray"></button>
+          </div>
+          <div class="cal-modal-times">
+            <input class="cal-modal-input cal-modal-time" id="cal-modal-start" placeholder="Start  e.g. 0900">
+            <span class="cal-modal-dash">→</span>
+            <input class="cal-modal-input cal-modal-time" id="cal-modal-end"   placeholder="End  e.g. 1730">
+          </div>
+          <div class="cal-modal-day-label" id="cal-modal-day-label"></div>
+          <div class="cal-modal-actions">
+            <button class="cal-modal-cancel" id="cal-modal-cancel">Cancel</button>
+            <button class="cal-modal-save"   id="cal-modal-save">Add event</button>
+          </div>
+        </div>
+      </div>
+
       <!-- ══ OTHER SECTIONS (placeholder) ══ -->
 
       <!-- ══ MOVEMENT ══ -->
@@ -370,57 +398,32 @@
         </div>
 
         <!-- Skill cards -->
-        <div class="section-label">Calisthenics skills</div>
-        <div class="skill-grid">
+        <div class="cs-section-header">
+          <span class="section-label" style="margin:0">Calisthenics skills</span>
+          <button id="cs-add-btn" class="log-btn">+ Add</button>
+        </div>
 
-          <div class="skill-card" data-status="drilling">
-            <div class="skill-card-top">
-              <div class="skill-name-wrap">
-                <span class="skill-name">Frog Stand</span>
-              </div>
-              <span class="status-badge drilling">Drilling</span>
-            </div>
-            <div class="skill-bar-track"><div class="skill-bar-fill"></div></div>
-            <textarea class="skill-notes" placeholder="Notes…"></textarea>
-          </div>
+        <!-- Inline add form -->
+        <div class="cs-add-form" id="cs-add-form">
+          <input type="text" class="form-input" id="cs-add-name" placeholder="Skill name…" style="flex:1;min-width:0">
+          <label class="cs-scary-label">
+            <input type="checkbox" id="cs-add-scary"> 🔥 scary
+          </label>
+          <button class="form-submit" id="cs-add-submit" style="white-space:nowrap">Add skill</button>
+          <button class="cs-add-cancel" id="cs-add-cancel">Cancel</button>
+        </div>
 
-          <div class="skill-card" data-status="not-started">
-            <div class="skill-card-top">
-              <div class="skill-name-wrap">
-                <span class="skill-name">Frog Stand → HS</span>
-              </div>
-              <span class="status-badge not-started">Not started</span>
-            </div>
-            <div class="skill-bar-track"><div class="skill-bar-fill"></div></div>
-            <textarea class="skill-notes" placeholder="Notes…"></textarea>
-          </div>
+        <!-- Active skills -->
+        <div class="skill-grid" id="skill-grid"></div>
 
-          <div class="skill-card" data-status="almost">
-            <div class="skill-card-top">
-              <div class="skill-name-wrap">
-                <span class="skill-name">Handstand Hold</span>
-              </div>
-              <span class="status-badge almost">Almost</span>
-            </div>
-            <div class="skill-bar-track"><div class="skill-bar-fill"></div></div>
-            <textarea class="skill-notes" placeholder="Notes…"></textarea>
-          </div>
-
-          <div class="skill-card" data-status="not-started">
-            <div class="skill-card-top">
-              <div class="skill-name-wrap">
-                <span class="skill-name">Backflip</span>
-                <div class="skill-scary-row">
-                  <span style="font-size:11px;line-height:1">🔥</span>
-                  <span class="skill-scary">scary</span>
-                </div>
-              </div>
-              <span class="status-badge not-started">Not started</span>
-            </div>
-            <div class="skill-bar-track"><div class="skill-bar-fill"></div></div>
-            <textarea class="skill-notes" placeholder="Notes…"></textarea>
-          </div>
-
+        <!-- Achieved dropdown -->
+        <div id="cs-achieved-section" style="display:none;margin-top:10px">
+          <button class="cs-achieved-toggle" id="cs-achieved-toggle">
+            <span>🏆 Achieved</span>
+            <span class="cs-achieved-count" id="cs-achieved-count">0</span>
+            <svg class="cs-toggle-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="skill-grid cs-achieved-grid" id="cs-achieved-grid"></div>
         </div>
 
         <!-- Log session -->
@@ -462,44 +465,17 @@
                 </div>
               </div>
             </div>
+            <div class="form-row">
+              <div class="form-field" style="flex:1">
+                <label class="form-label">Workout notes</label>
+                <textarea class="form-input log-notes-input" id="log-notes" rows="2" placeholder="e.g. Focused on tuck compression, sets felt strong…"></textarea>
+              </div>
+            </div>
             <button class="form-submit" id="log-submit">Save session</button>
           </div>
           <div class="session-list" id="session-list">
             <div class="no-sessions-msg" id="no-sessions-msg">No sessions logged yet.</div>
           </div>
-        </div>
-
-        <!-- ── Workout Logger ── -->
-        <div class="section-label" style="margin-top:20px">Workout Logger</div>
-
-        <div class="workout-log-card">
-          <div class="workout-log-header">
-            <span class="workout-log-title">Log a set</span>
-            <span class="workout-pr-indicator" id="workout-pr-msg" style="display:none;animation:pr-glow 0.5s ease">🏆 New PR!</span>
-          </div>
-          <div class="workout-input-row">
-            <input type="text" list="exercise-history" class="form-input workout-ex-input" id="wo-exercise" placeholder="Exercise name" autocomplete="off">
-            <datalist id="exercise-history"></datalist>
-            <input type="number" class="form-input workout-num-input" id="wo-weight" placeholder="kg" min="0" step="0.5">
-            <span class="workout-x">×</span>
-            <input type="number" class="form-input workout-num-input" id="wo-reps" placeholder="reps" min="1">
-            <button class="form-submit" id="wo-log-btn">Log set</button>
-          </div>
-          <div class="workout-lastbest" id="wo-lastbest" style="display:none"></div>
-        </div>
-
-        <!-- Today's session -->
-        <div class="workout-session-wrap" id="workout-session-wrap">
-          <div class="workout-session-empty" id="workout-session-empty">No sets logged today — add your first set above.</div>
-        </div>
-
-        <!-- History (shows once there are past sessions) -->
-        <div class="workout-history-wrap" id="workout-history-wrap" style="display:none">
-          <div class="workout-history-header">
-            <span>Past Sessions</span>
-            <button class="log-btn" id="workout-history-toggle" style="font-size:10px;padding:4px 10px">Show</button>
-          </div>
-          <div id="workout-history-list" style="display:none"></div>
         </div>
 
         <!-- ── Sleep OS ── -->
@@ -629,6 +605,7 @@
             <span class="gifd-past-title">Past Entries</span>
             <button class="log-btn" id="gifd-show-past" style="font-size:10px;padding:4px 10px">Show archive</button>
           </div>
+          <div class="gifd-dayinsight" id="gifd-dayinsight" style="display:none"></div>
           <div id="gifd-entries" style="display:none"></div>
 
           <div id="gifd-charts-wrap" style="display:none;margin-top:16px">
@@ -802,6 +779,10 @@
             <div class="los-card-title">Today's Log</div>
             <div id="mana-log-list"></div>
           </div>
+          <div class="los-card mana-insights-card" id="mana-insights-card" style="margin-top:10px;display:none">
+            <div class="los-card-title">⚡ Energy Patterns</div>
+            <div id="mana-insights"></div>
+          </div>
         </div>
 
         <!-- ── TAB 4.5: Map ── -->
@@ -940,17 +921,23 @@
       <div id="section-chicos" class="section">
 
         <div class="chicos-weekly-form">
-<h3 style="margin:0 0 1rem;font-size:14px;color:#fff">📅 Weekly Update</h3>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
-<div><label style="font-size:11px;color:#666;display:block;margin-bottom:4px">FOLLOWERS</label><input id="chicos-followers" type="number" placeholder="15988" style="width:100%;background:#0a0a0a;border:1px solid #1e1e1e;border-radius:8px;padding:8px 12px;color:#fff;font-size:16px"></div>
-<div><label style="font-size:11px;color:#666;display:block;margin-bottom:4px">BEST POST VIEWS</label><input id="chicos-best-views" type="number" placeholder="0" style="width:100%;background:#0a0a0a;border:1px solid #1e1e1e;border-radius:8px;padding:8px 12px;color:#fff;font-size:16px"></div>
-<div><label style="font-size:11px;color:#666;display:block;margin-bottom:4px">DMs SENT</label><input id="chicos-dms-sent" type="number" placeholder="0" style="width:100%;background:#0a0a0a;border:1px solid #1e1e1e;border-radius:8px;padding:8px 12px;color:#fff;font-size:16px"></div>
-<div><label style="font-size:11px;color:#666;display:block;margin-bottom:4px">DMs REPLIED</label><input id="chicos-dms-replied" type="number" placeholder="0" style="width:100%;background:#0a0a0a;border:1px solid #1e1e1e;border-radius:8px;padding:8px 12px;color:#fff;font-size:16px"></div>
-<div><label style="font-size:11px;color:#666;display:block;margin-bottom:4px">HIGGSFIELD EXPIRY</label><input id="chicos-higgsfield-expiry" type="date" style="width:100%;background:#0a0a0a;border:1px solid #1e1e1e;border-radius:8px;padding:8px 12px;color:#fff;font-size:14px"></div>
-<div><label style="font-size:11px;color:#666;display:block;margin-bottom:4px">LAST POST DATE</label><input id="chicos-last-post" type="date" style="width:100%;background:#0a0a0a;border:1px solid #1e1e1e;border-radius:8px;padding:8px 12px;color:#fff;font-size:14px"></div>
-</div>
-<div style="margin-bottom:1rem"><label style="font-size:11px;color:#666;display:block;margin-bottom:8px">POSTS THIS WEEK</label><div class="chicos-post-selector"><button class="chicos-post-btn" data-val="0">0</button><button class="chicos-post-btn" data-val="1">1</button><button class="chicos-post-btn" data-val="2">2</button><button class="chicos-post-btn" data-val="3">3</button><button class="chicos-post-btn" data-val="4">4</button><button class="chicos-post-btn" data-val="5">5</button><button class="chicos-post-btn" data-val="6">6</button><button class="chicos-post-btn" data-val="7">7</button></div></div>
-<button id="chicos-save-btn" style="width:100%;background:#3b82f6;border:none;border-radius:8px;padding:12px;color:#fff;font-size:14px;font-weight:600;cursor:pointer">Save Week →</button>
+  <button class="chicos-form-toggle" id="chicos-form-toggle">
+    <span>📅 Weekly Update</span>
+    <span id="chicos-update-badge" class="chicos-update-badge"></span>
+    <svg class="chicos-toggle-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <div class="chicos-form-body" id="chicos-form-body">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;margin-top:1rem">
+      <div><label style="font-size:11px;color:#666;display:block;margin-bottom:4px">FOLLOWERS</label><input id="chicos-followers" type="number" placeholder="15988" style="width:100%;background:#0a0a0a;border:1px solid #1e1e1e;border-radius:8px;padding:8px 12px;color:#fff;font-size:16px;box-sizing:border-box"></div>
+      <div><label style="font-size:11px;color:#666;display:block;margin-bottom:4px">BEST POST VIEWS</label><input id="chicos-best-views" type="number" placeholder="0" style="width:100%;background:#0a0a0a;border:1px solid #1e1e1e;border-radius:8px;padding:8px 12px;color:#fff;font-size:16px;box-sizing:border-box"></div>
+      <div><label style="font-size:11px;color:#666;display:block;margin-bottom:4px">DMs SENT</label><input id="chicos-dms-sent" type="number" placeholder="0" style="width:100%;background:#0a0a0a;border:1px solid #1e1e1e;border-radius:8px;padding:8px 12px;color:#fff;font-size:16px;box-sizing:border-box"></div>
+      <div><label style="font-size:11px;color:#666;display:block;margin-bottom:4px">DMs REPLIED</label><input id="chicos-dms-replied" type="number" placeholder="0" style="width:100%;background:#0a0a0a;border:1px solid #1e1e1e;border-radius:8px;padding:8px 12px;color:#fff;font-size:16px;box-sizing:border-box"></div>
+      <div><label style="font-size:11px;color:#666;display:block;margin-bottom:4px">HIGGSFIELD EXPIRY</label><input id="chicos-higgsfield-expiry" type="date" style="width:100%;background:#0a0a0a;border:1px solid #1e1e1e;border-radius:8px;padding:8px 12px;color:#fff;font-size:14px;box-sizing:border-box"></div>
+      <div><label style="font-size:11px;color:#666;display:block;margin-bottom:4px">LAST POST DATE</label><input id="chicos-last-post" type="date" style="width:100%;background:#0a0a0a;border:1px solid #1e1e1e;border-radius:8px;padding:8px 12px;color:#fff;font-size:14px;box-sizing:border-box"></div>
+    </div>
+    <div style="margin-bottom:1rem"><label style="font-size:11px;color:#666;display:block;margin-bottom:8px">POSTS THIS WEEK</label><div class="chicos-post-selector"><button class="chicos-post-btn" data-val="0">0</button><button class="chicos-post-btn" data-val="1">1</button><button class="chicos-post-btn" data-val="2">2</button><button class="chicos-post-btn" data-val="3">3</button><button class="chicos-post-btn" data-val="4">4</button><button class="chicos-post-btn" data-val="5">5</button><button class="chicos-post-btn" data-val="6">6</button><button class="chicos-post-btn" data-val="7">7</button></div></div>
+    <button id="chicos-save-btn" style="width:100%;background:#3b82f6;border:none;border-radius:8px;padding:12px;color:#fff;font-size:14px;font-weight:600;cursor:pointer">Save Week →</button>
+  </div>
 </div>
 <div id="chicos-alerts" style="margin-bottom:1rem"></div>
 <div class="chicos-metric-cards">
@@ -1163,13 +1150,18 @@
                 <span class="protein-streak-label">day protein streak</span>
               </div>
 
-              <div class="protein-presets">
-                <button class="protein-preset-btn" data-p="30"><span class="pname">🍗 Chicken</span><span class="pgrams">+30g</span></button>
-                <button class="protein-preset-btn" data-p="12"><span class="pname">🥚 2 Eggs</span><span class="pgrams">+12g</span></button>
-                <button class="protein-preset-btn" data-p="25"><span class="pname">💪 Whey</span><span class="pgrams">+25g</span></button>
-                <button class="protein-preset-btn" data-p="25"><span class="pname">🐟 Tuna</span><span class="pgrams">+25g</span></button>
-                <button class="protein-preset-btn" data-p="15"><span class="pname">🫙 Yogurt</span><span class="pgrams">+15g</span></button>
-                <button class="protein-preset-btn" data-p="50"><span class="pname">🥩 Steak</span><span class="pgrams">+50g</span></button>
+              <!-- Dynamic presets (JS rendered) -->
+              <div class="nutr-presets-header">
+                <span class="nutr-presets-lbl">Quick add</span>
+                <button class="nutr-presets-edit-btn" id="nutr-presets-edit-btn">Edit</button>
+              </div>
+              <div id="protein-presets-dynamic" class="protein-presets"></div>
+
+              <!-- Preset editor (hidden until Edit clicked) -->
+              <div class="nutr-preset-editor" id="nutr-preset-editor">
+                <div id="nutr-preset-rows"></div>
+                <button class="nutr-preset-add-btn" id="nutr-preset-add-btn">+ Add preset</button>
+                <button class="nutr-preset-done-btn" id="nutr-preset-done-btn">Done</button>
               </div>
 
               <div class="protein-kcal-row">
@@ -1182,8 +1174,23 @@
                 <input type="number" class="protein-goal-input" id="protein-goal-input" value="160" min="50" max="400">
                 <span style="font-size:11px;color:#555">g / day</span>
               </div>
+
+              <!-- Water tracker -->
+              <div class="nutr-water-row">
+                <span class="nutr-water-icon">💧</span>
+                <div class="nutr-water-dots" id="nutr-water-dots"></div>
+                <span class="nutr-water-count" id="nutr-water-count">0 / 8</span>
+                <button class="nutr-water-btn minus" id="nutr-water-minus">–</button>
+                <button class="nutr-water-btn plus"  id="nutr-water-plus">+</button>
+              </div>
             </div>
           </div>
+        </div>
+
+        <!-- 7-day protein history -->
+        <div class="nutr-history-card">
+          <div class="nutr-history-label">Last 7 days</div>
+          <div class="nutr-week-bars" id="nutr-week-bars"></div>
         </div>
 
         <!-- AI meal input -->
@@ -1245,8 +1252,14 @@
           <div class="money-hero-lbl">Total Balance</div>
           <div class="money-hero-balance" id="money-balance">€0.00</div>
           <div class="money-hero-delta" id="money-delta">+€0.00 this month</div>
-          <!-- Sparkline chart -->
-          <svg class="money-chart-svg" id="money-chart-svg" viewBox="0 0 400 90" preserveAspectRatio="none"></svg>
+          <!-- Sparkline chart + hover tooltip -->
+          <div class="money-chart-wrap">
+            <svg class="money-chart-svg" id="money-chart-svg" viewBox="0 0 400 90" preserveAspectRatio="none"></svg>
+            <div class="money-chart-tooltip" id="money-chart-tooltip">
+              <div class="mct-date" id="mct-date"></div>
+              <div class="mct-bal"  id="mct-bal"></div>
+            </div>
+          </div>
         </div>
 
         <!-- Accounts -->
@@ -1271,7 +1284,12 @@
         <!-- Cash flow -->
         <div class="money-flow-card">
           <div class="money-card-title">
-            <span>Cash Flow — <span id="money-month-label">May 2026</span></span>
+            <span>Cash Flow</span>
+            <div class="money-month-nav">
+              <button class="money-month-btn" id="money-month-prev">‹</button>
+              <span id="money-month-label">May 2026</span>
+              <button class="money-month-btn" id="money-month-next">›</button>
+            </div>
           </div>
           <div class="money-flow-row">
             <div class="money-flow-left">
@@ -1294,6 +1312,12 @@
             </div>
             <div class="money-flow-amount tot" id="money-flow-net">€0.00</div>
           </div>
+        </div>
+
+        <!-- Category spending breakdown -->
+        <div class="money-flow-card" id="money-cat-card" style="display:none">
+          <div class="money-card-title"><span>Spending by Category</span></div>
+          <div id="money-cat-list"></div>
         </div>
 
         <!-- Transaction log -->
@@ -1352,6 +1376,34 @@
   <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle light/dark theme">☀️</button>
 
   
+
+  <!-- Mobile bottom nav (hidden on desktop via CSS) -->
+  <nav class="mobile-nav" id="mobile-nav">
+    <div class="mob-nav-item active" data-section="today">
+      <svg class="mob-nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1.5L9.8 5.2l4.2.6-3 3 .7 4.2L8 11l-3.7 2 .7-4.2-3-3 4.2-.6z"/></svg>
+      <span>Today</span>
+    </div>
+    <div class="mob-nav-item" data-section="life-os">
+      <svg class="mob-nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2h10a1 1 0 011 1v10a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M5 6h6M5 9h4"/></svg>
+      <span>GIFD</span>
+    </div>
+    <div class="mob-nav-item" data-section="time-os">
+      <svg class="mob-nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M5 1v4M11 1v4M2 7h12"/></svg>
+      <span>Time</span>
+    </div>
+    <div class="mob-nav-item" data-section="movement">
+      <svg class="mob-nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 8h2m10 0h2M3 8l1-2h8l1 2M4 6V4m8 2V4M5 4h6"/></svg>
+      <span>Move</span>
+    </div>
+    <div class="mob-nav-item" data-section="nutrition">
+      <svg class="mob-nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 1v5a3 3 0 006 0V1M8 9v6M5 15h6"/></svg>
+      <span>Food</span>
+    </div>
+    <div class="mob-nav-item" data-section="money">
+      <svg class="mob-nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="14" height="9" rx="1.5"/><path d="M1 7.5h14M5.5 11.5h1M8.5 11.5h2"/></svg>
+      <span>Money</span>
+    </div>
+  </nav>
 
 <script src="dashboard.js"></script></body>
 </html>

@@ -24,16 +24,23 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
     });
 
     // Section switching
+    function switchSection(sectionKey) {
+      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+      document.querySelectorAll('.mob-nav-item').forEach(i => i.classList.remove('active'));
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll(`.nav-item[data-section="${sectionKey}"]`).forEach(i => i.classList.add('active'));
+      document.querySelectorAll(`.mob-nav-item[data-section="${sectionKey}"]`).forEach(i => i.classList.add('active'));
+      const target = document.getElementById(`section-${sectionKey}`);
+      if (target) target.classList.add('active');
+      window.updateDailyScore?.();
+    }
+
     document.querySelectorAll('.nav-item').forEach(item => {
-      item.addEventListener('click', () => {
-        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        item.classList.add('active');
-        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        const target = document.getElementById(`section-${item.dataset.section}`);
-        if (target) target.classList.add('active');
-        // Refresh score on every section visit
-        window.updateDailyScore?.();
-      });
+      item.addEventListener('click', () => switchSection(item.dataset.section));
+    });
+
+    document.querySelectorAll('.mob-nav-item').forEach(item => {
+      item.addEventListener('click', () => switchSection(item.dataset.section));
     });
 
     /* ══════════════════════════════
@@ -258,6 +265,21 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
       /* ── Drag state ── */
       let dragState = null;
 
+      // Parse compact time string "1130" / "930" / "9" / "11:30" → "11:30" | null
+      function parseCompactTime(s) {
+        const digits = (s || '').replace(/\D/g, '');
+        if (!digits) return null;
+        let h, m;
+        if (digits.length <= 2) {
+          h = parseInt(digits, 10); m = 0;
+        } else {
+          m = parseInt(digits.slice(-2), 10);
+          h = parseInt(digits.slice(0, -2), 10);
+        }
+        if (isNaN(h) || isNaN(m) || h > 23 || m > 59) return null;
+        return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+      }
+
       // Convert pixel offset from grid top (06:00 baseline) to HH:MM snapped to 15 min
       function pxToTime(px) {
         const totalMin = Math.round((px * 60 / 34) / 15) * 15;
@@ -267,41 +289,126 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
         return String(h).padStart(2,'0') + ':' + String(min).padStart(2,'0');
       }
 
-      document.addEventListener('mousemove', function(e) {
+      function calDragMove(clientX, clientY) {
         if (!dragState) return;
-        const dy = e.clientY - dragState.mouseY0;
-        const el = dragState.el;
+        const dy = clientY - dragState.mouseY0;
         if (dragState.type === 'move') {
-          const t = Math.max(0, Math.min(714 - dragState.h0, dragState.top0 + dy));
-          el.style.top = t + 'px';
-        } else if (dragState.type === 'bot') {
-          el.style.height = Math.max(17, dragState.h0 + dy) + 'px';
-        } else if (dragState.type === 'top') {
-          const nh = dragState.h0 - dy;
-          const nt = dragState.top0 + dy;
-          if (nh >= 17 && nt >= 0) { el.style.top = nt + 'px'; el.style.height = nh + 'px'; }
-        }
-      });
-
-      document.addEventListener('mouseup', function() {
-        if (!dragState) return;
-        const el = dragState.el;
-        if (el) {
-          el.classList.remove('is-dragging');
-          const newTop = parseFloat(el.style.top) || 0;
-          const newH   = parseFloat(el.style.height) || 34;
-          const block  = calBlocks.find(b => b.id === dragState.id);
-          if (block) {
-            block.start = pxToTime(newTop);
-            block.end   = pxToTime(newTop + newH);
-            saveCal(calBlocks);
-            renderCalendar();
+          const dx = clientX - dragState.mouseX0;
+          dragState.ghost.style.top  = (dragState.top0  + dy) + 'px';
+          dragState.ghost.style.left = (dragState.left0 + dx) + 'px';
+        } else {
+          const el = dragState.el;
+          if (dragState.type === 'bot') {
+            el.style.height = Math.max(17, dragState.h0 + dy) + 'px';
+          } else if (dragState.type === 'top') {
+            const nh = dragState.h0 - dy;
+            const nt = dragState.top0 + dy;
+            if (nh >= 17 && nt >= 0) { el.style.top = nt + 'px'; el.style.height = nh + 'px'; }
           }
         }
+      }
+
+      document.addEventListener('mousemove', function(e) { calDragMove(e.clientX, e.clientY); });
+      document.addEventListener('touchmove', function(e) {
+        if (!dragState) return;
+        e.preventDefault();
+        calDragMove(e.touches[0].clientX, e.touches[0].clientY);
+      }, { passive: false });
+
+      function calDragEnd(clientX, clientY) {
+        if (!dragState) return;
+        const el    = dragState.el;
+        const ghost = dragState.ghost;
+
+        if (dragState.type === 'move') {
+          // Read ghost position before removing it
+          const ghostFixedTop = ghost ? parseFloat(ghost.style.top)  || 0 : 0;
+
+          // Tear down ghost and restore original
+          if (ghost && ghost.parentNode) ghost.parentNode.removeChild(ghost);
+          if (el) { el.classList.remove('is-dragging'); el.style.opacity = ''; }
+
+          // Which column did the pointer land on?
+          const weekDates = getWeekDates();
+          let targetColIdx = dragState.colIdx;
+          for (let i = 0; i < 7; i++) {
+            const colEl = document.getElementById('dc-' + i);
+            if (colEl) {
+              const r = colEl.getBoundingClientRect();
+              if (clientX >= r.left && clientX <= r.right) { targetColIdx = i; break; }
+            }
+          }
+          const targetColEl = document.getElementById('dc-' + targetColIdx);
+          const colRect = targetColEl ? targetColEl.getBoundingClientRect() : null;
+          // Convert ghost's viewport-Y to column-relative px
+          const newRelTop = colRect
+            ? Math.max(0, Math.min(714 - dragState.h0, ghostFixedTop - colRect.top))
+            : 0;
+
+          const block = calBlocks.find(b => b.id === dragState.id);
+          if (block) {
+            block.start = pxToTime(newRelTop);
+            block.end   = pxToTime(newRelTop + dragState.h0);
+            const targetDate = weekDates[targetColIdx];
+            const targetDay  = DAYS[targetColIdx];
+            if (block.date) {
+              block.date = targetDate;                    // date-specific: move to new date
+            } else if (targetColIdx !== dragState.colIdx) {
+              block.date = targetDate; delete block.day; // recurring pinned to specific date
+            } else {
+              block.day = targetDay;                      // recurring, same column
+            }
+            saveCal(calBlocks);
+          }
+        } else {
+          // Resize — stays in same column, no ghost
+          if (el) {
+            el.classList.remove('is-dragging');
+            const newTop = parseFloat(el.style.top) || 0;
+            const newH   = parseFloat(el.style.height) || 34;
+            const block  = calBlocks.find(b => b.id === dragState.id);
+            if (block) {
+              block.start = pxToTime(newTop);
+              block.end   = pxToTime(newTop + newH);
+              saveCal(calBlocks);
+            }
+          }
+        }
+
         dragState = null;
         document.body.style.userSelect = '';
         document.body.style.cursor = '';
+        renderCalendar();
+      }
+
+      document.addEventListener('mouseup',  function(e) { calDragEnd(e.clientX, e.clientY); });
+      document.addEventListener('touchend',  function(e) {
+        if (!dragState) return;
+        const t = e.changedTouches[0];
+        calDragEnd(t.clientX, t.clientY);
       });
+      document.addEventListener('touchcancel', function() {
+        if (!dragState) return;
+        const ghost = dragState.ghost;
+        if (ghost && ghost.parentNode) ghost.parentNode.removeChild(ghost);
+        if (dragState.el) { dragState.el.classList.remove('is-dragging'); dragState.el.style.opacity = ''; }
+        dragState = null;
+        document.body.style.userSelect = '';
+        document.body.style.cursor = '';
+        renderCalendar();
+      });
+
+      // The calendar's "day" boundary is 06:00, not midnight.
+      // 00:00–05:59 of date D still belongs to D-1's column.
+      function calendarTodayStr() {
+        const n = new Date();
+        if (n.getHours() < 6) {
+          const prev = new Date(n);
+          prev.setDate(n.getDate() - 1);
+          return localDateStr(prev);
+        }
+        return localDateStr(n);
+      }
 
       function positionNowLine() {
         const line = document.getElementById('time-now-line');
@@ -367,7 +474,7 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
 
       function renderCalendar() {
         const weekDates = getWeekDates();
-        const todayStr  = localDateStr(new Date());
+        const todayStr  = calendarTodayStr(); // 06:00-boundary day, not midnight
 
         /* ── Header ── */
         const hdr = document.getElementById('cal-header');
@@ -424,13 +531,14 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
 
         body.innerHTML = html;
 
-        // Inject time-now-line into body so it spans all 7 day columns
-        body.style.position = 'relative';
-        if (weekDates.includes(todayStr)) {
+        // Inject time-now-line into TODAY's day-col only
+        const todayColIdx = weekDates.indexOf(todayStr);
+        if (todayColIdx >= 0) {
           const nl = document.createElement('div');
           nl.className = 'time-now-line';
           nl.id = 'time-now-line';
-          body.appendChild(nl);
+          const todayColEl = document.getElementById('dc-' + todayColIdx);
+          if (todayColEl) todayColEl.appendChild(nl);
         }
         positionNowLine();
         updateStatCards();
@@ -449,21 +557,53 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
         body.querySelectorAll('.cal-block').forEach(el => {
           const id = el.dataset.id;
 
-          // Resize top edge
-          el.querySelector('.cb-resize-top')?.addEventListener('mousedown', e => {
-            e.preventDefault(); e.stopPropagation();
-            dragState = { type:'top', id, el, mouseY0:e.clientY, top0:parseFloat(el.style.top)||0, h0:parseFloat(el.style.height)||34 };
+          // Helper: start resize drag (top or bot)
+          function startResize(type, clientY) {
+            dragState = { type, id, el, mouseY0:clientY, top0:parseFloat(el.style.top)||0, h0:parseFloat(el.style.height)||34 };
             document.body.style.userSelect = 'none';
             document.body.style.cursor = 'ns-resize';
-          });
+          }
+
+          // Resize top edge
+          const resizeTop = el.querySelector('.cb-resize-top');
+          if (resizeTop) {
+            resizeTop.addEventListener('mousedown', e => { e.preventDefault(); e.stopPropagation(); startResize('top', e.clientY); });
+            resizeTop.addEventListener('touchstart', e => { e.preventDefault(); e.stopPropagation(); startResize('top', e.touches[0].clientY); }, { passive:false });
+          }
 
           // Resize bottom edge
-          el.querySelector('.cb-resize-bot')?.addEventListener('mousedown', e => {
-            e.preventDefault(); e.stopPropagation();
-            dragState = { type:'bot', id, el, mouseY0:e.clientY, top0:parseFloat(el.style.top)||0, h0:parseFloat(el.style.height)||34 };
+          const resizeBot = el.querySelector('.cb-resize-bot');
+          if (resizeBot) {
+            resizeBot.addEventListener('mousedown', e => { e.preventDefault(); e.stopPropagation(); startResize('bot', e.clientY); });
+            resizeBot.addEventListener('touchstart', e => { e.preventDefault(); e.stopPropagation(); startResize('bot', e.touches[0].clientY); }, { passive:false });
+          }
+
+          // Helper: start move drag
+          function startMove(clientX, clientY) {
+            const colEl  = el.closest('.day-col');
+            const colIdx = colEl ? parseInt(colEl.id.replace('dc-', '')) : 0;
+            const rect   = el.getBoundingClientRect();
+            const ghost = el.cloneNode(true);
+            ghost.style.position     = 'fixed';
+            ghost.style.left         = rect.left + 'px';
+            ghost.style.top          = rect.top  + 'px';
+            ghost.style.width        = rect.width + 'px';
+            ghost.style.margin       = '0';
+            ghost.style.zIndex       = '9999';
+            ghost.style.pointerEvents = 'none';
+            ghost.classList.add('is-dragging-free');
+            document.body.appendChild(ghost);
+            el.classList.add('is-dragging');
+            el.style.opacity = '0.35';
+            dragState = {
+              type:'move', id, el, ghost,
+              mouseY0: clientY, mouseX0: clientX,
+              top0: rect.top, left0: rect.left,
+              h0: rect.height, colIdx
+            };
             document.body.style.userSelect = 'none';
-            document.body.style.cursor = 'ns-resize';
-          });
+            document.body.style.cursor = 'grabbing';
+          }
 
           // Move (block body — not resize handles or delete button)
           el.addEventListener('mousedown', e => {
@@ -471,14 +611,18 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
                 e.target.classList.contains('cb-resize-bot') ||
                 e.target.classList.contains('cal-del-btn')) return;
             e.preventDefault();
-            el.classList.add('is-dragging');
-            dragState = { type:'move', id, el, mouseY0:e.clientY, top0:parseFloat(el.style.top)||0, h0:parseFloat(el.style.height)||34 };
-            document.body.style.userSelect = 'none';
-            document.body.style.cursor = 'grabbing';
+            startMove(e.clientX, e.clientY);
           });
+          el.addEventListener('touchstart', e => {
+            if (e.target.classList.contains('cb-resize-top') ||
+                e.target.classList.contains('cb-resize-bot') ||
+                e.target.classList.contains('cal-del-btn')) return;
+            e.preventDefault();
+            startMove(e.touches[0].clientX, e.touches[0].clientY);
+          }, { passive:false });
         });
 
-        /* ── Add-block row ── */
+        /* ── Add-block row — + buttons only, open shared modal ── */
         const addRow = document.getElementById('add-block-row');
         if (!addRow) return;
 
@@ -486,72 +630,101 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
         DAYS.forEach((dayName, i) => {
           const dateStr = weekDates[i];
           rowHtml += `<div class="add-block-col">
-            <button class="add-block-trigger" data-col="${i}">+</button>
-            <div class="add-block-form" id="abf-${i}">
-              <input class="abf-input" id="abf-lbl-${i}" placeholder="Label">
-              <div class="abf-row">
-                <input class="abf-input" id="abf-s-${i}" placeholder="Start HH:MM" style="flex:1">
-                <input class="abf-input" id="abf-e-${i}" placeholder="End HH:MM"   style="flex:1">
-              </div>
-              <div class="abf-row" style="align-items:center;gap:4px">
-                <span style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:.05em">Color</span>
-                ${['red','blue','green','gray','purple'].map((c,ci) =>
-                  `<button class="abf-color-btn col-${c}${ci===0?' selected':''}" data-color="${c}" data-col="${i}"></button>`
-                ).join('')}
-              </div>
-              <div class="abf-actions">
-                <button class="abf-cancel-btn" data-col="${i}">Cancel</button>
-                <button class="abf-save-btn"   data-col="${i}" data-date="${dateStr}" data-day="${dayName}">Add</button>
-              </div>
-            </div>
+            <button class="add-block-trigger" data-col="${i}" data-date="${dateStr}" data-day="${dayName}">+</button>
           </div>`;
         });
         addRow.innerHTML = rowHtml;
 
         addRow.querySelectorAll('.add-block-trigger').forEach(btn => {
-          btn.addEventListener('click', () => {
-            const f = document.getElementById(`abf-${btn.dataset.col}`);
-            f && f.classList.toggle('open');
-          });
+          btn.addEventListener('click', () => openCalModal(btn.dataset.date, btn.dataset.day));
         });
+      }
 
+      /* ── Shared calendar add-event modal ── */
+      (function () {
+        const modal    = document.getElementById('cal-add-modal');
+        const lblInp   = document.getElementById('cal-modal-lbl');
+        const startInp = document.getElementById('cal-modal-start');
+        const endInp   = document.getElementById('cal-modal-end');
+        const dayLbl   = document.getElementById('cal-modal-day-label');
+        const saveBtn  = document.getElementById('cal-modal-save');
+        const cancelBtn= document.getElementById('cal-modal-cancel');
+        const closeBtn = document.getElementById('cal-modal-close');
+        if (!modal) return;
+
+        let _date = '', _day = '';
         const COLOR_DEFAULTS = { red:"Gaby's shift", blue:'Euroaula', green:'@2.chicos', purple:'Random', gray:'Free time' };
-        addRow.querySelectorAll('.abf-color-btn').forEach(btn => {
+
+        function getSelectedColor() {
+          const sel = modal.querySelector('.cal-modal-color.selected');
+          return sel ? sel.dataset.color : 'red';
+        }
+
+        function closeModal() {
+          modal.classList.remove('open');
+          lblInp.value = ''; startInp.value = ''; endInp.value = '';
+          modal.querySelectorAll('.cal-modal-color').forEach((b,i) => b.classList.toggle('selected', i===0));
+        }
+
+        window.openCalModal = function(date, day) {
+          _date = date; _day = day;
+          // Label in day header
+          const d = new Date(date + 'T00:00:00');
+          const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+          dayLbl.textContent = dayNames[d.getDay()] + ' ' + d.getDate() + ' ' + d.toLocaleString('default', {month:'long'});
+          modal.classList.add('open');
+          setTimeout(() => lblInp.focus(), 50);
+        };
+
+        // Color swatch clicks
+        modal.querySelectorAll('.cal-modal-color').forEach(btn => {
           btn.addEventListener('click', () => {
-            const col = btn.dataset.col;
-            addRow.querySelectorAll(`.abf-color-btn[data-col="${col}"]`).forEach(b => b.classList.remove('selected'));
+            modal.querySelectorAll('.cal-modal-color').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
-            // Auto-fill label if blank or still a default value
-            const lbl = document.getElementById(`abf-lbl-${col}`);
-            if (lbl && (!lbl.value || Object.values(COLOR_DEFAULTS).includes(lbl.value))) {
-              lbl.value = COLOR_DEFAULTS[btn.dataset.color] || '';
+            // Auto-fill label if blank or still a default
+            if (!lblInp.value || Object.values(COLOR_DEFAULTS).includes(lblInp.value)) {
+              lblInp.value = COLOR_DEFAULTS[btn.dataset.color] || '';
             }
           });
         });
 
-        addRow.querySelectorAll('.abf-cancel-btn').forEach(btn => {
-          btn.addEventListener('click', () => {
-            const f = document.getElementById(`abf-${btn.dataset.col}`);
-            f && f.classList.remove('open');
+        // Compact-time auto-format on blur
+        [startInp, endInp].forEach(inp => {
+          inp.addEventListener('blur', () => {
+            const parsed = parseCompactTime(inp.value);
+            if (parsed) inp.value = parsed;
           });
         });
 
-        addRow.querySelectorAll('.abf-save-btn').forEach(btn => {
-          btn.addEventListener('click', () => {
-            const col   = btn.dataset.col;
-            const label = document.getElementById(`abf-lbl-${col}`)?.value.trim();
-            const start = document.getElementById(`abf-s-${col}`)?.value.trim();
-            const end   = document.getElementById(`abf-e-${col}`)?.value.trim();
-            const selC  = addRow.querySelector(`.abf-color-btn.selected[data-col="${col}"]`);
-            const color = selC ? selC.dataset.color : 'gray';
-            if (!label || !start || !end) return;
+        // Enter key on title → focus start
+        lblInp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); startInp.focus(); } });
+        startInp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); endInp.focus(); } });
+        endInp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); saveBtn.click(); } });
 
-            calBlocks.push({ id:'custom-'+Date.now(), date: btn.dataset.date, label, start, end, color, style:'solid' });
-            saveCal(calBlocks);
-            renderCalendar();
-          });
+        saveBtn.addEventListener('click', () => {
+          const label = lblInp.value.trim();
+          const start = parseCompactTime(startInp.value);
+          const end   = parseCompactTime(endInp.value);
+          const color = getSelectedColor();
+          if (!label || !start || !end) {
+            if (!label) lblInp.focus();
+            else if (!start) startInp.focus();
+            else endInp.focus();
+            return;
+          }
+          calBlocks.push({ id:'custom-'+Date.now(), date:_date, label, start, end, color, style:'solid' });
+          saveCal(calBlocks);
+          closeModal();
+          renderCalendar();
         });
-      }
+
+        cancelBtn.addEventListener('click', closeModal);
+        closeBtn.addEventListener('click', closeModal);
+        // Click backdrop to close
+        modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+        // Esc key to close
+        document.addEventListener('keydown', e => { if (e.key === 'Escape' && modal.classList.contains('open')) closeModal(); });
+      })();
 
       renderCalendar();
       setInterval(positionNowLine, 60000); // update time line every minute
@@ -647,21 +820,133 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
     })();
 
     /* ══════════════════════════════
-       MOVEMENT — skill badges
+       MOVEMENT — calisthenics skills (dynamic + persisted)
     ══════════════════════════════ */
-    const statusCycle  = ['not-started', 'drilling', 'almost', 'unlocked'];
-    const statusLabels = { 'not-started': 'Not started', drilling: 'Drilling', almost: 'Almost', unlocked: 'Unlocked' };
+    (function () {
+      const LS_KEY        = 'leon-cali-skills';
+      const STATUS_CYCLE  = ['not-started', 'drilling', 'almost', 'unlocked'];
+      const STATUS_LABELS = { 'not-started': 'Not started', drilling: 'Drilling', almost: 'Almost', unlocked: 'Unlocked' };
 
-    document.querySelectorAll('.status-badge').forEach(badge => {
-      badge.addEventListener('click', () => {
-        const card = badge.closest('.skill-card');
-        const cur  = card.dataset.status;
-        const next = statusCycle[(statusCycle.indexOf(cur) + 1) % statusCycle.length];
-        card.dataset.status    = next;
-        badge.className        = `status-badge ${next}`;
-        badge.textContent      = statusLabels[next];
+      const DEFAULTS = [
+        { id: 'cs1', name: 'Frog Stand',      status: 'drilling',    notes: '', scary: false },
+        { id: 'cs2', name: 'Frog Stand → HS', status: 'not-started', notes: '', scary: false },
+        { id: 'cs3', name: 'Handstand Hold',  status: 'almost',      notes: '', scary: false },
+        { id: 'cs4', name: 'Backflip',        status: 'not-started', notes: '', scary: true  },
+      ];
+
+      function load() {
+        try { const v = localStorage.getItem(LS_KEY); return v ? JSON.parse(v) : JSON.parse(JSON.stringify(DEFAULTS)); }
+        catch(_) { return JSON.parse(JSON.stringify(DEFAULTS)); }
+      }
+      function save(d) { try { localStorage.setItem(LS_KEY, JSON.stringify(d)); } catch(_) {} }
+
+      let skills = load();
+
+      function makeCard(s) {
+        const card = document.createElement('div');
+        card.className    = 'skill-card';
+        card.dataset.status = s.status;
+
+        card.innerHTML = `
+          <div class="skill-card-top">
+            <div class="skill-name-wrap">
+              <span class="skill-name">${s.name}</span>
+              ${s.scary ? `<div class="skill-scary-row"><span style="font-size:11px;line-height:1">🔥</span><span class="skill-scary">scary</span></div>` : ''}
+            </div>
+            <div class="cs-card-actions">
+              <span class="status-badge ${s.status}">${STATUS_LABELS[s.status]}</span>
+              <button class="cs-del-btn" title="Remove">×</button>
+            </div>
+          </div>
+          <div class="skill-bar-track"><div class="skill-bar-fill"></div></div>
+          <textarea class="skill-notes" placeholder="Notes…">${s.notes || ''}</textarea>`;
+
+        card.querySelector('.status-badge').addEventListener('click', () => {
+          const next = STATUS_CYCLE[(STATUS_CYCLE.indexOf(s.status) + 1) % STATUS_CYCLE.length];
+          s.status = next;
+          save(skills);
+          render();
+        });
+
+        card.querySelector('.skill-notes').addEventListener('blur', e => {
+          s.notes = e.target.value;
+          save(skills);
+        });
+
+        card.querySelector('.cs-del-btn').addEventListener('click', () => {
+          if (!confirm(`Remove "${s.name}"?`)) return;
+          skills = skills.filter(x => x.id !== s.id);
+          save(skills);
+          render();
+        });
+
+        return card;
+      }
+
+      function render() {
+        const grid    = document.getElementById('skill-grid');
+        const achGrid = document.getElementById('cs-achieved-grid');
+        const achSec  = document.getElementById('cs-achieved-section');
+        const countEl = document.getElementById('cs-achieved-count');
+        if (!grid || !achGrid) return;
+
+        grid.innerHTML    = '';
+        achGrid.innerHTML = '';
+
+        const active   = skills.filter(s => s.status !== 'unlocked');
+        const achieved = skills.filter(s => s.status === 'unlocked');
+
+        active.forEach(s   => grid.appendChild(makeCard(s)));
+        achieved.forEach(s => achGrid.appendChild(makeCard(s)));
+
+        if (countEl) countEl.textContent = achieved.length;
+        if (achSec)  achSec.style.display = achieved.length ? '' : 'none';
+      }
+
+      /* ── Add form ── */
+      const addBtn    = document.getElementById('cs-add-btn');
+      const addForm   = document.getElementById('cs-add-form');
+      const nameInput = document.getElementById('cs-add-name');
+
+      addBtn?.addEventListener('click', () => {
+        const open = addForm.classList.toggle('open');
+        if (open) nameInput?.focus();
+        addBtn.textContent = open ? '✕ Cancel' : '+ Add';
       });
-    });
+
+      document.getElementById('cs-add-cancel')?.addEventListener('click', () => {
+        addForm.classList.remove('open');
+        addBtn.textContent = '+ Add';
+        if (nameInput) nameInput.value = '';
+      });
+
+      function doAdd() {
+        const name  = nameInput?.value.trim();
+        if (!name) return;
+        const scary = document.getElementById('cs-add-scary')?.checked || false;
+        skills.push({ id: Date.now().toString(), name, status: 'not-started', notes: '', scary });
+        save(skills);
+        render();
+        if (nameInput) nameInput.value = '';
+        document.getElementById('cs-add-scary').checked = false;
+        addForm.classList.remove('open');
+        addBtn.textContent = '+ Add';
+      }
+
+      document.getElementById('cs-add-submit')?.addEventListener('click', doAdd);
+      nameInput?.addEventListener('keydown', e => { if (e.key === 'Enter') doAdd(); });
+
+      /* ── Achieved toggle ── */
+      document.getElementById('cs-achieved-toggle')?.addEventListener('click', function() {
+        const achGrid = document.getElementById('cs-achieved-grid');
+        const chevron = this.querySelector('.cs-toggle-chevron');
+        if (!achGrid) return;
+        const open = achGrid.classList.toggle('open');
+        if (chevron) chevron.style.transform = open ? 'rotate(180deg)' : '';
+      });
+
+      render();
+    })();
 
     /* ── Log session (calisthenics practice — persisted) ── */
     const LS_SESSIONS  = 'leon-skill-sessions';
@@ -697,14 +982,17 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
       const date  = logDateEl?.value;
       const skill = document.getElementById('log-skill')?.value;
       const dur   = document.getElementById('log-dur')?.value;
+      const notes = document.getElementById('log-notes')?.value.trim() || '';
       if (!date || !skill || !dur) return;
 
-      sessions.unshift({ date, skill, dur: +dur, feel: selectedFeel || 'OK' });
+      sessions.unshift({ date, skill, dur: +dur, feel: selectedFeel || 'OK', notes });
       saveSessions();
       renderSessions();
 
       document.getElementById('log-skill').value = '';
       document.getElementById('log-dur').value   = '';
+      const notesEl = document.getElementById('log-notes');
+      if (notesEl) notesEl.value = '';
       document.querySelectorAll('.feel-btn').forEach(b => b.classList.remove('sel'));
       selectedFeel = '';
       logForm.classList.remove('open');
@@ -721,14 +1009,17 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
       sessions.slice(0, 20).forEach(s => {
         const d    = new Date(s.date + 'T00:00:00');
         const dStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-        const fc   = s.feel.toLowerCase().replace(/\s+/g, '-');
+        const fc   = (s.feel || 'OK').toLowerCase().replace(/\s+/g, '-');
         const el   = document.createElement('div');
         el.className = 'session-item';
         el.innerHTML = `
-          <span class="si-date">${dStr}</span>
-          <span class="si-skill">${s.skill}</span>
-          <span class="si-dur">${s.dur} min</span>
-          <span class="si-feel ${fc}">${s.feel}</span>`;
+          <div class="si-main-row">
+            <span class="si-date">${dStr}</span>
+            <span class="si-skill">${s.skill}</span>
+            <span class="si-dur">${s.dur} min</span>
+            <span class="si-feel ${fc}">${s.feel || 'OK'}</span>
+          </div>
+          ${s.notes ? `<div class="si-notes">${s.notes}</div>` : ''}`;
         list.appendChild(el);
       });
     }
@@ -874,9 +1165,10 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
     })();
 
     /* ══════════════════════════════
-       @2.CHICOS
+       @2.CHICOS  (handled by initChicosSection at bottom of file)
     ══════════════════════════════ */
-    (function () {
+    /* legacy IIFE removed — all chicos logic lives in initChicosSection() */
+    if (false) (function () {
       const LS_STATS   = 'leon-chicos-stats';
       const LS_FOLLOW  = 'leon-chicos-followers';
       const LS_KANBAN  = 'leon-chicos-kanban';
@@ -1194,7 +1486,7 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
         }).observe(sec, { attributes: true, attributeFilter: ['class'] });
         if (sec.classList.contains('active')) initChicos();
       }
-    })();
+    }); /* end dead IIFE — never called */
 
     /* ══════════════════════════════
        SIDE PROJECTS
@@ -1370,7 +1662,7 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
             tab.classList.add('active');
             const pane = document.getElementById(`los-${tab.dataset.losTab}`);
             if (pane) pane.classList.add('active');
-            if (tab.dataset.losTab === 'radar') initRadarChart();
+            if (tab.dataset.losTab === 'radar') { initRadarChart(); renderDebuffs(); }
             if (tab.dataset.losTab === 'mana')  initManaChart();
             if (tab.dataset.losTab === 'gifd')  renderGIFDCharts();
           });
@@ -1393,6 +1685,63 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
 
       function calcScore(e) {
         return Object.values(e.good||{}).filter(Boolean).length - Object.values(e.bad||{}).filter(Boolean).length;
+      }
+
+      /* ── Habit streak: how many consecutive past days has this chip been active? ── */
+      function getHabitStreak(key, isGood) {
+        const todayStr = lDate(new Date());
+        // Build the yesterday string
+        const yest = new Date(); yest.setDate(yest.getDate() - 1);
+        const yestStr = lDate(yest);
+        const sorted = [...gifdEntries]
+          .filter(e => e.date < todayStr)    // past only (not today)
+          .sort((a,b) => b.date < a.date ? -1 : 1); // newest first
+        let streak = 0;
+        // Walk backward from yesterday — missing day breaks streak
+        let expectDate = yestStr;
+        for (const e of sorted) {
+          if (e.date !== expectDate) break; // gap or missed day — streak broken
+          const active = isGood ? !!(e.good||{})[key] : !!(e.bad||{})[key];
+          if (!active) break; // habit not done that day — streak broken
+          streak++;
+          // Next expected day is one day earlier
+          const prev = new Date(e.date + 'T00:00:00');
+          prev.setDate(prev.getDate() - 1);
+          expectDate = lDate(prev);
+        }
+        // Count today too if it's already ticked
+        const todayActive = isGood ? !!todayGood[key] : !!todayBad[key];
+        if (todayActive) streak++;
+        return streak;
+      }
+
+      /* ── Best/worst day of week from past entries ── */
+      function getBestWorstDay() {
+        const todayStr = lDate(new Date());
+        const past = gifdEntries.filter(e => e.date < todayStr);
+        if (past.length < 7) return null;
+        const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+        const buckets = Array.from({length:7}, ()=>[]); // index 0=Sun
+        past.forEach(e => {
+          const d = new Date(e.date + 'T00:00:00');
+          buckets[d.getDay()].push(calcScore(e));
+        });
+        const avgs = buckets.map(arr => arr.length < 2 ? null : arr.reduce((a,b)=>a+b,0)/arr.length);
+        const valid = avgs.map((v,i)=>v===null?null:{day:i,avg:v}).filter(Boolean);
+        if (valid.length < 2) return null;
+        const best  = valid.reduce((a,b)=>b.avg>a.avg?b:a);
+        const worst = valid.reduce((a,b)=>b.avg<a.avg?b:a);
+        if (best.day === worst.day) return null;
+        return { best: DAY_NAMES[best.day], worst: DAY_NAMES[worst.day],
+                 bestAvg: best.avg.toFixed(1), worstAvg: worst.avg.toFixed(1) };
+      }
+
+      function renderDayInsight() {
+        const el = document.getElementById('gifd-dayinsight'); if (!el) return;
+        const res = getBestWorstDay();
+        if (!res) { el.style.display = 'none'; return; }
+        el.style.display = '';
+        el.innerHTML = `You score best on <strong>${res.best}s</strong> (avg ${res.bestAvg > 0 ? '+' : ''}${res.bestAvg}) · Worst on <strong>${res.worst}s</strong> (avg ${res.worstAvg > 0 ? '+' : ''}${res.worstAvg})`;
       }
 
       function calcLiveScore() {
@@ -1438,16 +1787,22 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
         if (badList) {
           badList.innerHTML = '';
           BAD_CHIPS.forEach(([k, label]) => {
+            const streak = getHabitStreak(k, false);
             const btn = document.createElement('button');
             btn.className = 'gifd-habit-chip bad' + (todayBad[k] ? ' active' : '');
             btn.dataset.k = k;
-            btn.innerHTML = `<span class="chip-icon">✗</span>${label}`;
+            btn.innerHTML = `<span class="chip-icon">✗</span>${label}${streak >= 2 ? `<span class="chip-streak">${streak}d</span>` : ''}`;
             btn.addEventListener('click', () => {
               todayBad[k] = !todayBad[k];
               btn.classList.toggle('active', todayBad[k]);
               btn.classList.remove('pop'); void btn.offsetWidth; btn.classList.add('pop');
               updateLiveScore();
               autoSaveToday();
+              // Update streak badge live
+              const s = getHabitStreak(k, false);
+              let badge = btn.querySelector('.chip-streak');
+              if (s >= 2) { if (badge) badge.textContent = s + 'd'; else { badge = document.createElement('span'); badge.className = 'chip-streak'; badge.textContent = s + 'd'; btn.appendChild(badge); } }
+              else if (badge) badge.remove();
             });
             badList.appendChild(btn);
           });
@@ -1458,16 +1813,22 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
         if (goodList) {
           goodList.innerHTML = '';
           GOOD_CHIPS.forEach(([k, label]) => {
+            const streak = getHabitStreak(k, true);
             const btn = document.createElement('button');
             btn.className = 'gifd-habit-chip good' + (todayGood[k] ? ' active' : '');
             btn.dataset.k = k;
-            btn.innerHTML = `<span class="chip-icon">✓</span>${label}`;
+            btn.innerHTML = `<span class="chip-icon">✓</span>${label}${streak >= 2 ? `<span class="chip-streak">${streak}d</span>` : ''}`;
             btn.addEventListener('click', () => {
               todayGood[k] = !todayGood[k];
               btn.classList.toggle('active', todayGood[k]);
               btn.classList.remove('pop'); void btn.offsetWidth; btn.classList.add('pop');
               updateLiveScore();
               autoSaveToday();
+              // Update streak badge live
+              const s = getHabitStreak(k, true);
+              let badge = btn.querySelector('.chip-streak');
+              if (s >= 2) { if (badge) badge.textContent = s + 'd'; else { badge = document.createElement('span'); badge.className = 'chip-streak'; badge.textContent = s + 'd'; btn.appendChild(badge); } }
+              else if (badge) badge.remove();
             });
             goodList.appendChild(btn);
           });
@@ -1609,16 +1970,17 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
         }
 
         // Show/hide archive
-        const showPast = document.getElementById('gifd-show-past');
+        const showPast  = document.getElementById('gifd-show-past');
         const entriesEl = document.getElementById('gifd-entries');
         const chartsEl  = document.getElementById('gifd-charts-wrap');
+        let archiveOpen = false; // explicit flag — avoids empty-string falsy bug
         if (showPast) {
           showPast.addEventListener('click', () => {
-            const open = entriesEl?.style.display === 'none' || !entriesEl?.style.display;
-            if (entriesEl) entriesEl.style.display = open ? '' : 'none';
-            if (chartsEl)  chartsEl.style.display  = open ? '' : 'none';
-            showPast.textContent = open ? 'Hide archive' : 'Show archive';
-            if (open) { renderGIFDEntries(); loadChartLOS(() => renderGIFDCharts()); }
+            archiveOpen = !archiveOpen;
+            if (entriesEl) entriesEl.style.display = archiveOpen ? '' : 'none';
+            if (chartsEl)  chartsEl.style.display  = archiveOpen ? '' : 'none';
+            showPast.textContent = archiveOpen ? 'Hide archive' : 'Show archive';
+            if (archiveOpen) { renderGIFDEntries(); loadChartLOS(() => renderGIFDCharts()); renderDayInsight(); }
           });
         }
 
@@ -1638,6 +2000,7 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
 
         populateGIFDArchive();
         renderGIFDEntries();
+        renderDayInsight();
       }
       /* ════ SKILLS ════ */
       const LS_SKILLS_XP='los-skills-xp', LS_SKILLS_HX='los-skills-history';
@@ -1709,12 +2072,60 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
         {id:'d2',name:'Creator Quest Ghost',desc:'Abandoned creator quest creates Incomplete Quest debuff, lowers resolve.',resolved:false},
         {id:'d3',name:'Dark Cloud',desc:'High stats but zero current Main Quest. Feeling over-leveled with nothing to aim at.',resolved:false},
       ];
+
+      /* ── Live debuff rules — scan last 7 days of GIFD ── */
+      const LIVE_DEBUFF_RULES = [
+        { id:'ld-weed',   check: (counts) => counts.bad.weed   >= 3, name:'Clouded Mind',      desc:'Weed 3+ days this week.',          mods:{int:-1,luk:-1} },
+        { id:'ld-porn',   check: (counts) => counts.bad.porn   >= 3, name:'Dopamine Drain',    desc:'Porn 3+ days this week.',          mods:{cha:-1,str:-1} },
+        { id:'ld-scroll', check: (counts) => counts.bad.scroll >= 4, name:'Attention Scatter', desc:'Scroll +1h on 4+ days this week.', mods:{int:-1,dex:-1} },
+        { id:'ld-junk',   check: (counts) => counts.bad.junk   >= 4, name:'Low Fuel',          desc:'Junk food 4+ days this week.',     mods:{str:-1} },
+        { id:'ld-smoke',  check: (counts) => counts.bad.smoked >= 2, name:'Lung Debuff',       desc:'Smoked 2+ days this week.',        mods:{str:-1,dex:-1} },
+        { id:'ld-post',   check: (counts) => counts.good.posted < 2, name:'Creator Ghost',     desc:'Posted fewer than 2× this week.',  mods:{cha:-1} },
+        { id:'ld-train',  check: (counts) => counts.good.trained < 2,name:'Untrained',         desc:'Trained fewer than 2× this week.', mods:{str:-1} },
+        { id:'ld-med',    check: (counts) => counts.good.meditate === 0, name:'Uncalibrated',  desc:'No meditation this week.',         mods:{int:-1} },
+      ];
+
+      function computeLiveDebuffs() {
+        try {
+          const allEntries = JSON.parse(localStorage.getItem('los-gifd-current') || '[]');
+          const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 7);
+          const cutoffStr = lDate(cutoff);
+          const recent = allEntries.filter(e => e.date >= cutoffStr);
+          const counts = { bad:{weed:0,porn:0,scroll:0,junk:0,smoked:0}, good:{posted:0,trained:0,meditate:0} };
+          recent.forEach(e => {
+            ['weed','porn','scroll','junk','smoked'].forEach(k=>{ if((e.bad||{})[k]) counts.bad[k]++; });
+            ['posted','trained','meditate'].forEach(k=>{ if((e.good||{})[k]) counts.good[k]++; });
+          });
+          return LIVE_DEBUFF_RULES.filter(r => r.check(counts));
+        } catch(_) { return []; }
+      }
+
       function getDebuffs(){const s=lsLoad(LS_DEBUFFS);return s&&s.length?s:DEF_DEBUFFS.map(d=>({...d}));}
 
       function renderDebuffs(){
         const el=document.getElementById('debuff-cards'); if(!el) return;
-        const debuffs=getDebuffs(); el.innerHTML='';
-        debuffs.forEach(df=>{
+        const liveDebuffs = computeLiveDebuffs();
+        const manualDebuffs=getDebuffs();
+        el.innerHTML='';
+        function addEl(html){const t=document.createElement('div');t.innerHTML=html;el.appendChild(t.firstChild);}
+
+        // Live debuffs section
+        addEl(`<div style="font-size:10px;color:#555;margin-bottom:6px;letter-spacing:0.5px;text-transform:uppercase">Auto — this week's GIFD</div>`);
+        if (liveDebuffs.length) {
+          liveDebuffs.forEach(df=>{
+            const modsStr = Object.entries(df.mods).map(([k,v])=>`${v>0?'+':''}${v} ${k.toUpperCase()}`).join(', ');
+            const c=document.createElement('div'); c.className='debuff-card live-debuff';
+            c.innerHTML=`<div style="flex:1"><div class="debuff-name">${df.name} <span style="font-size:10px;font-weight:400;color:#c94f4f;margin-left:4px">${modsStr}</span></div><div class="debuff-desc">${df.desc}</div></div>`;
+            el.appendChild(c);
+          });
+        } else {
+          addEl(`<div style="font-size:11px;color:#2e2e2e;padding:4px 0 8px">✅ No auto-debuffs this week — clean run.</div>`);
+        }
+        addEl(`<div style="height:1px;background:#1e1e1e;margin:10px 0"></div>`);
+
+        // Manual debuffs section
+        addEl(`<div style="font-size:10px;color:#555;margin-bottom:6px;letter-spacing:0.5px;text-transform:uppercase">Manual</div>`);
+        manualDebuffs.forEach(df=>{
           const c=document.createElement('div'); c.className=`debuff-card${df.resolved?' resolved':''}`;
           c.innerHTML=`<div style="flex:1"><div class="debuff-name">${df.name}</div><div class="debuff-desc">${df.desc}</div></div>
             <button class="debuff-resolve-btn" data-id="${df.id}"${df.resolved?' style="color:#333;border-color:#222"':''}>${df.resolved?'Resolved':'Remove Debuff'}</button>`;
@@ -1731,12 +2142,30 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
         const snaps=loadSnaps(),latest=snaps[snaps.length-1];
         const canvas=document.getElementById('radar-chart'); if(!canvas) return;
         if(radarChart){radarChart.destroy();radarChart=null;}
-        radarChart=new Chart(canvas.getContext('2d'),{type:'radar',data:{labels:R_AXES,datasets:[{
-          data:R_KEYS.map(k=>latest.stats[k]||0),backgroundColor:'rgba(79,126,201,0.25)',
-          borderColor:'#4f7ec9',borderWidth:1.5,pointRadius:3,pointBackgroundColor:'#4f7ec9'
-        }]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-          scales:{r:{min:0,max:10,ticks:{display:false},grid:{color:'#1e1e1e'},angleLines:{color:'#1e1e1e'},
-                    pointLabels:{color:'#666',font:{family:'Inter',size:11}}}}}});
+
+        // Compute effective stats by applying live debuff mods
+        const liveDebuffs = computeLiveDebuffs();
+        const baseStats = R_KEYS.map(k=>latest.stats[k]||0);
+        const effectiveMods = {}; R_KEYS.forEach(k=>effectiveMods[k]=0);
+        liveDebuffs.forEach(df=>{ Object.entries(df.mods).forEach(([k,v])=>{ if(effectiveMods[k]!==undefined) effectiveMods[k]+=v; }); });
+        const effectiveStats = R_KEYS.map((k,i)=>Math.max(0,Math.min(10,baseStats[i]+(effectiveMods[k]||0))));
+        const hasDebuffs = liveDebuffs.length > 0;
+
+        const datasets = [{
+          data:baseStats,backgroundColor:'rgba(79,126,201,0.15)',
+          borderColor:'#4f7ec9',borderWidth:1.5,pointRadius:3,pointBackgroundColor:'#4f7ec9',
+          label:'Base'
+        }];
+        if (hasDebuffs) datasets.push({
+          data:effectiveStats,backgroundColor:'rgba(201,79,79,0.12)',
+          borderColor:'rgba(201,79,79,0.8)',borderWidth:1.5,pointRadius:3,pointBackgroundColor:'#c94f4f',
+          borderDash:[4,3],label:'Effective'
+        });
+
+        radarChart=new Chart(canvas.getContext('2d'),{type:'radar',data:{labels:R_AXES,datasets},
+          options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:hasDebuffs,labels:{color:'#555',font:{size:10}}}},
+            scales:{r:{min:0,max:10,ticks:{display:false},grid:{color:'#1e1e1e'},angleLines:{color:'#1e1e1e'},
+                      pointLabels:{color:'#666',font:{family:'Inter',size:11}}}}}});
         const st=document.getElementById('radar-date-stamp');if(st)st.textContent='Last updated: '+latest.date;
         const hel=document.getElementById('radar-history');if(hel){
           hel.innerHTML=loadSnaps().slice(-3).reverse().map(s=>
@@ -1799,6 +2228,48 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
         });
       }
 
+      /* ── Mana pattern insights: scan all los-mana-* keys ── */
+      function getManaInsights() {
+        const hourBuckets = Array.from({length:24}, ()=>[]); // index = hour
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (!k || !k.startsWith('los-mana-')) continue;
+          try {
+            const entries = JSON.parse(localStorage.getItem(k) || '[]');
+            entries.forEach(p => { if (p.hour >= 0 && p.hour < 24 && p.energy >= 0 && p.energy <= 10) hourBuckets[p.hour].push(p.energy); });
+          } catch(_) {}
+        }
+        const avgs = hourBuckets.map((arr,h) => arr.length >= 2 ? {hour:h,avg:arr.reduce((a,b)=>a+b,0)/arr.length,n:arr.length} : null).filter(Boolean);
+        if (avgs.length < 3) return null;
+        const peak = avgs.reduce((a,b)=>b.avg>a.avg?b:a);
+        const low  = avgs.reduce((a,b)=>b.avg<a.avg?b:a);
+        return { peak, low };
+      }
+
+      function renderManaInsights() {
+        const card = document.getElementById('mana-insights-card');
+        const el   = document.getElementById('mana-insights');
+        if (!card || !el) return;
+        const ins = getManaInsights();
+        if (!ins) { card.style.display='none'; return; }
+        card.style.display = '';
+        el.innerHTML = `
+          <div class="mana-insight-row">
+            <span class="mir-icon">⚡</span>
+            <div>
+              <div class="mir-label">Peak energy</div>
+              <div class="mir-val"><span class="mir-time">${String(ins.peak.hour).padStart(2,'0')}:00</span> — avg ${ins.peak.avg.toFixed(1)}/10 <span style="font-size:10px;color:#333">(${ins.peak.n} readings)</span></div>
+            </div>
+          </div>
+          <div class="mana-insight-row">
+            <span class="mir-icon">😴</span>
+            <div>
+              <div class="mir-label">Low energy</div>
+              <div class="mir-val"><span class="mir-time">${String(ins.low.hour).padStart(2,'0')}:00</span> — avg ${ins.low.avg.toFixed(1)}/10 <span style="font-size:10px;color:#333">(${ins.low.n} readings)</span></div>
+            </div>
+          </div>`;
+      }
+
       function renderStreaks(){
         const str=lsLoad(LS_STREAKS)||{};
         const t=new Date(),d=t.getDay();
@@ -1827,7 +2298,7 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
       }
 
       function initMana(){
-        renderStreaks(); renderManaLog();
+        renderStreaks(); renderManaLog(); renderManaInsights(); loadChartLOS(initManaChart);
         document.getElementById('mana-log-btn')?.addEventListener('click',()=>document.getElementById('mana-form')?.classList.toggle('open'));
         document.getElementById('mana-save')?.addEventListener('click',()=>{
           const h=+(document.getElementById('mana-hour')?.value);
@@ -1838,7 +2309,7 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
           saveManaToday(log);
           document.getElementById('mana-hour').value='';document.getElementById('mana-energy').value='';
           document.getElementById('mana-form').classList.remove('open');
-          renderManaLog();initManaChart();
+          renderManaLog();initManaChart();renderManaInsights();
         });
       }
 
@@ -2498,8 +2969,45 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
         { id: 'lg5', title: 'Save €1,000',                          category: 'Money',    due: '2026-10-31', progress: 30, notes: '' },
       ];
 
-      function ls()      { try { const v = localStorage.getItem(LS_KEY); return v ? JSON.parse(v) : JSON.parse(JSON.stringify(DEFAULTS)); } catch (_) { return JSON.parse(JSON.stringify(DEFAULTS)); } }
+      function ls() {
+        const yearStart = new Date().getFullYear() + '-01-01';
+        try {
+          const v   = localStorage.getItem(LS_KEY);
+          const raw = v ? JSON.parse(v) : JSON.parse(JSON.stringify(DEFAULTS));
+          return raw.map(g => {
+            /* if startDate was missing, this is pre-auto-progress data:
+               assign Jan 1 as start and clear manualProgress so auto drives it */
+            if (!g.startDate) {
+              g.startDate      = yearStart;
+              g.manualProgress = null;   /* wipe old hardcoded value → auto takes over */
+            }
+            if (g.manualProgress === undefined) g.manualProgress = null;
+            return g;
+          });
+        } catch (_) {
+          return JSON.parse(JSON.stringify(DEFAULTS)).map(g =>
+            ({ ...g, startDate: yearStart, manualProgress: null })
+          );
+        }
+      }
       function lsSave(v) { try { localStorage.setItem(LS_KEY, JSON.stringify(v)); } catch (_) {} }
+
+      /* ── Auto-progress helpers ── */
+      function autoProgress(g) {
+        if (!g.startDate) return null;
+        const start = new Date(g.startDate + 'T00:00:00');
+        const due   = new Date(g.due       + 'T00:00:00');
+        const today = new Date(); today.setHours(0,0,0,0);
+        const total = due - start;
+        if (total <= 0) return 100;
+        return Math.min(100, Math.max(0, Math.round((today - start) / total * 100)));
+      }
+      function displayProgress(g) {
+        const m = g.manualProgress;
+        if (m !== null && m !== undefined) return m;
+        const a = autoProgress(g);
+        return a !== null ? a : (g.progress || 0);
+      }
 
       let goals = ls();
 
@@ -2542,13 +3050,14 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
         if (!grid) return;
         grid.innerHTML = '';
 
-        /* sort by due date asc */
         [...goals]
           .sort((a, b) => a.due < b.due ? -1 : 1)
           .forEach(g => {
-            const col = catColor(g.category);
-            const dl  = daysLeft(g.due);
-            const tag = daysTag(dl);
+            const col   = catColor(g.category);
+            const dl    = daysLeft(g.due);
+            const tag   = daysTag(dl);
+            const autoP = autoProgress(g);           /* null if no startDate */
+            const dispP = displayProgress(g);        /* what the slider shows */
 
             const card = document.createElement('div');
             card.className = 'goal-card';
@@ -2556,40 +3065,82 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
               <div>
                 <div class="goal-title-row">
                   <span class="goal-title">${g.title}</span>
-                  <button class="goal-del" data-id="${g.id}">×</button>
+                  <div class="goal-card-actions">
+                    <button class="goal-edit-btn" title="Edit deadline">✎</button>
+                    <button class="goal-del" title="Delete">×</button>
+                  </div>
                 </div>
                 <div class="goal-meta-row" style="margin-top:6px">
                   <span class="goal-cat" style="background:${col.bg};color:${col.fg}">${g.category}</span>
-                  <span class="goal-due">${fmtDue(g.due)}</span>
-                  <span class="goal-days goal-days-${tag.cls}">${tag.text}</span>
+                  <span class="goal-due" id="due-${g.id}">${fmtDue(g.due)}</span>
+                  <span class="goal-days goal-days-${tag.cls}" id="daytag-${g.id}">${tag.text}</span>
+                </div>
+                <div class="goal-edit-form" id="edit-form-${g.id}">
+                  <span class="goal-edit-label">New deadline</span>
+                  <input type="date" class="goal-edit-date" value="${g.due}">
+                  <button class="goal-edit-save">Save</button>
+                  <button class="goal-edit-cancel">Cancel</button>
                 </div>
               </div>
               <div class="goal-slider-row">
-                <input type="range" class="goal-progress" min="0" max="100" value="${g.progress}" data-id="${g.id}">
-                <span class="goal-pct" id="pct-${g.id}">${g.progress}%</span>
+                <div class="goal-slider-wrap">
+                  ${autoP !== null ? `<div class="goal-auto-tick" style="left:${autoP}%" title="Expected: ${autoP}%"></div>` : ''}
+                  <input type="range" class="goal-progress" min="0" max="100" value="${dispP}">
+                </div>
+                <span class="goal-pct" id="pct-${g.id}">${dispP}%</span>
               </div>
               <textarea class="goal-notes" data-id="${g.id}" placeholder="Notes…">${g.notes || ''}</textarea>`;
 
             grid.appendChild(card);
 
-            const slider = card.querySelector('.goal-progress');
-            setSliderBg(slider, g.progress);
+            const slider  = card.querySelector('.goal-progress');
+            const editBtn = card.querySelector('.goal-edit-btn');
+            const delBtn  = card.querySelector('.goal-del');
+            const editForm = card.querySelector('.goal-edit-form');
+            const editDate = card.querySelector('.goal-edit-date');
+            setSliderBg(slider, dispP);
 
+            /* ── Slider: manual override ── */
             slider.addEventListener('input', () => {
               const v = +slider.value;
               setSliderBg(slider, v);
               const pctEl = document.getElementById(`pct-${g.id}`);
               if (pctEl) pctEl.textContent = v + '%';
               const goal = goals.find(x => x.id === g.id);
-              if (goal) { goal.progress = v; lsSave(goals); }
+              if (goal) { goal.manualProgress = v; goal.progress = v; lsSave(goals); }
             });
 
+            /* ── Edit deadline ── */
+            editBtn.addEventListener('click', () => {
+              const open = editForm.classList.toggle('open');
+              editBtn.classList.toggle('active', open);
+              if (open) editDate.focus();
+            });
+            editForm.querySelector('.goal-edit-cancel').addEventListener('click', () => {
+              editForm.classList.remove('open');
+              editBtn.classList.remove('active');
+            });
+            editForm.querySelector('.goal-edit-save').addEventListener('click', () => {
+              const newDue = editDate.value;
+              if (!newDue) return;
+              const goal = goals.find(x => x.id === g.id);
+              if (!goal) return;
+              goal.due = newDue;
+              /* clear manual override so auto-progress recalculates from new deadline */
+              goal.manualProgress = null;
+              if (!goal.startDate) goal.startDate = new Date().getFullYear() + '-01-01';
+              lsSave(goals);
+              render();
+            });
+
+            /* ── Notes ── */
             card.querySelector('.goal-notes').addEventListener('blur', e => {
               const goal = goals.find(x => x.id === g.id);
               if (goal) { goal.notes = e.target.value; lsSave(goals); }
             });
 
-            card.querySelector('.goal-del').addEventListener('click', () => {
+            /* ── Delete ── */
+            delBtn.addEventListener('click', () => {
               goals = goals.filter(x => x.id !== g.id);
               lsSave(goals);
               render();
@@ -2615,7 +3166,8 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
         ));
         if (!title || !due) return;
 
-        goals.push({ id: Date.now().toString(), title, category, due, progress, notes: '' });
+        goals.push({ id: Date.now().toString(), title, category, due,
+          startDate: todayStr, manualProgress: null, progress: 0, notes: '' });
         lsSave(goals);
         render();
 
@@ -2933,37 +3485,76 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
         if (btn) { btn.textContent = '✓ Saved!'; setTimeout(() => { btn.textContent = 'Save night'; }, 2000); }
       });
 
-      // 7-day chart
+      // 7-day chart — single bar (actual sleep) with quality on hover
+      const QUAL_LABEL = ['—', 'Terrible 😞', 'Bad 🙁', 'Ok 😐', 'Good 🙂', 'Great 😊'];
       let sleepChart = null;
       function renderSleepChart() {
         if (!window.Chart) return;
-        const data   = lsSleep2();
-        const last7  = [];
+        const data  = lsSleep2();
+        const last7 = [];
         for (let i = 6; i >= 0; i--) {
-          const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
+          const d     = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
           const entry = data.entries.find(e => e.date === d);
-          last7.push({ date: d.slice(5), actual: entry?.actual || 0, inBed: entry?.inBed || 0 });
+          const actual  = entry?.actual  || 0;
+          const quality = entry?.quality || 0;
+          const label   = d.slice(5); // MM-DD
+          last7.push({ label, actual, quality, hasData: !!entry });
         }
         const canvas = document.getElementById('sleep-week-chart');
         if (!canvas) return;
         if (sleepChart) { sleepChart.destroy(); sleepChart = null; }
+
         sleepChart = new Chart(canvas.getContext('2d'), {
           type: 'bar',
           data: {
-            labels: last7.map(d => d.date),
-            datasets: [
-              { label: 'In Bed', data: last7.map(d => d.inBed),   backgroundColor: 'rgba(79,126,201,0.18)', borderRadius: 4 },
-              { label: 'Asleep', data: last7.map(d => d.actual),  backgroundColor: 'rgba(77,170,125,0.5)',  borderRadius: 4 }
-            ]
+            labels: last7.map(d => d.label),
+            datasets: [{
+              label: 'Sleep',
+              data:  last7.map(d => d.actual),
+              backgroundColor: last7.map(d => {
+                if (!d.hasData) return 'rgba(40,40,40,0.4)';
+                return d.actual >= 7 ? 'rgba(77,170,125,0.65)' :
+                       d.actual >= 6 ? 'rgba(201,160,50,0.6)'  :
+                                       'rgba(201,79,79,0.55)';
+              }),
+              borderRadius: 5,
+              borderSkipped: false,
+            }]
           },
           options: {
-            responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { display: false },
-              annotation: { annotations: { goal: { type:'line', yMin:8, yMax:8, borderColor:'rgba(255,255,255,0.1)', borderWidth:1, borderDash:[4,4] } } }
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: '#111',
+                borderColor: '#2a2a2a',
+                borderWidth: 1,
+                titleColor: '#888',
+                bodyColor: '#ddd',
+                padding: 10,
+                callbacks: {
+                  title: ctx => last7[ctx[0].dataIndex].label,
+                  label: ctx => {
+                    const d   = last7[ctx.dataIndex];
+                    if (!d.hasData) return ' No data logged';
+                    const hrs = Math.floor(d.actual);
+                    const min = Math.round((d.actual - hrs) * 60);
+                    const timeStr = min ? `${hrs}h ${min}m` : `${hrs}h`;
+                    const qual = QUAL_LABEL[d.quality] || '—';
+                    return [` ${timeStr} slept`, ` Quality: ${qual}`];
+                  }
+                }
+              }
             },
             scales: {
-              x: { stacked: false, grid: { color:'#161616' }, border: { color:'#1e1e1e' }, ticks: { color:'#333', font:{ size:9 } } },
-              y: { grid: { color:'#161616' }, border: { color:'#1e1e1e' }, ticks: { color:'#333', font:{ size:9 }, callback: v => v + 'h' }, suggestedMax: 9 }
+              x: { grid: { color: '#161616' }, border: { color: '#1e1e1e' }, ticks: { color: '#444', font: { size: 9 } } },
+              y: {
+                grid: { color: '#161616' }, border: { color: '#1e1e1e' },
+                ticks: { color: '#444', font: { size: 9 }, callback: v => v + 'h' },
+                suggestedMax: 9,
+                /* 8h goal line via custom annotation-free approach */
+              }
             }
           }
         });
@@ -3048,25 +3639,29 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
 
       /* ── Init (lazy) ── */
       const sec = document.getElementById('section-movement');
-      if (sec) {
-        const initWo = () => {
-          const d = getWoData();
-          refreshExerciseList(d);
-          renderWorkoutToday(d);
-          renderWorkoutHistory(d);
-        };
-        new MutationObserver(() => { if (sec.classList.contains('active')) initWo(); })
-          .observe(sec, { attributes: true, attributeFilter: ['class'] });
-        if (sec.classList.contains('active')) initWo();
-      }
+      /* workout logger removed — no init needed; sleep chart renders via tryRenderSleepChart */
     })();
 
     /* ══════════════════════════════
        NUTRITION
     ══════════════════════════════ */
     (function () {
-      const LS_KEY = 'leon-nutrition-v2';
-      const TODAY  = new Date().toISOString().slice(0, 10);
+      const LS_KEY      = 'leon-nutrition-v2';
+      const LS_HISTORY  = 'leon-nutr-history-v1';  // { [date]: { protein, calories } }
+      const LS_PRESETS  = 'leon-nutr-presets-v1';  // [{ emoji, name, p }]
+      const LS_WATER    = 'leon-nutr-water-v1';     // { date, glasses }
+      const TODAY       = new Date().toISOString().slice(0, 10);
+      const WATER_GOAL  = 8;
+
+      const DEFAULT_PRESETS = [
+        { emoji:'🍗', name:'Chicken', p:30 },
+        { emoji:'🥚', name:'2 Eggs',  p:12 },
+        { emoji:'💪', name:'Whey',    p:25 },
+        { emoji:'🐟', name:'Tuna',    p:25 },
+        { emoji:'🫙', name:'Yogurt',  p:15 },
+        { emoji:'🥩', name:'Steak',   p:50 },
+      ];
+
       // Load protein goal (editable)
       const LS_NUTR_GOALS = 'leon-macro-goals';
       function getProteinGoal() { try { return JSON.parse(localStorage.getItem(LS_NUTR_GOALS)||'{}').protein || 160; } catch(_) { return 160; } }
@@ -3083,6 +3678,154 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
 
       function lsSave(d) {
         try { localStorage.setItem(LS_KEY, JSON.stringify(d)); } catch(_) {}
+        // Persist today's totals into the 7-day history log
+        try {
+          const h = JSON.parse(localStorage.getItem(LS_HISTORY) || '{}');
+          h[TODAY] = { protein: d.totals.protein || 0, calories: d.totals.calories || 0 };
+          // Prune to last 60 days
+          const kept = {}; Object.keys(h).sort().slice(-60).forEach(k => kept[k] = h[k]);
+          localStorage.setItem(LS_HISTORY, JSON.stringify(kept));
+        } catch(_) {}
+      }
+
+      /* ── Presets ── */
+      function loadPresets() {
+        try { return JSON.parse(localStorage.getItem(LS_PRESETS) || 'null') || DEFAULT_PRESETS.map(p => ({...p})); }
+        catch(_) { return DEFAULT_PRESETS.map(p => ({...p})); }
+      }
+      function savePresets(arr) { try { localStorage.setItem(LS_PRESETS, JSON.stringify(arr)); } catch(_) {} }
+
+      function renderPresets() {
+        const wrap = document.getElementById('protein-presets-dynamic');
+        if (!wrap) return;
+        const presets = loadPresets();
+        wrap.innerHTML = presets.map((p, i) =>
+          `<button class="protein-preset-btn" data-idx="${i}">
+            <span class="pname">${p.emoji} ${p.name}</span>
+            <span class="pgrams">+${p.p}g</span>
+          </button>`
+        ).join('');
+        wrap.querySelectorAll('.protein-preset-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const ps  = loadPresets();
+            const idx = parseInt(btn.dataset.idx, 10);
+            const pr  = ps[idx];
+            if (!pr) return;
+            addMeal({ description: `${pr.emoji} ${pr.name}`, protein: pr.p, carbs: 0, fat: 0, calories: Math.round(pr.p * 4) });
+            btn.classList.remove('pop'); void btn.offsetWidth; btn.classList.add('pop');
+          });
+        });
+      }
+
+      function renderPresetEditor() {
+        const rowsEl = document.getElementById('nutr-preset-rows');
+        if (!rowsEl) return;
+        const presets = loadPresets();
+        rowsEl.innerHTML = presets.map((p, i) =>
+          `<div class="nutr-preset-row" data-idx="${i}">
+            <input class="nutr-pr-emoji" value="${p.emoji}" placeholder="🍗" maxlength="4" data-field="emoji">
+            <input class="nutr-pr-name"  value="${p.name}"  placeholder="Name" data-field="name">
+            <input class="nutr-pr-grams" value="${p.p}"     placeholder="g"    data-field="p" type="number" min="1">
+            <button class="nutr-pr-del" data-idx="${i}" title="Delete">×</button>
+          </div>`
+        ).join('');
+        rowsEl.querySelectorAll('.nutr-pr-del').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const ps = loadPresets();
+            ps.splice(parseInt(btn.dataset.idx, 10), 1);
+            savePresets(ps);
+            renderPresetEditor();
+            renderPresets();
+          });
+        });
+      }
+
+      // Edit toggle
+      const editBtn  = document.getElementById('nutr-presets-edit-btn');
+      const editor   = document.getElementById('nutr-preset-editor');
+      const addPBtn  = document.getElementById('nutr-preset-add-btn');
+      const doneBtn  = document.getElementById('nutr-preset-done-btn');
+
+      editBtn?.addEventListener('click', () => {
+        renderPresetEditor();
+        editor?.classList.add('open');
+        editBtn.style.display = 'none';
+      });
+
+      doneBtn?.addEventListener('click', () => {
+        // Read all inputs and save
+        const rows = document.querySelectorAll('#nutr-preset-rows .nutr-preset-row');
+        const updated = [];
+        rows.forEach(row => {
+          const emoji = row.querySelector('[data-field="emoji"]')?.value.trim() || '●';
+          const name  = row.querySelector('[data-field="name"]')?.value.trim()  || 'Food';
+          const p     = parseInt(row.querySelector('[data-field="p"]')?.value, 10) || 0;
+          if (name && p > 0) updated.push({ emoji, name, p });
+        });
+        savePresets(updated);
+        renderPresets();
+        editor?.classList.remove('open');
+        if (editBtn) editBtn.style.display = '';
+      });
+
+      addPBtn?.addEventListener('click', () => {
+        const ps = loadPresets();
+        ps.push({ emoji: '🍽', name: 'New food', p: 20 });
+        savePresets(ps);
+        renderPresetEditor();
+      });
+
+      /* ── Water tracker ── */
+      function loadWater()   { try { const v = JSON.parse(localStorage.getItem(LS_WATER)||'{}'); return v.date === TODAY ? (v.glasses||0) : 0; } catch(_) { return 0; } }
+      function saveWater(n)  { try { localStorage.setItem(LS_WATER, JSON.stringify({ date: TODAY, glasses: n })); } catch(_) {} }
+
+      function renderWater() {
+        const n     = loadWater();
+        const dotsEl = document.getElementById('nutr-water-dots');
+        const countEl = document.getElementById('nutr-water-count');
+        if (dotsEl) {
+          dotsEl.innerHTML = Array.from({ length: WATER_GOAL }, (_, i) =>
+            `<div class="nutr-water-dot${i < n ? ' filled' : ''}"></div>`
+          ).join('');
+        }
+        if (countEl) countEl.textContent = `${n} / ${WATER_GOAL}`;
+      }
+
+      document.getElementById('nutr-water-plus')?.addEventListener('click', () => {
+        const n = Math.min(WATER_GOAL, loadWater() + 1);
+        saveWater(n); renderWater();
+      });
+      document.getElementById('nutr-water-minus')?.addEventListener('click', () => {
+        const n = Math.max(0, loadWater() - 1);
+        saveWater(n); renderWater();
+      });
+
+      /* ── 7-day protein history bars ── */
+      function renderWeekBars() {
+        const el   = document.getElementById('nutr-week-bars');
+        if (!el) return;
+        const goal = getProteinGoal();
+        const h    = JSON.parse(localStorage.getItem(LS_HISTORY) || '{}');
+        const DAY_LABELS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        // Build last 7 days including today
+        const days = Array.from({ length: 7 }, (_, offset) => {
+          const d  = new Date(); d.setDate(d.getDate() - (6 - offset));
+          const ds = d.toISOString().slice(0, 10);
+          return { label: DAY_LABELS[d.getDay()], protein: (h[ds]||{}).protein || 0, isToday: offset === 6 };
+        });
+        const maxP = Math.max(goal, ...days.map(d => d.protein), 1);
+        el.innerHTML = days.map(d => {
+          const barPct  = Math.round(d.protein / maxP * 100);
+          const goalPct = Math.round(goal / maxP * 100);
+          const color   = d.protein >= goal ? 'var(--green)' : d.protein > 0 ? '#c9a032' : '#1e1e1e';
+          return `<div class="nutr-wb-col${d.isToday ? ' today' : ''}">
+            <div class="nutr-wb-bar-wrap">
+              <div class="nutr-wb-goal-line" style="bottom:${goalPct}%"></div>
+              <div class="nutr-wb-fill" style="height:${barPct}%;background:${color}" title="${Math.round(d.protein)}g protein"></div>
+            </div>
+            <div class="nutr-wb-label">${d.label}</div>
+          </div>`;
+        }).join('');
       }
 
       function recalcTotals(d) {
@@ -3180,6 +3923,7 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
             lsSave(d2);
             renderTotals(d2.totals);
             renderMeals(d2);
+            renderWeekBars();
           });
         });
       }
@@ -3191,19 +3935,11 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
         lsSave(d);
         renderTotals(d.totals);
         renderMeals(d);
+        renderWeekBars();
         window.updateDailyScore?.();
       }
 
-      // ── Protein presets ──
-      document.querySelectorAll('.protein-preset-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const p   = parseInt(btn.dataset.p, 10);
-          const lbl = btn.querySelector('.pname')?.textContent || 'Quick add';
-          addMeal({ description: lbl, protein: p, carbs: 0, fat: 0, calories: Math.round(p * 4) });
-          // Pop animation
-          btn.classList.remove('pop'); void btn.offsetWidth; btn.classList.add('pop');
-        });
-      });
+      // ── Protein presets (dynamic — rendered by renderPresets()) ──
 
       // Editable protein goal
       const pgInput = document.getElementById('protein-goal-input');
@@ -3327,7 +4063,7 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
       /* Clear today */
       document.getElementById('nutr-reset')?.addEventListener('click', () => {
         const d = emptyDay(); lsSave(d);
-        renderTotals(d.totals); renderMeals(d);
+        renderTotals(d.totals); renderMeals(d); renderWeekBars();
       });
 
       /* Enter key in textarea triggers AI */
@@ -3339,6 +4075,9 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
       const d = lsLoad();
       renderTotals(d.totals);
       renderMeals(d);
+      renderPresets();
+      renderWater();
+      renderWeekBars();
     })();
 
     /* ══════════════════════════════
@@ -3943,6 +4682,20 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
       function loadAcct()  { try { return JSON.parse(localStorage.getItem(LS_ACCT)  || '{"checking":0,"savings":0}'); } catch(_) { return {checking:0,savings:0}; } }
       function saveAcct(d) { try { localStorage.setItem(LS_ACCT,  JSON.stringify(d)); } catch(_) {} }
 
+      // View-month state (for Cash Flow nav) — starts at current month
+      const _now = new Date();
+      let viewYear  = _now.getFullYear();
+      let viewMonth = _now.getMonth(); // 0-based
+
+      document.getElementById('money-month-prev')?.addEventListener('click', () => {
+        viewMonth--; if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+        render();
+      });
+      document.getElementById('money-month-next')?.addEventListener('click', () => {
+        viewMonth++; if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+        render();
+      });
+
       // Add-form toggle
       let txType = 'inc';
       document.getElementById('money-add-btn')?.addEventListener('click', () => {
@@ -4010,13 +4763,12 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
       function drawChart(txList) {
         const svg = document.getElementById('money-chart-svg');
         if (!svg) return;
+
         // Build last 30 days cumulative balance
         const today = new Date();
-        const points = [];
+        const points = [], dateLabels = [];
         let running = 0;
-        // Sort oldest→newest
         const sorted = [...txList].sort((a,b) => a.date < b.date ? -1 : 1);
-        // Pre-sum all before window — use local date strings
         const windowStart = new Date(today); windowStart.setDate(today.getDate() - 29);
         const wsStr = localDs(windowStart);
         sorted.filter(t => t.date < wsStr).forEach(t => { running += t.type==='inc' ? t.amount : -t.amount; });
@@ -4025,8 +4777,10 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
           const ds = localDs(d);
           sorted.filter(t => t.date === ds).forEach(t => { running += t.type==='inc' ? t.amount : -t.amount; });
           points.push(running);
+          dateLabels.push(d.toLocaleDateString('en-GB', { day:'numeric', month:'short' }));
         }
         if (points.every(p => p === 0)) { svg.innerHTML = ''; return; }
+
         const min = Math.min(...points), max = Math.max(...points);
         const range = max - min || 1;
         const W = 400, H = 90, pad = 10;
@@ -4036,14 +4790,59 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
         const fillD = pathD + ` L${xs[xs.length-1]},${H} L${xs[0]},${H} Z`;
         const isPos = points[points.length-1] >= 0;
         const col = isPos ? '#4daa7d' : '#c94f4f';
-        const body = document.body.classList.contains('light');
+        const isLight = document.body.classList.contains('light');
+
         svg.innerHTML = `
           <defs><linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="${col}" stop-opacity="${body?'0.25':'0.3'}"/>
+            <stop offset="0%" stop-color="${col}" stop-opacity="${isLight?'0.25':'0.3'}"/>
             <stop offset="100%" stop-color="${col}" stop-opacity="0"/>
           </linearGradient></defs>
           <path d="${fillD}" fill="url(#chartGrad)"/>
-          <path d="${pathD}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+          <path d="${pathD}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+          <line id="mch-rule" x1="0" y1="0" x2="0" y2="${H}" stroke="${col}" stroke-width="1" stroke-dasharray="3,2" opacity="0" pointer-events="none"/>
+          <circle id="mch-dot" cx="0" cy="0" r="4" fill="${col}" stroke="${isLight?'#fff':'#0d0d0d'}" stroke-width="2" opacity="0" pointer-events="none"/>
+          <rect x="0" y="0" width="${W}" height="${H}" fill="none" pointer-events="all" id="mch-hit"/>`;
+
+        // Wire up hover interaction
+        const hitEl  = svg.querySelector('#mch-hit');
+        const ruleEl = svg.querySelector('#mch-rule');
+        const dotEl  = svg.querySelector('#mch-dot');
+        const tip    = document.getElementById('money-chart-tooltip');
+        const tipDate = document.getElementById('mct-date');
+        const tipBal  = document.getElementById('mct-bal');
+
+        if (!hitEl || !tip) return;
+
+        hitEl.addEventListener('mousemove', e => {
+          const svgRect = svg.getBoundingClientRect();
+          const px = (e.clientX - svgRect.left) / svgRect.width * W; // map to viewBox coords
+          // Find nearest data point
+          let closest = 0, minDist = Infinity;
+          xs.forEach((x, i) => { const d = Math.abs(x - px); if (d < minDist) { minDist = d; closest = i; } });
+
+          const x = xs[closest], y = ys[closest];
+          ruleEl.setAttribute('x1', x); ruleEl.setAttribute('x2', x); ruleEl.setAttribute('opacity', '0.6');
+          dotEl.setAttribute('cx', x); dotEl.setAttribute('cy', y); dotEl.setAttribute('opacity', '1');
+
+          // Position HTML tooltip — keep it inside the wrap
+          const wrapRect = svg.parentElement.getBoundingClientRect();
+          const clientX  = svgRect.left + (x / W) * svgRect.width; // real pixel X for this point
+          const relX = clientX - wrapRect.left;
+          const tipW = 110; // approx tooltip width
+          const tipLeft = Math.min(relX - tipW / 2, wrapRect.width - tipW - 4);
+          tip.style.left = Math.max(0, tipLeft) + 'px';
+
+          tipDate.textContent = dateLabels[closest];
+          tipBal.textContent  = fmtEur(points[closest]);
+          tipBal.style.color  = points[closest] >= 0 ? '#4daa7d' : '#c94f4f';
+          tip.classList.add('visible');
+        });
+
+        hitEl.addEventListener('mouseleave', () => {
+          ruleEl.setAttribute('opacity', '0');
+          dotEl.setAttribute('opacity', '0');
+          tip.classList.remove('visible');
+        });
       }
 
       function render() {
@@ -4051,38 +4850,51 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
         const goals  = loadGoals();
         const acct   = loadAcct();
 
-        // Compute totals
-        const now = new Date();
-        const monthStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-        let incomeTotal = 0, expenseTotal = 0, totalBalance = 0;
+        // All-time total balance (never changes with month nav)
+        let totalBalance = 0;
+        txList.forEach(t => { totalBalance += t.type === 'inc' ? t.amount : -t.amount; });
+
+        // Current month net (for hero delta — always shows real now)
+        const nowReal  = new Date();
+        const curMonthStr = `${nowReal.getFullYear()}-${String(nowReal.getMonth()+1).padStart(2,'0')}`;
+        let curIncome = 0, curExpense = 0;
         txList.forEach(t => {
-          const val = t.type === 'inc' ? t.amount : -t.amount;
-          totalBalance += val;
-          if (t.date.startsWith(monthStr)) {
-            if (t.type === 'inc') incomeTotal += t.amount;
-            else expenseTotal += t.amount;
-          }
+          if (!t.date.startsWith(curMonthStr)) return;
+          if (t.type === 'inc') curIncome += t.amount; else curExpense += t.amount;
         });
-        const net = incomeTotal - expenseTotal;
+        const curNet = curIncome - curExpense;
 
         // Balance hero
         const balEl = document.getElementById('money-balance');
         if (balEl) balEl.textContent = fmtEur(totalBalance);
         const deltaEl = document.getElementById('money-delta');
         if (deltaEl) {
-          deltaEl.textContent = `${net >= 0 ? '+' : ''}${fmtEur(net)} this month`;
-          deltaEl.className = 'money-hero-delta' + (net < 0 ? ' neg' : '');
+          deltaEl.textContent = `${curNet >= 0 ? '+' : ''}${fmtEur(curNet)} this month`;
+          deltaEl.className = 'money-hero-delta' + (curNet < 0 ? ' neg' : '');
         }
         const checkEl = document.getElementById('money-checking');
         if (checkEl) checkEl.textContent = fmtEur(acct.checking || totalBalance);
         const savEl = document.getElementById('money-savings');
         if (savEl) savEl.textContent = fmtEur(acct.savings || 0);
         const netEl = document.getElementById('money-net');
-        if (netEl) { netEl.textContent = (net >= 0 ? '+' : '') + fmtEur(net); netEl.style.color = net >= 0 ? 'var(--green)' : 'var(--red)'; }
+        if (netEl) { netEl.textContent = (curNet >= 0 ? '+' : '') + fmtEur(curNet); netEl.style.color = curNet >= 0 ? 'var(--green)' : 'var(--red)'; }
+
+        // ── Cash flow for viewYear/viewMonth ──
+        const viewMonthStr = `${viewYear}-${String(viewMonth+1).padStart(2,'0')}`;
+        let incomeTotal = 0, expenseTotal = 0;
+        txList.forEach(t => {
+          if (!t.date.startsWith(viewMonthStr)) return;
+          if (t.type === 'inc') incomeTotal += t.amount; else expenseTotal += t.amount;
+        });
+        const net = incomeTotal - expenseTotal;
 
         // Month label
         const mlbl = document.getElementById('money-month-label');
-        if (mlbl) mlbl.textContent = now.toLocaleDateString('en-US', { month:'long', year:'numeric' });
+        if (mlbl) mlbl.textContent = new Date(viewYear, viewMonth, 1).toLocaleDateString('en-US', { month:'long', year:'numeric' });
+
+        // Disable next button if already at current month
+        const nextBtn = document.getElementById('money-month-next');
+        if (nextBtn) nextBtn.disabled = (viewYear === nowReal.getFullYear() && viewMonth === nowReal.getMonth());
 
         // Cash flow
         const incEl = document.getElementById('money-income-total');
@@ -4091,6 +4903,31 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
         if (expEl) expEl.textContent = '-' + fmtEur(expenseTotal);
         const flowEl = document.getElementById('money-flow-net');
         if (flowEl) { flowEl.textContent = (net >= 0?'+':'') + fmtEur(net); flowEl.className = 'money-flow-amount tot'; }
+
+        // ── Category breakdown (expenses only for viewMonth) ──
+        const catTotals = {};
+        txList.forEach(t => {
+          if (t.type !== 'exp' || !t.date.startsWith(viewMonthStr)) return;
+          catTotals[t.cat] = (catTotals[t.cat] || 0) + t.amount;
+        });
+        const catCard = document.getElementById('money-cat-card');
+        const catList = document.getElementById('money-cat-list');
+        if (catList) {
+          const cats = Object.entries(catTotals).sort((a,b) => b[1]-a[1]);
+          if (cats.length) {
+            catCard && (catCard.style.display = '');
+            const topAmt = cats[0][1];
+            catList.innerHTML = cats.map(([name, amt]) =>
+              `<div class="money-cat-row">
+                <div class="money-cat-name">${name}</div>
+                <div class="money-cat-track"><div class="money-cat-fill" style="width:${Math.round(amt/topAmt*100)}%"></div></div>
+                <div class="money-cat-amt">${fmtEur(amt)}</div>
+               </div>`
+            ).join('');
+          } else {
+            catCard && (catCard.style.display = 'none');
+          }
+        }
 
         // Transaction list
         const txListEl = document.getElementById('money-tx-list');
@@ -4394,10 +5231,39 @@ dmsReplied: parseInt(document.getElementById('chicos-dms-replied')?.value) || 0,
 higgsfieldExpiry: document.getElementById('chicos-higgsfield-expiry')?.value || '',
 lastPostDate: document.getElementById('chicos-last-post')?.value || ''
 };
-stored.push(entry);
+/* Overwrite today's entry if one already exists, otherwise append */
+const todayIdx = stored.findIndex(e => e.date === entry.date);
+if (todayIdx !== -1) stored[todayIdx] = entry;
+else stored.push(entry);
 localStorage.setItem('twochicos_weekly', JSON.stringify(stored));
 renderChicosMetrics();
-alert('Week saved!');
+updateCountdownBadge();
+}
+function updateCountdownBadge() {
+  const badge = document.getElementById('chicos-update-badge');
+  if (!badge) return;
+  const data = JSON.parse(localStorage.getItem('twochicos_weekly') || '[]');
+  if (!data.length) {
+    badge.textContent = 'no data yet';
+    badge.className = 'chicos-update-badge badge-due';
+    return;
+  }
+  const lastTs = data[data.length - 1].timestamp || 0;
+  const msLeft = (lastTs + 7 * 86400000) - Date.now();
+  const daysLeft = Math.ceil(msLeft / 86400000);
+  if (daysLeft > 2) {
+    badge.textContent = 'update in ' + daysLeft + 'd';
+    badge.className = 'chicos-update-badge badge-ok';
+  } else if (daysLeft > 0) {
+    badge.textContent = 'due in ' + daysLeft + 'd';
+    badge.className = 'chicos-update-badge badge-soon';
+  } else if (daysLeft === 0) {
+    badge.textContent = 'due today';
+    badge.className = 'chicos-update-badge badge-due';
+  } else {
+    badge.textContent = Math.abs(daysLeft) + 'd overdue';
+    badge.className = 'chicos-update-badge badge-overdue';
+  }
 }
 function renderChicosMetrics() {
 const data = JSON.parse(localStorage.getItem('twochicos_weekly') || '[]');
@@ -4441,26 +5307,44 @@ if (hEl && higgsfieldDays !== null) {
 }
 
 const monthEl = document.getElementById('chicos-month-posts');
-if (monthEl) monthEl.textContent = monthPosts + '/4';
+if (monthEl) {
+  const monthTarget = 12;
+  monthEl.textContent = monthPosts + '/12-16';
+  monthEl.style.color = monthPosts >= 16 ? '#22c55e' : monthPosts >= 12 ? '#4ade80' : monthPosts >= 8 ? '#f59e0b' : monthPosts >= 4 ? '#f97316' : '';
+}
 
 const alertsEl = document.getElementById('chicos-alerts');
 if (alertsEl) {
   let html = '';
+  if (!data.length) { alertsEl.innerHTML = ''; return; } /* no data yet — suppress all alerts */
   if (daysSince !== null && daysSince > 14) html += '<div class="chicos-alert chicos-alert-red">🔴 ' + daysSince + ' DAYS WITHOUT POSTING — @2.chicos is bleeding followers</div>';
-  if (latest.posts === 0 && new Date().getDay() >= 4) html += '<div class="chicos-alert chicos-alert-amber">⚠️ No post this week yet — window closing</div>';
+  if (data.length > 0 && latest.posts === 0 && new Date().getDay() >= 4) html += '<div class="chicos-alert chicos-alert-amber">⚠️ No post this week yet — window closing</div>';
   if (followerChange !== null && followerChange < 0) html += '<div class="chicos-alert chicos-alert-amber">📉 Lost ' + Math.abs(followerChange) + ' followers this week — post something this weekend</div>';
   if (latest.dmsSent > 0 && latest.dmsReplied === 0) html += '<div class="chicos-alert chicos-alert-blue">💬 Sent DMs but no replies — follow up or try new brands</div>';
   if (higgsfieldDays !== null && higgsfieldDays <= 3) html += '<div class="chicos-alert chicos-alert-red">🎬 Higgsfield expires in ' + higgsfieldDays + ' days — generate content NOW</div>';
   alertsEl.innerHTML = html;
 }
 
-if (data.length > 1 && window.chicosChart) {
+if (window.chicosChart) {
   window.chicosChart.data.labels = data.map(e => e.date);
   window.chicosChart.data.datasets[0].data = data.map(e => e.followers);
+  window.chicosChart.data.datasets[1].data = data.map(() => 20000);
   window.chicosChart.update();
+} else if (window.Chart) {
+  buildChicosChart();
 }
 }
 document.getElementById('chicos-save-btn')?.addEventListener('click', saveWeek);
+/* ── Weekly form collapse toggle ── */
+(function() {
+  const toggleBtn = document.getElementById('chicos-form-toggle');
+  const formBody  = document.getElementById('chicos-form-body');
+  if (!toggleBtn || !formBody) return;
+  toggleBtn.addEventListener('click', () => {
+    const open = formBody.classList.toggle('open');
+    toggleBtn.classList.toggle('open', open);
+  });
+})();
 document.querySelectorAll('.chicos-post-btn').forEach(btn => {
 btn.addEventListener('click', () => {
 selectedPosts = parseInt(btn.dataset.val);
@@ -4468,49 +5352,243 @@ document.querySelectorAll('.chicos-post-btn').forEach(b => b.classList.remove('a
 btn.classList.add('active');
 });
 });
-const chartEl = document.getElementById('chicos-growth-chart');
-if (chartEl && window.Chart) {
-const data = JSON.parse(localStorage.getItem('twochicos_weekly') || '[]');
-window.chicosChart = new Chart(chartEl, {
-type: 'line',
-data: {
-labels: data.map(e => e.date),
-datasets: [{
-label: 'Followers',
-data: data.map(e => e.followers),
-borderColor: '#3b82f6',
-backgroundColor: 'rgba(59,130,246,0.1)',
-tension: 0.4,
-fill: true
-}, {
-label: 'Goal 20k',
-data: data.map(() => 20000),
-borderColor: '#f59e0b',
-borderDash: [5,5],
-pointRadius: 0
-}]
-},
-options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#1e1e1e' }, ticks: { color: '#666' } }, x: { grid: { color: '#1e1e1e' }, ticks: { color: '#666' } } } }
-});
+/* ── Growth chart (lazy-load Chart.js if not already present) ── */
+function buildChicosChart() {
+  if (!window.Chart) return;
+  const chartEl = document.getElementById('chicos-growth-chart');
+  if (!chartEl) return;
+  if (window.chicosChart) { window.chicosChart.destroy(); window.chicosChart = null; }
+  const data = JSON.parse(localStorage.getItem('twochicos_weekly') || '[]');
+  const ctx = chartEl.getContext('2d');
+  const grad = ctx.createLinearGradient(0, 0, 0, 180);
+  grad.addColorStop(0, 'rgba(59,130,246,0.18)');
+  grad.addColorStop(1, 'rgba(59,130,246,0)');
+  window.chicosChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: data.map(e => e.date),
+      datasets: [{
+        label: 'Followers',
+        data: data.map(e => e.followers),
+        borderColor: '#3b82f6',
+        backgroundColor: grad,
+        borderWidth: 1.5,
+        tension: 0.4,
+        fill: true,
+        pointRadius: 3,
+        pointBackgroundColor: '#3b82f6',
+        pointBorderColor: 'transparent'
+      }, {
+        label: '20k goal',
+        data: data.map(() => 20000),
+        borderColor: '#f59e0b',
+        borderDash: [5, 5],
+        borderWidth: 1,
+        pointRadius: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#111',
+          borderColor: '#2a2a2a',
+          borderWidth: 1,
+          titleColor: '#555',
+          bodyColor: '#ddd',
+          padding: 8
+        }
+      },
+      scales: {
+        y: { grid: { color: '#1a1a1a' }, ticks: { color: '#555' }, border: { color: '#1e1e1e' } },
+        x: { grid: { color: '#1a1a1a' }, ticks: { color: '#555' }, border: { color: '#1e1e1e' } }
+      }
+    }
+  });
 }
-const kanbanData = JSON.parse(localStorage.getItem('chicos_kanban') || 'null') || {
-idea: ['Backrooms Ep.4 — La Sala Roja', 'Anime short'],
-filming: ['Cinematic commercial — next brand'],
-editing: [],
-published: ['Backrooms Ep.1 — La Oficina']
-};
-function renderKanban() {
-['idea','filming','editing','published'].forEach(col => {
-const el = document.getElementById('kanban-' + col);
-if (el) el.innerHTML = (kanbanData[col] || []).map((t,i) => '<div class="chicos-card" draggable="true" data-col="' + col + '" data-idx="' + i + '">' + t + '</div>').join('');
-});
-localStorage.setItem('chicos_kanban', JSON.stringify(kanbanData));
-}
-renderKanban();
+(function loadChicosChartJS() {
+  if (window.Chart) { buildChicosChart(); return; }
+  const s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
+  s.onload = buildChicosChart;
+  document.head.appendChild(s);
+})();
+/* ── Chicos Kanban ── */
+(function () {
+  const COLS = ['idea', 'filming', 'editing', 'published'];
+  const LS_KEY = 'chicos_kanban';
+
+  /* Migrate old string-array format → {id, title} objects */
+  function migrate(raw) {
+    const out = {};
+    COLS.forEach(col => {
+      const arr = raw[col] || [];
+      out[col] = arr.map((item, i) =>
+        typeof item === 'string'
+          ? { id: Date.now().toString() + '_' + col + '_' + i, title: item }
+          : item
+      );
+    });
+    return out;
+  }
+
+  const _raw = JSON.parse(localStorage.getItem(LS_KEY) || 'null') || {
+    idea:      ['Backrooms Ep.4 — La Sala Roja', 'Anime short'],
+    filming:   ['Cinematic commercial — next brand'],
+    editing:   [],
+    published: ['Backrooms Ep.1 — La Oficina']
+  };
+  const kanbanData = migrate(_raw);
+
+  let _dragId = null, _dragFromCol = null;
+
+  function saveKanban() {
+    localStorage.setItem(LS_KEY, JSON.stringify(kanbanData));
+  }
+
+  /* Only render the cards list — column chrome (drop zone, + button) is set up once */
+  function renderCards(col) {
+    const container = document.getElementById('kanban-' + col);
+    if (!container) return;
+    container.innerHTML = '';
+
+    (kanbanData[col] || []).forEach(card => {
+      const el = document.createElement('div');
+      el.className = 'chicos-card';
+      el.draggable = true;
+      el.dataset.id  = card.id;
+      el.dataset.col = col;
+      el.innerHTML =
+        '<button class="chicos-card-del" title="Delete">✕</button>' +
+        '<div class="chicos-card-title">' + card.title + '</div>';
+
+      /* Delete */
+      el.querySelector('.chicos-card-del').addEventListener('click', e => {
+        e.stopPropagation();
+        kanbanData[col] = kanbanData[col].filter(c => c.id !== card.id);
+        saveKanban();
+        renderCards(col);
+      });
+
+      /* Drag */
+      el.addEventListener('dragstart', e => {
+        _dragId = card.id;
+        _dragFromCol = col;
+        setTimeout(() => el.classList.add('chicos-card-dragging'), 0);
+        e.dataTransfer.effectAllowed = 'move';
+      });
+      el.addEventListener('dragend', () => {
+        el.classList.remove('chicos-card-dragging');
+        document.querySelectorAll('.chicos-drag-over')
+          .forEach(c => c.classList.remove('chicos-drag-over'));
+        _dragId = _dragFromCol = null;
+      });
+
+      container.appendChild(el);
+    });
+  }
+
+  function renderKanban() { COLS.forEach(renderCards); saveKanban(); }
+
+  /* Wire drop zone + add button once per column (keyed on colEl dataset) */
+  function setupColumns() {
+    COLS.forEach(col => {
+      const container = document.getElementById('kanban-' + col);
+      if (!container) return;
+      const colEl = container.closest('.chicos-kanban-col');
+      if (!colEl || colEl.dataset.kanbanReady) return;
+      colEl.dataset.kanbanReady = '1';
+
+      /* ── Drop zone on the full column div so empty columns work ── */
+      colEl.addEventListener('dragover', e => {
+        e.preventDefault();
+        if (_dragFromCol !== col) colEl.classList.add('chicos-drag-over');
+      });
+      colEl.addEventListener('dragleave', e => {
+        if (!colEl.contains(e.relatedTarget))
+          colEl.classList.remove('chicos-drag-over');
+      });
+      colEl.addEventListener('drop', e => {
+        e.preventDefault();
+        colEl.classList.remove('chicos-drag-over');
+        if (!_dragId || !_dragFromCol || _dragFromCol === col) return;
+        const card = (kanbanData[_dragFromCol] || []).find(c => c.id === _dragId);
+        if (!card) return;
+        kanbanData[_dragFromCol] = kanbanData[_dragFromCol].filter(c => c.id !== _dragId);
+        kanbanData[col].push(card);
+        _dragId = _dragFromCol = null;
+        saveKanban();
+        renderKanban();
+      });
+
+      /* ── + button + inline form (Idea column only) ── */
+      if (col !== 'idea') return;
+      const addBtn = document.createElement('button');
+      addBtn.className = 'chicos-add-btn';
+      addBtn.textContent = '+';
+
+      const addForm = document.createElement('div');
+      addForm.className = 'chicos-add-form';
+      addForm.innerHTML =
+        '<input class="chicos-add-input" type="text" placeholder="Add a card…" />' +
+        '<div class="chicos-add-actions">' +
+          '<button class="chicos-add-save">Add</button>' +
+          '<button class="chicos-add-cancel">✕</button>' +
+        '</div>';
+
+      const input  = addForm.querySelector('.chicos-add-input');
+      const saveBtn  = addForm.querySelector('.chicos-add-save');
+      const cancelBtn = addForm.querySelector('.chicos-add-cancel');
+
+      function openForm() {
+        addForm.classList.add('open');
+        addBtn.classList.add('active');
+        input.focus();
+      }
+      function closeForm() {
+        addForm.classList.remove('open');
+        addBtn.classList.remove('active');
+        input.value = '';
+      }
+      function addCard() {
+        const title = input.value.trim();
+        if (!title) return;
+        kanbanData[col].unshift({ id: Date.now().toString() + '_' + col, title });
+        saveKanban();
+        renderCards(col);
+        closeForm();
+      }
+
+      addBtn.addEventListener('click', () => addForm.classList.contains('open') ? closeForm() : openForm());
+      saveBtn.addEventListener('click', addCard);
+      cancelBtn.addEventListener('click', closeForm);
+      input.addEventListener('keydown', e => {
+        if (e.key === 'Enter') addCard();
+        if (e.key === 'Escape') closeForm();
+      });
+
+      colEl.appendChild(addBtn);
+      colEl.appendChild(addForm);
+    });
+  }
+
+  window._renderChicosKanban = function () {
+    setupColumns();
+    renderKanban();
+  };
+})();
+/* call once on init */
+if (window._renderChicosKanban) window._renderChicosKanban();
 renderChicosMetrics();
-if (latest.followers) document.getElementById('chicos-followers').value = latest.followers;
+updateCountdownBadge();
+if (latest.followers)       document.getElementById('chicos-followers').value         = latest.followers;
+if (latest.bestViews)       document.getElementById('chicos-best-views').value        = latest.bestViews;
+if (latest.dmsSent)         document.getElementById('chicos-dms-sent').value          = latest.dmsSent;
+if (latest.dmsReplied)      document.getElementById('chicos-dms-replied').value       = latest.dmsReplied;
 if (latest.higgsfieldExpiry) document.getElementById('chicos-higgsfield-expiry').value = latest.higgsfieldExpiry;
-if (latest.lastPostDate) document.getElementById('chicos-last-post').value = latest.lastPostDate;
+if (latest.lastPostDate)    document.getElementById('chicos-last-post').value         = latest.lastPostDate;
 document.querySelectorAll('.chicos-post-btn').forEach(btn => {
 if (parseInt(btn.dataset.val) === selectedPosts) btn.classList.add('active');
 });
