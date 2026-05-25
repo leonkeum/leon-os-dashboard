@@ -33,6 +33,9 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
       const target = document.getElementById(`section-${sectionKey}`);
       if (target) target.classList.add('active');
       window.updateDailyScore?.();
+      // Show FAB only on Time OS on mobile
+      const fab = document.getElementById('mob-cal-fab');
+      if (fab) fab.style.display = (sectionKey === 'time-os' && window.innerWidth <= 768) ? 'flex' : 'none';
     }
 
     document.querySelectorAll('.nav-item').forEach(item => {

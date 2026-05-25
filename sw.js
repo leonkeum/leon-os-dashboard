@@ -1,13 +1,8 @@
-const CACHE_NAME = 'leon-os-v1';
-const ASSETS = [
-  './dashboard.html',
-  'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Press+Start+2P&display=swap'
-];
+const CACHE_NAME = 'leon-os-v3'; // bump version to bust old cache
+const STATIC = ['./dashboard.html', './dashboard.css', './dashboard.js'];
 
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll([ASSETS[0]]))
-  );
+  event.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(STATIC)));
   self.skipWaiting();
 });
 
@@ -21,14 +16,17 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-  // Cache-first for the dashboard, network-first for everything else
-  if (event.request.url.includes('dashboard.html')) {
+  // Network-first for all our own files so updates always land immediately.
+  // Falls back to cache only when offline.
+  const url = event.request.url;
+  const isOwn = STATIC.some(s => url.endsWith(s.replace('./', '')));
+  if (isOwn) {
     event.respondWith(
-      caches.match(event.request).then(cached => cached || fetch(event.request).then(resp => {
+      fetch(event.request).then(resp => {
         const clone = resp.clone();
         caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
         return resp;
-      }))
+      }).catch(() => caches.match(event.request))
     );
   } else {
     event.respondWith(fetch(event.request).catch(() => caches.match(event.request)));

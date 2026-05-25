@@ -4281,7 +4281,6 @@
 
   /* ── Calendar — single day view ── */
   .mob-cal-nav { display: flex; }
-  #section-time-os.active .mob-cal-fab { display: flex; }
 
   /* Grid collapses to time-labels + 1 active column */
   #cal-header { grid-template-columns: 48px 1fr !important; }
