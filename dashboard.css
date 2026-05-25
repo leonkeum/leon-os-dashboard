@@ -4150,6 +4150,12 @@
 .mob-nav-item.active { color: #e0e0e0; }
 .mob-nav-item:active  { background: #161616; }
 
+/* Center "Today" home button — slightly larger */
+.mob-nav-home .mob-nav-icon {
+  width: 24px; height: 24px;
+}
+.mob-nav-home { font-size: 10px; }
+
 .mob-nav-icon {
   width: 20px;
   height: 20px;
@@ -4158,6 +4164,50 @@
 }
 
 .mob-nav-item.active .mob-nav-icon { opacity: 1; }
+
+/* ── Mobile calendar nav bar ── */
+.mob-cal-nav {
+  display: none; /* shown only on mobile */
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px 6px;
+}
+
+.mob-cal-arrow {
+  background: transparent; border: none; color: #bbb;
+  font-size: 28px; line-height: 1; cursor: pointer;
+  padding: 4px 12px; border-radius: 8px;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.12s;
+}
+.mob-cal-arrow:active { background: #1e1e1e; }
+
+.mob-cal-day-label {
+  font-size: 16px; font-weight: 600; color: #e0e0e0;
+  letter-spacing: -0.01em; text-align: center; flex: 1;
+}
+
+/* ── Mobile calendar FAB ── */
+.mob-cal-fab {
+  display: none; /* shown on mobile when time-os is active */
+  position: fixed;
+  bottom: 80px; right: 18px;
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: #4f7ec9;
+  border: none;
+  color: #fff;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  z-index: 8000;
+  box-shadow: 0 4px 20px rgba(79,126,201,0.45);
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.mob-cal-fab:active { transform: scale(0.92); box-shadow: 0 2px 10px rgba(79,126,201,0.3); }
 
 /* ════════════════════════════════════════════
    MOBILE RESPONSIVE  ≤ 768px
@@ -4229,11 +4279,42 @@
   .today-card { padding: 14px 16px; }
   .today-score-bar { padding: 14px 16px; gap: 14px; }
 
-  /* ── Calendar ── */
-  .week-grid-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  .week-header    { min-width: 520px; }
-  #cal-body       { min-width: 520px; height: 480px !important; }
-  .week-body      { min-width: 520px; }
+  /* ── Calendar — single day view ── */
+  .mob-cal-nav { display: flex; }
+  #section-time-os.active .mob-cal-fab { display: flex; }
+
+  /* Grid collapses to time-labels + 1 active column */
+  #cal-header { grid-template-columns: 48px 1fr !important; }
+  #cal-body   { grid-template-columns: 48px 1fr !important; height: 560px !important; }
+
+  /* Hide inactive day columns & header cells */
+  #cal-body .day-col:not(.mob-active)   { display: none; }
+  #cal-header .wh-day:not(.mob-active)  { display: none; }
+
+  /* Make the active column fill full width */
+  #cal-body .day-col.mob-active { width: 100%; }
+
+  /* Delete button: hidden by default, shown when block is selected */
+  .cal-block .cal-del-btn { display: none !important; }
+  .cal-block.mob-selected .cal-del-btn {
+    display: flex !important;
+    width: 28px !important; height: 28px !important;
+    font-size: 18px !important;
+    top: 4px !important; right: 4px !important;
+    border-radius: 50% !important;
+    background: rgba(0,0,0,0.5) !important;
+    border: none !important;
+    align-items: center; justify-content: center;
+  }
+
+  /* Selected block highlight */
+  .cal-block.mob-selected {
+    box-shadow: 0 0 0 2px #fff, 0 4px 16px rgba(0,0,0,0.4);
+    z-index: 20;
+  }
+
+  /* No overflow scroll needed anymore */
+  .week-grid-wrap { overflow-x: hidden; }
   .stat-cards.time-stats { grid-template-columns: repeat(2, 1fr); }
 
   /* ── Life OS tabs ── */

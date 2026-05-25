@@ -617,10 +617,34 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
             if (e.target.classList.contains('cb-resize-top') ||
                 e.target.classList.contains('cb-resize-bot') ||
                 e.target.classList.contains('cal-del-btn')) return;
-            e.preventDefault();
-            startMove(e.touches[0].clientX, e.touches[0].clientY);
+            // On mobile: short tap = select; long-press = drag
+            if (window.innerWidth <= 768) {
+              // Use a 250ms hold timer to distinguish tap vs drag
+              let holdTimer = setTimeout(() => {
+                holdTimer = null;
+                e.preventDefault();
+                startMove(e.touches[0].clientX, e.touches[0].clientY);
+              }, 250);
+              el.addEventListener('touchend', function onTapEnd(te) {
+                el.removeEventListener('touchend', onTapEnd);
+                if (holdTimer) {
+                  clearTimeout(holdTimer);
+                  // It was a tap — toggle selection
+                  const already = el.classList.contains('mob-selected');
+                  body.querySelectorAll('.cal-block.mob-selected').forEach(b => b.classList.remove('mob-selected'));
+                  if (!already) el.classList.add('mob-selected');
+                  te.preventDefault();
+                }
+              }, { once: true, passive: false });
+            } else {
+              e.preventDefault();
+              startMove(e.touches[0].clientX, e.touches[0].clientY);
+            }
           }, { passive:false });
         });
+
+        // Mobile: re-apply active day view after every render
+        if (typeof updateMobCalView === 'function' && window.innerWidth <= 768) updateMobCalView();
 
         /* ── Add-block row — + buttons only, open shared modal ── */
         const addRow = document.getElementById('add-block-row');
@@ -726,7 +750,96 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
         document.addEventListener('keydown', e => { if (e.key === 'Escape' && modal.classList.contains('open')) closeModal(); });
       })();
 
+      /* ══ Mobile single-day calendar view ══ */
+      let mobCalDayIdx = 0; // which of the 7 week columns is visible on mobile
+
+      function updateMobCalView() {
+        const weekDates = getWeekDates();
+        // Show only the active day column
+        document.querySelectorAll('#cal-body .day-col').forEach((col, i) => {
+          col.classList.toggle('mob-active', i === mobCalDayIdx);
+        });
+        // Show only the active header cell
+        document.querySelectorAll('#cal-header .wh-day').forEach((el, i) => {
+          el.classList.toggle('mob-active', i === mobCalDayIdx);
+        });
+        // Update the day label above the grid
+        const label = document.getElementById('mob-cal-day-label');
+        if (label) {
+          const dt = new Date(weekDates[mobCalDayIdx] + 'T00:00:00');
+          const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+          label.textContent = dayNames[dt.getDay()] + ' ' + dt.getDate();
+        }
+        // Deselect any selected blocks when switching day
+        document.querySelectorAll('.cal-block.mob-selected').forEach(b => b.classList.remove('mob-selected'));
+        // Scroll the day's column to ~current time
+        const activeCol = document.querySelector('#cal-body .day-col.mob-active');
+        if (activeCol) {
+          const body = document.getElementById('cal-body');
+          if (body) {
+            const nowH = new Date().getHours();
+            const scrollTo = Math.max(0, (nowH - 7) * 34 - 60);
+            body.scrollTop = scrollTo;
+          }
+        }
+      }
+
+      function initMobCal() {
+        if (window.innerWidth > 768) return;
+        const weekDates = getWeekDates();
+        const todayStr  = calendarTodayStr();
+        const idx = weekDates.indexOf(todayStr);
+        mobCalDayIdx = idx >= 0 ? idx : 0;
+        updateMobCalView();
+      }
+
+      // Prev / Next day buttons
+      document.getElementById('mob-cal-prev')?.addEventListener('click', () => {
+        mobCalDayIdx = (mobCalDayIdx + 6) % 7;
+        updateMobCalView();
+      });
+      document.getElementById('mob-cal-next')?.addEventListener('click', () => {
+        mobCalDayIdx = (mobCalDayIdx + 1) % 7;
+        updateMobCalView();
+      });
+
+      // Swipe left/right on the calendar grid to change day
+      let _swipeStartX = null, _swipeStartY = null;
+      const _calWrap = document.getElementById('week-grid-wrap');
+      if (_calWrap) {
+        _calWrap.addEventListener('touchstart', e => {
+          if (dragState) return;
+          _swipeStartX = e.touches[0].clientX;
+          _swipeStartY = e.touches[0].clientY;
+        }, { passive: true });
+        _calWrap.addEventListener('touchend', e => {
+          if (_swipeStartX === null || dragState) return;
+          const dx = e.changedTouches[0].clientX - _swipeStartX;
+          const dy = e.changedTouches[0].clientY - _swipeStartY;
+          _swipeStartX = null; _swipeStartY = null;
+          if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.2) return; // not a horizontal swipe
+          if (window.innerWidth > 768) return;
+          mobCalDayIdx = dx < 0 ? (mobCalDayIdx + 1) % 7 : (mobCalDayIdx + 6) % 7;
+          updateMobCalView();
+        });
+      }
+
+      // FAB → open add-event modal for the visible day
+      document.getElementById('mob-cal-fab')?.addEventListener('click', () => {
+        const weekDates = getWeekDates();
+        window.openCalModal(weekDates[mobCalDayIdx], DAYS[mobCalDayIdx]);
+      });
+
+      // Tap outside any block → deselect
+      document.getElementById('cal-body')?.addEventListener('click', e => {
+        if (window.innerWidth > 768) return;
+        if (!e.target.closest('.cal-block')) {
+          document.querySelectorAll('.cal-block.mob-selected').forEach(b => b.classList.remove('mob-selected'));
+        }
+      });
+
       renderCalendar();
+      initMobCal();
       setInterval(positionNowLine, 60000); // update time line every minute
 
       /* ── Gaby schedule upload ── */

@@ -344,14 +344,24 @@
           </div>
         </div>
 
+        <!-- Mobile: day navigator (hidden on desktop) -->
+        <div class="mob-cal-nav" id="mob-cal-nav">
+          <button class="mob-cal-arrow" id="mob-cal-prev">‹</button>
+          <span class="mob-cal-day-label" id="mob-cal-day-label">Monday</span>
+          <button class="mob-cal-arrow" id="mob-cal-next">›</button>
+        </div>
+
         <!-- Weekly grid — JS rendered -->
-        <div class="week-grid-wrap">
+        <div class="week-grid-wrap" id="week-grid-wrap">
           <div class="week-header" id="cal-header" style="display:grid;grid-template-columns:48px repeat(7,1fr);border-bottom:1px solid #1a1a1a"></div>
           <div class="week-body" id="cal-body" style="display:grid;grid-template-columns:48px repeat(7,1fr);height:714px">
             <!-- JS fills this -->
           </div>
           <div class="add-block-row" id="add-block-row"></div>
         </div>
+
+        <!-- Mobile FAB: add event -->
+        <button class="mob-cal-fab" id="mob-cal-fab">+</button>
       </div>
 
       <!-- Cal add event modal (shared, outside grid) -->
@@ -1379,10 +1389,6 @@
 
   <!-- Mobile bottom nav (hidden on desktop via CSS) -->
   <nav class="mobile-nav" id="mobile-nav">
-    <div class="mob-nav-item active" data-section="today">
-      <svg class="mob-nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1.5L9.8 5.2l4.2.6-3 3 .7 4.2L8 11l-3.7 2 .7-4.2-3-3 4.2-.6z"/></svg>
-      <span>Today</span>
-    </div>
     <div class="mob-nav-item" data-section="life-os">
       <svg class="mob-nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2h10a1 1 0 011 1v10a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M5 6h6M5 9h4"/></svg>
       <span>GIFD</span>
@@ -1390,6 +1396,14 @@
     <div class="mob-nav-item" data-section="time-os">
       <svg class="mob-nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M5 1v4M11 1v4M2 7h12"/></svg>
       <span>Time</span>
+    </div>
+    <div class="mob-nav-item" data-section="chicos">
+      <svg class="mob-nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5" r="2.5"/><path d="M3 14c0-3 2-5 5-5s5 2 5 5"/></svg>
+      <span>2.chicos</span>
+    </div>
+    <div class="mob-nav-item mob-nav-home active" data-section="today">
+      <svg class="mob-nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1.5L9.8 5.2l4.2.6-3 3 .7 4.2L8 11l-3.7 2 .7-4.2-3-3 4.2-.6z"/></svg>
+      <span>Today</span>
     </div>
     <div class="mob-nav-item" data-section="movement">
       <svg class="mob-nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 8h2m10 0h2M3 8l1-2h8l1 2M4 6V4m8 2V4M5 4h6"/></svg>
