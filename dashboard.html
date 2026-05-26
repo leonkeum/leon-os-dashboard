@@ -182,8 +182,33 @@
           </div>
         </div>
         <span class="topbar-badge" id="daily-score-badge" style="display:none"></span>
+        <button class="sync-btn" id="sync-btn" title="Cloud Sync">☁</button>
       </div>
     </header>
+
+    <!-- ══ Sync Modal ══ -->
+    <div class="sync-modal-overlay" id="sync-overlay" style="display:none" onclick="if(event.target===this)document.getElementById('sync-overlay').style.display='none'">
+      <div class="sync-modal">
+        <div class="sync-modal-header">
+          <span class="sync-modal-title">☁ Cloud Sync</span>
+          <button class="sync-modal-close" onclick="document.getElementById('sync-overlay').style.display='none'">✕</button>
+        </div>
+        <p class="sync-modal-desc">Sync your data via a private GitHub Gist so it's the same on desktop and mobile.</p>
+        <label class="sync-label">GitHub Personal Access Token</label>
+        <input class="sync-input" id="sync-pat" type="password" placeholder="ghp_…" autocomplete="off"/>
+        <label class="sync-label">Gist ID <span class="sync-muted">(leave blank to auto-create)</span></label>
+        <input class="sync-input" id="sync-gist-id" type="text" placeholder="auto-created on first push"/>
+        <div class="sync-auto-row">
+          <label class="sync-auto-label">Auto-pull on load</label>
+          <input type="checkbox" id="sync-auto-cb" class="sync-auto-cb"/>
+        </div>
+        <div class="sync-actions">
+          <button class="sync-action-btn sync-push-btn" id="sync-push-btn">↑ Push</button>
+          <button class="sync-action-btn sync-pull-btn" id="sync-pull-btn">↓ Pull</button>
+        </div>
+        <div class="sync-status" id="sync-status"></div>
+      </div>
+    </div>
 
     <main class="content">
 

@@ -5564,6 +5564,87 @@ function buildChicosChart() {
     localStorage.setItem(LS_KEY, JSON.stringify(kanbanData));
   }
 
+  /* ── Touch drag-and-drop for Kanban (mobile) ── */
+  function addTouchDrag(el, card, col) {
+    el.addEventListener('touchstart', function(e) {
+      if (e.touches.length !== 1) return;
+      const touch0 = e.touches[0];
+      const startX = touch0.clientX, startY = touch0.clientY;
+      let ghost = null, active = false, cancelled = false;
+
+      const holdTimer = setTimeout(() => {
+        if (cancelled) return;
+        active = true;
+        _dragId = card.id;
+        _dragFromCol = col;
+        el.style.opacity = '0.35';
+        const rect = el.getBoundingClientRect();
+        const ox = touch0.clientX - rect.left;
+        const oy = touch0.clientY - rect.top;
+        ghost = el.cloneNode(true);
+        ghost._ox = ox;
+        ghost._oy = oy;
+        ghost.style.cssText = 'position:fixed;top:' + rect.top + 'px;left:' + rect.left + 'px;width:' + rect.width + 'px;opacity:0.92;pointer-events:none;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,0.6);transform:rotate(2deg);margin:0;border-radius:8px;';
+        document.body.appendChild(ghost);
+      }, 230);
+
+      function onMove(ev) {
+        const t = ev.touches[0];
+        if (!active) {
+          if (Math.hypot(t.clientX - startX, t.clientY - startY) > 8) {
+            cancelled = true;
+            clearTimeout(holdTimer);
+            document.removeEventListener('touchmove', onMove);
+            document.removeEventListener('touchend', onEnd);
+          }
+          return;
+        }
+        ev.preventDefault();
+        ghost.style.top  = (t.clientY - ghost._oy) + 'px';
+        ghost.style.left = (t.clientX - ghost._ox) + 'px';
+        ghost.style.display = 'none';
+        const over = document.elementFromPoint(t.clientX, t.clientY);
+        ghost.style.display = '';
+        const overColEl = over ? over.closest('.chicos-kanban-col') : null;
+        document.querySelectorAll('.chicos-drag-over').forEach(c => c.classList.remove('chicos-drag-over'));
+        if (overColEl && overColEl.dataset.kanbanCol && overColEl.dataset.kanbanCol !== col) {
+          overColEl.classList.add('chicos-drag-over');
+        }
+      }
+
+      function onEnd(ev) {
+        clearTimeout(holdTimer);
+        document.removeEventListener('touchmove', onMove);
+        document.removeEventListener('touchend', onEnd);
+        if (ghost) { ghost.remove(); ghost = null; }
+        el.style.opacity = '';
+        if (!active) return;
+        active = false;
+
+        const t = ev.changedTouches[0];
+        const over = document.elementFromPoint(t.clientX, t.clientY);
+        const overColEl = over ? over.closest('.chicos-kanban-col') : null;
+        const targetCol = overColEl ? overColEl.dataset.kanbanCol : null;
+        document.querySelectorAll('.chicos-drag-over').forEach(c => c.classList.remove('chicos-drag-over'));
+
+        if (targetCol && targetCol !== col) {
+          const cardObj = (kanbanData[col] || []).find(c => c.id === card.id);
+          if (cardObj) {
+            kanbanData[col] = kanbanData[col].filter(c => c.id !== card.id);
+            if (!kanbanData[targetCol]) kanbanData[targetCol] = [];
+            kanbanData[targetCol].push(cardObj);
+            saveKanban();
+            renderKanban();
+          }
+        }
+        _dragId = _dragFromCol = null;
+      }
+
+      document.addEventListener('touchmove', onMove, { passive: false });
+      document.addEventListener('touchend', onEnd, { passive: true });
+    }, { passive: true });
+  }
+
   /* Only render the cards list — column chrome (drop zone, + button) is set up once */
   function renderCards(col) {
     const container = document.getElementById('kanban-' + col);
@@ -5588,7 +5669,7 @@ function buildChicosChart() {
         renderCards(col);
       });
 
-      /* Drag */
+      /* Desktop drag */
       el.addEventListener('dragstart', e => {
         _dragId = card.id;
         _dragFromCol = col;
@@ -5601,6 +5682,9 @@ function buildChicosChart() {
           .forEach(c => c.classList.remove('chicos-drag-over'));
         _dragId = _dragFromCol = null;
       });
+
+      /* Mobile touch drag */
+      addTouchDrag(el, card, col);
 
       container.appendChild(el);
     });
@@ -5616,6 +5700,7 @@ function buildChicosChart() {
       const colEl = container.closest('.chicos-kanban-col');
       if (!colEl || colEl.dataset.kanbanReady) return;
       colEl.dataset.kanbanReady = '1';
+      colEl.dataset.kanbanCol = col;  // used by touch drag to identify target
 
       /* ── Drop zone on the full column div so empty columns work ── */
       colEl.addEventListener('dragover', e => {
@@ -5710,3 +5795,186 @@ if (parseInt(btn.dataset.val) === selectedPosts) btn.classList.add('active');
 });
 }
 document.addEventListener('DOMContentLoaded', () => { if (document.getElementById('chicos-followers')) initChicosSection(); });
+
+/* ══════════════════════════════════════════════════════════════
+   GIST SYNC — push/pull all Leon OS data to a private GitHub Gist
+   Config keys (never synced themselves):
+     sync-pat       — GitHub Personal Access Token
+     sync-gist-id   — Gist ID (set after first push)
+     sync-auto      — '1' if auto-pull on load is enabled
+     sync-last-push — ISO timestamp of last push
+   ══════════════════════════════════════════════════════════════ */
+(function initGistSync() {
+  const SKIP_KEYS = new Set(['sync-pat','sync-gist-id','sync-auto','sync-last-push']);
+  const GIST_FILE = 'leon-os-data.json';
+
+  const overlay   = document.getElementById('sync-overlay');
+  const syncBtn   = document.getElementById('sync-btn');
+  const patInput  = document.getElementById('sync-pat');
+  const gistInput = document.getElementById('sync-gist-id');
+  const autoCb    = document.getElementById('sync-auto-cb');
+  const pushBtn   = document.getElementById('sync-push-btn');
+  const pullBtn   = document.getElementById('sync-pull-btn');
+  const statusEl  = document.getElementById('sync-status');
+
+  if (!overlay || !syncBtn) return;
+
+  /* ── Persist config in localStorage ── */
+  function getCfg() {
+    return {
+      pat:    localStorage.getItem('sync-pat')     || '',
+      gistId: localStorage.getItem('sync-gist-id') || '',
+      auto:   localStorage.getItem('sync-auto')    === '1',
+    };
+  }
+  function saveCfg() {
+    localStorage.setItem('sync-pat',    patInput.value.trim());
+    localStorage.setItem('sync-gist-id',gistInput.value.trim());
+    localStorage.setItem('sync-auto',   autoCb.checked ? '1' : '0');
+  }
+
+  /* ── Open modal, populate inputs ── */
+  syncBtn.addEventListener('click', () => {
+    const cfg = getCfg();
+    patInput.value  = cfg.pat;
+    gistInput.value = cfg.gistId;
+    autoCb.checked  = cfg.auto;
+    const last = localStorage.getItem('sync-last-push');
+    setStatus(last ? 'Last push: ' + new Date(last).toLocaleString() : '', '');
+    overlay.style.display = 'flex';
+    patInput.focus();
+  });
+
+  /* ── Status helper ── */
+  function setStatus(msg, cls) {
+    statusEl.textContent = msg;
+    statusEl.className   = 'sync-status' + (cls ? ' ' + cls : '');
+  }
+  function setBusy(busy) {
+    pushBtn.disabled = pullBtn.disabled = busy;
+    syncBtn.classList.toggle('syncing', busy);
+  }
+
+  /* ── Collect all data to sync ── */
+  function collectData() {
+    const data = {};
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (!SKIP_KEYS.has(k)) data[k] = localStorage.getItem(k);
+    }
+    return data;
+  }
+
+  /* ── Gist API helpers ── */
+  async function gistRequest(method, path, body, pat) {
+    const resp = await fetch('https://api.github.com' + path, {
+      method,
+      headers: {
+        'Authorization': 'token ' + pat,
+        'Accept':        'application/vnd.github+json',
+        'Content-Type':  'application/json',
+      },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.message || resp.statusText);
+    }
+    return resp.json();
+  }
+
+  /* ── Push ── */
+  pushBtn.addEventListener('click', async () => {
+    saveCfg();
+    const cfg = getCfg();
+    if (!cfg.pat) { setStatus('Enter your GitHub PAT first.', 'err'); return; }
+    setBusy(true);
+    setStatus('Pushing…', '');
+    try {
+      const content = JSON.stringify(collectData(), null, 0);
+      const filePayload = { [GIST_FILE]: { content } };
+
+      let gistId = cfg.gistId;
+      if (!gistId) {
+        // Create new gist
+        const created = await gistRequest('POST', '/gists', {
+          description: 'Leon OS dashboard data',
+          public: false,
+          files: filePayload,
+        }, cfg.pat);
+        gistId = created.id;
+        localStorage.setItem('sync-gist-id', gistId);
+        gistInput.value = gistId;
+      } else {
+        await gistRequest('PATCH', '/gists/' + gistId, { files: filePayload }, cfg.pat);
+      }
+
+      const ts = new Date().toISOString();
+      localStorage.setItem('sync-last-push', ts);
+      setStatus('✓ Pushed at ' + new Date(ts).toLocaleTimeString(), 'ok');
+    } catch(e) {
+      setStatus('Push failed: ' + e.message, 'err');
+    }
+    setBusy(false);
+  });
+
+  /* ── Pull ── */
+  async function doPull(silent) {
+    const cfg = getCfg();
+    if (!cfg.pat || !cfg.gistId) {
+      if (!silent) setStatus('Enter PAT and Gist ID first.', 'err');
+      return false;
+    }
+    if (!silent) { setBusy(true); setStatus('Pulling…', ''); }
+    try {
+      const gist = await gistRequest('GET', '/gists/' + cfg.gistId, null, cfg.pat);
+      const file = gist.files && gist.files[GIST_FILE];
+      if (!file) throw new Error('File "' + GIST_FILE + '" not found in gist.');
+
+      // Fetch raw content (may be truncated in API response)
+      let raw = file.content;
+      if (file.truncated) {
+        const r = await fetch(file.raw_url);
+        raw = await r.text();
+      }
+      const data = JSON.parse(raw);
+
+      // Restore — overwrite matching keys, leave others untouched
+      Object.entries(data).forEach(([k, v]) => {
+        if (!SKIP_KEYS.has(k)) localStorage.setItem(k, v);
+      });
+
+      if (!silent) {
+        setStatus('✓ Pulled. Reloading…', 'ok');
+        setTimeout(() => location.reload(), 900);
+      }
+      return true;
+    } catch(e) {
+      if (!silent) { setStatus('Pull failed: ' + e.message, 'err'); setBusy(false); }
+      return false;
+    }
+  }
+
+  pullBtn.addEventListener('click', async () => {
+    saveCfg();
+    setBusy(true);
+    await doPull(false);
+    setBusy(false);
+  });
+
+  /* ── Auto-pull on load ── */
+  autoCb.addEventListener('change', saveCfg);
+  const cfg0 = getCfg();
+  if (cfg0.auto && cfg0.pat && cfg0.gistId) {
+    doPull(true).then(ok => {
+      if (ok) {
+        // Show a brief toast then reload
+        const toast = document.createElement('div');
+        toast.textContent = '☁ Synced from cloud';
+        toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#4f7ec9;color:#fff;font-size:12px;padding:8px 16px;border-radius:20px;z-index:9999;pointer-events:none;';
+        document.body.appendChild(toast);
+        setTimeout(() => { toast.remove(); location.reload(); }, 1200);
+      }
+    });
+  }
+})();

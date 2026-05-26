@@ -4380,7 +4380,68 @@
 
   /* ── Theme toggle — move above nav bar ── */
   .theme-toggle-btn { bottom: 74px; right: 14px; width: 38px; height: 38px; font-size: 16px; }
+
+  /* ── Calendar — hide per-day + row, FAB replaces it ── */
+  .add-block-row { display: none !important; }
 }
 
 /* Existing chicos override kept in one block */
 @media (max-width: 768px) { .chicos-kanban { grid-template-columns: repeat(2,1fr); } .chicos-metric-cards { grid-template-columns: repeat(2,1fr); } }
+
+/* ── Sync Button (topbar) ── */
+.sync-btn {
+  background: none; border: none; cursor: pointer;
+  color: #555; font-size: 16px; padding: 4px 6px;
+  border-radius: 6px; transition: color 0.15s, background 0.15s;
+  line-height: 1;
+}
+.sync-btn:hover { color: #aaa; background: rgba(255,255,255,0.06); }
+.sync-btn.syncing { color: #4f7ec9; animation: syncPulse 1.2s ease-in-out infinite; }
+@keyframes syncPulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+
+/* ── Sync Modal ── */
+.sync-modal-overlay {
+  position: fixed; inset: 0; z-index: 9500;
+  background: rgba(0,0,0,0.7);
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+}
+.sync-modal {
+  background: #161616; border: 1px solid #2a2a2a;
+  border-radius: 14px; padding: 20px; width: 100%; max-width: 380px;
+  display: flex; flex-direction: column; gap: 10px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.8);
+}
+.sync-modal-header { display: flex; align-items: center; justify-content: space-between; }
+.sync-modal-title { font-size: 14px; font-weight: 700; color: #e0e0e0; letter-spacing: 0.02em; }
+.sync-modal-close {
+  background: none; border: none; color: #555; font-size: 16px;
+  cursor: pointer; padding: 2px 6px; border-radius: 4px;
+  transition: color 0.15s;
+}
+.sync-modal-close:hover { color: #aaa; }
+.sync-modal-desc { font-size: 11px; color: #666; line-height: 1.5; }
+.sync-label { font-size: 10px; font-weight: 600; color: #888; letter-spacing: 0.06em; text-transform: uppercase; margin-top: 2px; }
+.sync-muted { font-weight: 400; color: #555; text-transform: none; }
+.sync-input {
+  background: #0d0d0d; border: 1px solid #1e1e1e; border-radius: 6px;
+  color: #ccc; font-family: 'Inter', sans-serif; font-size: 12px;
+  padding: 8px 10px; outline: none; transition: border-color 0.15s; width: 100%;
+}
+.sync-input:focus { border-color: #333; }
+.sync-auto-row { display: flex; align-items: center; justify-content: space-between; margin-top: 2px; }
+.sync-auto-label { font-size: 11px; color: #888; }
+.sync-auto-cb { accent-color: #4f7ec9; width: 16px; height: 16px; cursor: pointer; }
+.sync-actions { display: flex; gap: 8px; margin-top: 4px; }
+.sync-action-btn {
+  flex: 1; padding: 9px; border-radius: 8px; border: none; cursor: pointer;
+  font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.sync-action-btn:active { transform: scale(0.97); }
+.sync-push-btn { background: #4f7ec9; color: #fff; }
+.sync-pull-btn { background: #4daa7d; color: #fff; }
+.sync-action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.sync-status { font-size: 11px; color: #888; min-height: 16px; text-align: center; }
+.sync-status.ok   { color: #4daa7d; }
+.sync-status.err  { color: #c94f4f; }

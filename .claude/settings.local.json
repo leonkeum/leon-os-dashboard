@@ -21,7 +21,14 @@
       "Bash(npx --yes playwright --version)",
       "PowerShell(Start-Process \"C:\\\\Users\\\\keuul\\\\Desktop\\\\ClaudeCodeTest\\\\dashboard.html\")",
       "Bash(python3 *)",
-      "Bash(node --input-type=module)"
+      "Bash(node --input-type=module)",
+      "PowerShell(Get-Item *)",
+      "PowerShell(Get-Command *)",
+      "Bash(Get-Content \"C:\\\\Users\\\\keuul\\\\Desktop\\\\ClaudeCodeTest\\\\dashboard.css\")",
+      "Bash(Select-Object -Last 5)",
+      "Bash(node *)",
+      "PowerShell(Get-Content *)",
+      "PowerShell(node -e \"require\\('fs'\\).readFileSync\\('C:/Users/keuul/Desktop/ClaudeCodeTest/dashboard.js','utf8'\\)\" 2>&1 | Select-Object -First 10)"
     ]
   }
 }
