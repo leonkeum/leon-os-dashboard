@@ -2891,6 +2891,8 @@
     /* ══════════════════════════════
        PROTEIN RING
     ══════════════════════════════ */
+    .nutr-date-nav-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+    .nutr-date-display { font-size: 13px; font-weight: 600; color: #ccc; min-width: 80px; text-align: center; }
     .protein-hero-card {
       background: #111;
       border: 1px solid #1e1e1e;

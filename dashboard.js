@@ -3798,8 +3798,21 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
       const LS_HISTORY  = 'leon-nutr-history-v1';  // { [date]: { protein, calories } }
       const LS_PRESETS  = 'leon-nutr-presets-v1';  // [{ emoji, name, p }]
       const LS_WATER    = 'leon-nutr-water-v1';     // { date, glasses }
-      const TODAY       = new Date().toISOString().slice(0, 10);
+      let nutrActiveDate = lDate(new Date());
       const WATER_GOAL  = 8;
+
+      function renderNutrDateNav() {
+        const el = document.getElementById('nutr-date-display');
+        const nextBtn = document.getElementById('nutr-date-next');
+        const realToday = lDate(new Date());
+        if (el) {
+          const d = new Date(nutrActiveDate + 'T00:00:00');
+          el.textContent = nutrActiveDate === realToday
+            ? 'Today'
+            : d.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
+        }
+        if (nextBtn) nextBtn.disabled = (nutrActiveDate >= realToday);
+      }
 
       const DEFAULT_PRESETS = [
         { emoji:'🍗', name:'Chicken', p:30 },
@@ -3815,22 +3828,41 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
       function getProteinGoal() { try { return JSON.parse(localStorage.getItem(LS_NUTR_GOALS)||'{}').protein || 160; } catch(_) { return 160; } }
       const GOALS  = { protein: 160, carbs: 250, fat: 80 };
 
-      const emptyDay = () => ({ date: TODAY, meals: [], totals: { protein:0, carbs:0, fat:0, calories:0 } });
+      const emptyDay = (date) => ({ date: date || nutrActiveDate, meals: [], totals: { protein:0, carbs:0, fat:0, calories:0 } });
+
+      function nutrStore() {
+        // Storage format: { [date]: { date, meals[], totals } }
+        // Migrate old single-object format on first read
+        try {
+          const raw = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
+          if (raw.date && Array.isArray(raw.meals)) {
+            // Old format — migrate to dict
+            const migrated = { [raw.date]: raw };
+            localStorage.setItem(LS_KEY, JSON.stringify(migrated));
+            return migrated;
+          }
+          return raw;
+        } catch(_) { return {}; }
+      }
 
       function lsLoad() {
-        try {
-          const v = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
-          return v.date === TODAY ? v : emptyDay();
-        } catch(_) { return emptyDay(); }
+        const store = nutrStore();
+        return store[nutrActiveDate] || emptyDay();
       }
 
       function lsSave(d) {
-        try { localStorage.setItem(LS_KEY, JSON.stringify(d)); } catch(_) {}
-        // Persist today's totals into the 7-day history log
+        try {
+          const store = nutrStore();
+          store[nutrActiveDate] = d;
+          // Prune to last 90 days
+          const keys = Object.keys(store).sort();
+          if (keys.length > 90) keys.slice(0, keys.length - 90).forEach(k => delete store[k]);
+          localStorage.setItem(LS_KEY, JSON.stringify(store));
+        } catch(_) {}
+        // Persist totals into history
         try {
           const h = JSON.parse(localStorage.getItem(LS_HISTORY) || '{}');
-          h[TODAY] = { protein: d.totals.protein || 0, calories: d.totals.calories || 0 };
-          // Prune to last 60 days
+          h[nutrActiveDate] = { protein: d.totals.protein || 0, calories: d.totals.calories || 0 };
           const kept = {}; Object.keys(h).sort().slice(-60).forEach(k => kept[k] = h[k]);
           localStorage.setItem(LS_HISTORY, JSON.stringify(kept));
         } catch(_) {}
@@ -3924,8 +3956,8 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
       });
 
       /* ── Water tracker ── */
-      function loadWater()   { try { const v = JSON.parse(localStorage.getItem(LS_WATER)||'{}'); return v.date === TODAY ? (v.glasses||0) : 0; } catch(_) { return 0; } }
-      function saveWater(n)  { try { localStorage.setItem(LS_WATER, JSON.stringify({ date: TODAY, glasses: n })); } catch(_) {} }
+      function loadWater()  { try { const v = JSON.parse(localStorage.getItem(LS_WATER)||'{}'); return v[nutrActiveDate] || 0; } catch(_) { return 0; } }
+      function saveWater(n) { try { const v = JSON.parse(localStorage.getItem(LS_WATER)||'{}'); v[nutrActiveDate] = n; localStorage.setItem(LS_WATER, JSON.stringify(v)); } catch(_) {} }
 
       function renderWater() {
         const n     = loadWater();
@@ -4219,7 +4251,30 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
         if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); aiBtn?.click(); }
       });
 
+      /* ── Date navigation ── */
+      function switchNutrDate(newDate) {
+        nutrActiveDate = newDate;
+        renderNutrDateNav();
+        const d = lsLoad();
+        renderTotals(d.totals);
+        renderMeals(d);
+        renderWater();
+      }
+      document.getElementById('nutr-date-prev')?.addEventListener('click', () => {
+        const d = new Date(nutrActiveDate + 'T00:00:00');
+        d.setDate(d.getDate() - 1);
+        switchNutrDate(lDate(d));
+      });
+      document.getElementById('nutr-date-next')?.addEventListener('click', () => {
+        const realToday = lDate(new Date());
+        if (nutrActiveDate >= realToday) return;
+        const d = new Date(nutrActiveDate + 'T00:00:00');
+        d.setDate(d.getDate() + 1);
+        switchNutrDate(lDate(d));
+      });
+
       /* Init */
+      renderNutrDateNav();
       const d = lsLoad();
       renderTotals(d.totals);
       renderMeals(d);

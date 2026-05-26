@@ -1127,6 +1127,13 @@
 
         <div class="section-label">Nutrition — Protein Focus</div>
 
+        <!-- Date navigation -->
+        <div class="nutr-date-nav-row">
+          <button class="gifd-date-nav-btn" id="nutr-date-prev">‹</button>
+          <span class="nutr-date-display" id="nutr-date-display"></span>
+          <button class="gifd-date-nav-btn" id="nutr-date-next" disabled>›</button>
+        </div>
+
         <!-- Protein ring + quick presets -->
         <div class="protein-hero-card">
           <div class="protein-ring-layout">
@@ -1241,7 +1248,7 @@
         <div class="nutrition-log-wrap">
           <div class="nutrition-log-header">
             <span>Meal Log</span>
-            <button class="log-btn" id="nutr-reset" style="font-size:10px;padding:4px 10px">Clear today</button>
+            <button class="log-btn" id="nutr-reset" style="font-size:10px;padding:4px 10px">Clear day</button>
           </div>
           <div id="nutr-meals"></div>
           <div class="nutrition-empty" id="nutr-empty">No meals logged yet — describe a meal or tap a preset above.</div>
