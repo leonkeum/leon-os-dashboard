@@ -5764,6 +5764,36 @@ document.addEventListener('DOMContentLoaded', () => { if (document.getElementByI
     syncBtn.classList.toggle('syncing', busy);
   }
 
+  /* ── Silent auto-push (debounced) ── */
+  let autoPushTimer = null;
+  let autoPushing   = false;
+  async function doSilentPush() {
+    const cfg = getCfg();
+    if (!cfg.pat || !cfg.gistId) return; // not configured — skip
+    if (autoPushing) return;             // push already in flight
+    autoPushing = true;
+    syncBtn.classList.add('syncing');
+    try {
+      const content = JSON.stringify(collectData(), null, 0);
+      await gistRequest('PATCH', '/gists/' + cfg.gistId, { [GIST_FILE]: { content } }, cfg.pat);
+      const ts = new Date().toISOString();
+      _origSetItem.call(localStorage, 'sync-last-push', ts);
+    } catch(_) { /* silent — user can manually push if needed */ }
+    autoPushing = false;
+    syncBtn.classList.remove('syncing');
+  }
+  function scheduleAutoPush() {
+    clearTimeout(autoPushTimer);
+    autoPushTimer = setTimeout(doSilentPush, 4000);
+  }
+
+  /* ── Intercept localStorage writes to trigger auto-push ── */
+  const _origSetItem = localStorage.setItem.bind(localStorage);
+  localStorage.setItem = function(key, value) {
+    _origSetItem(key, value);
+    if (!SKIP_KEYS.has(key)) scheduleAutoPush();
+  };
+
   /* ── Collect all data to sync ── */
   function collectData() {
     const data = {};
@@ -5819,7 +5849,7 @@ document.addEventListener('DOMContentLoaded', () => { if (document.getElementByI
       }
 
       const ts = new Date().toISOString();
-      localStorage.setItem('sync-last-push', ts);
+      _origSetItem.call(localStorage, 'sync-last-push', ts);
       setStatus('✓ Pushed at ' + new Date(ts).toLocaleTimeString(), 'ok');
     } catch(e) {
       setStatus('Push failed: ' + e.message, 'err');
@@ -5849,8 +5879,9 @@ document.addEventListener('DOMContentLoaded', () => { if (document.getElementByI
       const data = JSON.parse(raw);
 
       // Restore — overwrite matching keys, leave others untouched
+      // Use _origSetItem so restoring data doesn't trigger auto-push
       Object.entries(data).forEach(([k, v]) => {
-        if (!SKIP_KEYS.has(k)) localStorage.setItem(k, v);
+        if (!SKIP_KEYS.has(k)) _origSetItem.call(localStorage, k, v);
       });
 
       if (!silent) {
