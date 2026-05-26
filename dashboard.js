@@ -245,8 +245,8 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
 
       function getWeekDates() {
         const t = new Date(); const d = t.getDay();
-        // Sunday (0) → go to NEXT Monday (+1). Other days → back to Monday.
-        const mon = new Date(t); mon.setDate(t.getDate() + (d === 0 ? 1 : 1 - d)); mon.setHours(0,0,0,0);
+        // Sunday (0) → go back 6 days to THIS week's Monday. Other days → back to Monday.
+        const mon = new Date(t); mon.setDate(t.getDate() + (d === 0 ? -6 : 1 - d)); mon.setHours(0,0,0,0);
         return Array.from({length:7}, (_,i) => { const x = new Date(mon); x.setDate(mon.getDate()+i); return localDateStr(x); });
       }
 
@@ -515,8 +515,8 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
 
           dayBlocks.forEach(bl => {
             const c   = PAL[bl.color] || PAL.gray;
-            const top = tpx(bl.start, false);
-            const ht  = Math.max(tpx(bl.end, true) - top, 17);
+            const top = tpx(bl.start);
+            const ht  = Math.max(tpx(bl.end) - top, 17);
             const bdr = `2px ${bl.style==='dashed'?'dashed':'solid'} ${c.bl}`;
             const showTime = ht > 32;
             html += `<div class="tb cal-block" style="top:${top}px;height:${ht}px;background:${c.bg};border-left:${bdr}" data-id="${bl.id}">
@@ -4826,16 +4826,16 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
         if (f) f.classList.toggle('open');
       });
 
-      // Type toggle
+      // Type toggle — only toggle the 'sel' class; keep 'inc'/'exp' on their buttons permanently
       document.getElementById('money-type-inc')?.addEventListener('click', () => {
         txType = 'inc';
-        document.getElementById('money-type-inc')?.classList.add('sel','inc');
-        document.getElementById('money-type-exp')?.classList.remove('sel','exp');
+        document.getElementById('money-type-inc')?.classList.add('sel');
+        document.getElementById('money-type-exp')?.classList.remove('sel');
       });
       document.getElementById('money-type-exp')?.addEventListener('click', () => {
         txType = 'exp';
-        document.getElementById('money-type-exp')?.classList.add('sel','exp');
-        document.getElementById('money-type-inc')?.classList.remove('sel','inc');
+        document.getElementById('money-type-exp')?.classList.add('sel');
+        document.getElementById('money-type-inc')?.classList.remove('sel');
       });
 
       // Save transaction
@@ -5968,12 +5968,14 @@ document.addEventListener('DOMContentLoaded', () => { if (document.getElementByI
   if (cfg0.auto && cfg0.pat && cfg0.gistId) {
     doPull(true).then(ok => {
       if (ok) {
-        // Show a brief toast then reload
+        // Show toast only — no reload. A reload after auto-pull causes an
+        // infinite loop because every reload re-triggers auto-pull.
+        // Fresh data is now in localStorage; it will render on next genuine open.
         const toast = document.createElement('div');
         toast.textContent = '☁ Synced from cloud';
-        toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#4f7ec9;color:#fff;font-size:12px;padding:8px 16px;border-radius:20px;z-index:9999;pointer-events:none;';
+        toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#4f7ec9;color:#fff;font-size:12px;padding:8px 16px;border-radius:20px;z-index:9999;pointer-events:none;opacity:1;transition:opacity .4s;';
         document.body.appendChild(toast);
-        setTimeout(() => { toast.remove(); location.reload(); }, 1200);
+        setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 400); }, 2000);
       }
     });
   }

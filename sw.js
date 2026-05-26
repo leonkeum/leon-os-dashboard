@@ -1,4 +1,4 @@
-const CACHE_NAME = 'leon-os-v4'; // bump version to bust old cache
+const CACHE_NAME = 'leon-os-v5'; // bump version to bust old cache
 const STATIC = ['./dashboard.html', './dashboard.css', './dashboard.js'];
 
 self.addEventListener('install', event => {
