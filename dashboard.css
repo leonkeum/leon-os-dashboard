@@ -1907,7 +1907,10 @@
       padding: 22px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 16px;
     }
     .gifd-today-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
-    .gifd-today-date { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #555; margin-bottom: 3px; }
+    .gifd-date-nav-row { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
+    .gifd-date-nav-btn { background: none; border: none; color: #888; font-size: 18px; line-height: 1; padding: 0 4px; cursor: pointer; touch-action: manipulation; }
+    .gifd-date-nav-btn:disabled { opacity: 0.2; cursor: default; }
+    .gifd-today-date { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #555; }
     .gifd-today-subtitle { font-size: 18px; font-weight: 600; color: #ddd; }
 
     .gifd-live-score-wrap { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }

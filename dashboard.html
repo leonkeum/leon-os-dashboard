@@ -583,7 +583,6 @@
 
         <div class="los-tabs">
           <button class="los-tab active" data-los-tab="gifd">GIFD</button>
-          <button class="los-tab" data-los-tab="mood">Mood</button>
           <button class="los-tab" data-los-tab="skills">Skills</button>
           <button class="los-tab" data-los-tab="radar">Radar</button>
           <button class="los-tab" data-los-tab="mana">Mana</button>
@@ -598,8 +597,12 @@
           <div class="gifd-today-card" id="gifd-today-card">
             <div class="gifd-today-header">
               <div>
-                <div class="gifd-today-date" id="gifd-today-date"></div>
-                <div class="gifd-today-subtitle">What happened today?</div>
+                <div class="gifd-date-nav-row">
+                  <button class="gifd-date-nav-btn" id="gifd-date-prev">‹</button>
+                  <div class="gifd-today-date" id="gifd-today-date"></div>
+                  <button class="gifd-date-nav-btn" id="gifd-date-next" disabled>›</button>
+                </div>
+                <div class="gifd-today-subtitle" id="gifd-today-subtitle">What happened today?</div>
               </div>
               <div class="gifd-live-score-wrap">
                 <div class="gifd-live-score" id="gifd-live-score">0</div>
@@ -632,7 +635,7 @@
               </div>
             </div>
 
-            <button class="gifd-save-btn" id="gifd-save-btn">Save today's entry ↵</button>
+            <button class="gifd-save-btn" id="gifd-save-btn">Save entry ↵</button>
           </div>
 
           <!-- PAST ENTRIES -->
@@ -662,42 +665,7 @@
 
         </div>
 
-        <!-- ── TAB 2: Mood ── -->
-        <div class="los-pane" id="los-mood">
-          <div class="mood-hero-card">
-            <div class="mood-hero-title">How are you feeling?</div>
-            <!-- Emoji picker -->
-            <div class="mood-emoji-row">
-              <button class="mood-pick-btn v1" data-v="1"><span class="mood-emoji">😞</span><span class="mood-btn-label">Terrible</span></button>
-              <button class="mood-pick-btn v2" data-v="2"><span class="mood-emoji">😐</span><span class="mood-btn-label">Rough</span></button>
-              <button class="mood-pick-btn v3" data-v="3"><span class="mood-emoji">🙂</span><span class="mood-btn-label">Okay</span></button>
-              <button class="mood-pick-btn v4" data-v="4"><span class="mood-emoji">😊</span><span class="mood-btn-label">Good</span></button>
-              <button class="mood-pick-btn v5" data-v="5"><span class="mood-emoji">🔥</span><span class="mood-btn-label">Locked in</span></button>
-            </div>
-            <!-- Tags -->
-            <div class="mood-tags-row" id="mood-tags-row">
-              <button class="mood-tag" data-tag="work">work</button>
-              <button class="mood-tag" data-tag="rest">rest</button>
-              <button class="mood-tag" data-tag="productive">productive</button>
-              <button class="mood-tag" data-tag="tired">tired</button>
-              <button class="mood-tag" data-tag="social">social</button>
-              <button class="mood-tag" data-tag="stressed">stressed</button>
-              <button class="mood-tag" data-tag="motivated">motivated</button>
-              <button class="mood-tag" data-tag="gym">gym</button>
-              <button class="mood-tag" data-tag="study">study</button>
-              <button class="mood-tag" data-tag="creative">creative</button>
-            </div>
-            <!-- Note -->
-            <textarea class="mood-note-input" id="mood-note" placeholder="Add a note… what's on your mind?" rows="2"></textarea>
-            <button class="mood-save-btn" id="mood-save-btn">Log mood ↵</button>
-          </div>
-          <!-- History -->
-          <div class="mood-history" id="mood-history">
-            <div class="mood-empty-msg" id="mood-empty">No moods logged yet. Log your first one above.</div>
-          </div>
-        </div>
-
-        <!-- ── TAB 3: Skills ── -->
+        <!-- ── TAB 2: Skills ── -->
         <div class="los-pane" id="los-skills">
           <div class="los-xp-bars" id="skills-xp-bars"></div>
           <div class="los-card" style="margin-top:12px">

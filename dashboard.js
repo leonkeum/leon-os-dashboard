@@ -1791,10 +1791,11 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
       function loadGIFD()  { try { gifdEntries = JSON.parse(localStorage.getItem(LS_GIFD)||'[]'); } catch(_){ gifdEntries=[]; } }
       function saveGIFD()  { try { localStorage.setItem(LS_GIFD, JSON.stringify(gifdEntries)); } catch(_){} }
 
-      const BAD_CHIPS  = [['weed','Weed'],['porn','Porn'],['scroll','Scroll +1h'],['junk','Junk food'],['smoked','Smoked']];
-      const GOOD_CHIPS = [['posted','Posted @2.chicos'],['trained','Trained'],['meditate','Meditated'],['slept','Slept on schedule'],['read','Read +10 pages'],['clean','Room clean'],['noscroll','No late scrolling'],['studied','Studied something']];
+      const BAD_CHIPS  = [['weed','Weed'],['nopor','Nopor'],['scroll','Doom scroll'],['junk','Junk food'],['latesleep','Late sleep'],['impulse','Impulse spend']];
+      const GOOD_CHIPS = [['posted','Posted @2.chicos'],['gym','Gym'],['slept','Slept on sched'],['read','Read 10pages+'],['clean','Room clean'],['studied','Studied something'],['nophone','No phone morning'],['planned','Planned tomorrow']];
 
       /* ── Today's entry state ── */
+      let gifdActiveDate = lDate(new Date()); // can be changed to log a past day
       let todayBad  = {};
       let todayGood = {};
       let todayFeel = 0;
@@ -1879,13 +1880,21 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
       }
 
       function renderTodayCard() {
-        const dateEl = document.getElementById('gifd-today-date');
+        const realToday = lDate(new Date());
+        const dateEl    = document.getElementById('gifd-today-date');
+        const subtitleEl = document.getElementById('gifd-today-subtitle');
+        const nextBtn   = document.getElementById('gifd-date-next');
         if (dateEl) {
-          dateEl.textContent = new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
+          const d = new Date(gifdActiveDate + 'T00:00:00');
+          dateEl.textContent = d.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
         }
+        if (subtitleEl) {
+          subtitleEl.textContent = gifdActiveDate === realToday ? 'What happened today?' : 'Logging for a past day';
+        }
+        if (nextBtn) nextBtn.disabled = (gifdActiveDate >= realToday);
 
-        // Restore today's saved state from entries
-        const todayStr = lDate(new Date());
+        // Restore saved state for the active date
+        const todayStr = gifdActiveDate;
         const todayEntry = gifdEntries.find(e => e.date === todayStr);
         if (todayEntry) {
           todayBad  = { ...todayEntry.bad };
@@ -1964,7 +1973,7 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
       }
 
       function autoSaveToday() {
-        const todayStr = lDate(new Date());
+        const todayStr = gifdActiveDate;
         const ta  = document.getElementById('gifd-journal-text');
         const desc = ta ? ta.value : '';
         let entry = gifdEntries.find(e => e.date === todayStr);
@@ -2059,7 +2068,30 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
 
       function initGIFD() {
         loadGIFD();
+        gifdActiveDate = lDate(new Date()); // reset to today on init
         renderTodayCard();
+
+        // Date navigation — prev/next day
+        document.getElementById('gifd-date-prev')?.addEventListener('click', () => {
+          const d = new Date(gifdActiveDate + 'T00:00:00');
+          d.setDate(d.getDate() - 1);
+          gifdActiveDate = lDate(d);
+          todayBad = {}; todayGood = {}; todayFeel = 0;
+          const ta = document.getElementById('gifd-journal-text');
+          if (ta) ta.value = '';
+          renderTodayCard();
+        });
+        document.getElementById('gifd-date-next')?.addEventListener('click', () => {
+          const realToday = lDate(new Date());
+          if (gifdActiveDate >= realToday) return;
+          const d = new Date(gifdActiveDate + 'T00:00:00');
+          d.setDate(d.getDate() + 1);
+          gifdActiveDate = lDate(d);
+          todayBad = {}; todayGood = {}; todayFeel = 0;
+          const ta = document.getElementById('gifd-journal-text');
+          if (ta) ta.value = '';
+          renderTodayCard();
+        });
 
         // Journal auto-save on type
         const ta = document.getElementById('gifd-journal-text');
@@ -2076,7 +2108,7 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
             saveBtn.textContent = '✓ Saved!';
             saveBtn.classList.add('saved');
             setTimeout(() => {
-              saveBtn.textContent = "Save today's entry ↵";
+              saveBtn.textContent = 'Save entry ↵';
               saveBtn.classList.remove('saved');
             }, 2000);
             renderGIFDEntries();
@@ -4652,129 +4684,6 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
       setTimeout(window.syncTodayProgress, 800);
     })();
 
-    /* ══════════════════════════════
-       MOOD LOG
-    ══════════════════════════════ */
-    (function () {
-      const LS = 'leon-mood-v1';
-      const MOODS = { 1:{emoji:'😞',name:'Terrible',cls:'v1'}, 2:{emoji:'😐',name:'Rough',cls:'v2'}, 3:{emoji:'🙂',name:'Okay',cls:'v3'}, 4:{emoji:'😊',name:'Good',cls:'v4'}, 5:{emoji:'🔥',name:'Locked in',cls:'v5'} };
-
-      function load() { try { return JSON.parse(localStorage.getItem(LS) || '[]'); } catch(_) { return []; } }
-      function save(d) { try { localStorage.setItem(LS, JSON.stringify(d)); } catch(_) {} }
-
-      let selVal = null;
-      const selTags = new Set();
-
-      // Pick mood
-      document.querySelectorAll('.mood-pick-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.mood-pick-btn').forEach(b => b.classList.remove('sel'));
-          btn.classList.add('sel');
-          selVal = parseInt(btn.dataset.v);
-        });
-      });
-
-      // Pick tags
-      document.querySelectorAll('#mood-tags-row .mood-tag').forEach(tag => {
-        tag.addEventListener('click', () => {
-          const t = tag.dataset.tag;
-          if (selTags.has(t)) { selTags.delete(t); tag.classList.remove('sel'); }
-          else { selTags.add(t); tag.classList.add('sel'); }
-        });
-      });
-
-      // Save
-      document.getElementById('mood-save-btn')?.addEventListener('click', () => {
-        if (!selVal) {
-          // Shake the emoji row instead of alert()
-          const row = document.querySelector('.mood-emoji-row');
-          if (row) { row.style.animation='none'; void row.offsetWidth; row.style.animation='moodShake 0.4s ease'; }
-          return;
-        }
-        const note = document.getElementById('mood-note')?.value.trim() || '';
-        const entry = {
-          id: Date.now(),
-          val: selVal,
-          tags: [...selTags],
-          note,
-          time: new Date().toISOString(),
-        };
-        const data = load();
-        data.unshift(entry);
-        save(data);
-        // Reset
-        selVal = null;
-        selTags.clear();
-        document.querySelectorAll('.mood-pick-btn').forEach(b => b.classList.remove('sel'));
-        document.querySelectorAll('#mood-tags-row .mood-tag').forEach(t => t.classList.remove('sel'));
-        const noteEl = document.getElementById('mood-note');
-        if (noteEl) noteEl.value = '';
-        renderHistory();
-      });
-
-      function renderHistory() {
-        const hist = document.getElementById('mood-history');
-        const empty = document.getElementById('mood-empty');
-        if (!hist) return;
-        const data = load();
-        if (!data.length) { if (empty) empty.style.display = ''; return; }
-        if (empty) empty.style.display = 'none';
-
-        // Group by date
-        const groups = {};
-        data.forEach(e => {
-          const d = new Date(e.time).toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
-          if (!groups[d]) groups[d] = [];
-          groups[d].push(e);
-        });
-
-        const today = new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
-        hist.innerHTML = '';
-        if (empty) { empty.style.display = 'none'; hist.appendChild(empty); }
-
-        Object.entries(groups).forEach(([date, entries]) => {
-          const lbl = date === today ? 'Today' : date;
-          const grp = document.createElement('div');
-          grp.className = 'mood-group';
-          grp.innerHTML = `<div class="mood-group-label"><span>${lbl}</span><span class="mood-group-count">${entries.length} entr${entries.length===1?'y':'ies'}</span></div>`;
-          entries.forEach(e => {
-            const m = MOODS[e.val] || MOODS[3];
-            const t = new Date(e.time).toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
-            const tagHtml = (e.tags||[]).map(tg => `<span class="mood-tag-chip">${tg}</span>`).join('');
-            const row = document.createElement('div');
-            row.className = 'mood-entry';
-            row.innerHTML = `
-              <div class="mood-entry-face ${m.cls}">${m.emoji}</div>
-              <div class="mood-entry-body">
-                <div class="mood-entry-top">
-                  <span class="mood-entry-name">${m.name}</span>
-                  <span class="mood-entry-time">${t}</span>
-                </div>
-                ${tagHtml ? `<div class="mood-entry-tags">${tagHtml}</div>` : ''}
-                ${e.note ? `<div class="mood-entry-note">${e.note}</div>` : ''}
-              </div>
-              <span class="mood-entry-del" data-id="${e.id}" title="Delete">×</span>`;
-            row.querySelector('.mood-entry-del')?.addEventListener('click', ev => {
-              const id = parseInt(ev.target.dataset.id);
-              const d2 = load().filter(x => x.id !== id);
-              save(d2);
-              renderHistory();
-            });
-            grp.appendChild(row);
-          });
-          hist.appendChild(grp);
-        });
-      }
-
-      // Init on mood tab open
-      const losPane = document.getElementById('los-mood');
-      if (losPane) {
-        new MutationObserver(() => {
-          if (losPane.classList.contains('active')) renderHistory();
-        }).observe(losPane, { attributes:true, attributeFilter:['class'] });
-      }
-      renderHistory();
-    })();
 
     /* ══════════════════════════════
        MONEY SECTION
