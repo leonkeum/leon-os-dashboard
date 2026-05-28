@@ -183,9 +183,12 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
         setRing('workout',   wl, '#c94f4f');
         setRing('nutrition', nl, '#4daa7d');
 
+        const wStreak = updateStreak('workout', wl);
         renderStreakNum('streak-gifd-num',      updateStreak('gifd',      gl));
-        renderStreakNum('streak-workout-num',   updateStreak('workout',   wl));
+        renderStreakNum('streak-workout-num',   wStreak);
         renderStreakNum('streak-nutrition-num', updateStreak('nutrition', nl));
+        const mvEl = document.getElementById('movement-streak-display');
+        if (mvEl) mvEl.textContent = wStreak > 0 ? wStreak : '0';
       };
 
       /* Init + poll every 30s */
