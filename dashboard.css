@@ -169,6 +169,54 @@
       padding: 0 28px;
     }
 
+    /* ── GIFD Reminder Banner ── */
+    #gifd-reminder-banner {
+      background: linear-gradient(135deg, #2a1a4a 0%, #1a1a3a 100%);
+      border-bottom: 1px solid #4f7ec9;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      animation: bannerSlideIn 0.3s ease;
+    }
+    @keyframes bannerSlideIn {
+      from { transform: translateY(-100%); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+    #gifd-reminder-text {
+      font-size: 13px;
+      color: #c8d8f8;
+      line-height: 1.4;
+      flex: 1;
+    }
+    .gifd-reminder-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .gifd-reminder-go {
+      background: #4f7ec9;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .gifd-reminder-dismiss {
+      background: none;
+      border: none;
+      color: #666;
+      font-size: 14px;
+      cursor: pointer;
+      padding: 4px;
+      line-height: 1;
+    }
+
     .topbar-left { display: flex; align-items: center; gap: 14px; }
 
     .topbar-greeting {

@@ -191,6 +191,66 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
       /* Init + poll every 30s */
       window.updateDailyScore();
       setInterval(window.updateDailyScore, 30000);
+
+      /* ── GIFD Reminder Banner ── */
+      (function checkGIFDReminder() {
+        const DISMISS_KEY = 'gifd-reminder-dismissed';
+        if (sessionStorage.getItem(DISMISS_KEY)) return; // already dismissed this session
+
+        const now       = new Date();
+        const hour      = now.getHours();
+        const todayStr  = lDate(now);
+        const yest      = new Date(now); yest.setDate(yest.getDate() - 1);
+        const yesterdayStr = lDate(yest);
+
+        function gifdLoggedFor(dateStr) {
+          try {
+            const entries = JSON.parse(localStorage.getItem('los-gifd-current') || '[]');
+            const e = entries.find(x => x.date === dateStr);
+            return !!(e && (e.desc || Object.values(e.good||{}).some(Boolean) || Object.values(e.bad||{}).some(Boolean)));
+          } catch(_) { return false; }
+        }
+
+        function getGIFDStreak() {
+          try { return (JSON.parse(localStorage.getItem('leon-streaks-v1') || '{}').gifd || {}).count || 0; }
+          catch(_) { return 0; }
+        }
+
+        let msg = null;
+        const streak = getGIFDStreak();
+
+        if (hour >= 22 && !gifdLoggedFor(todayStr)) {
+          // After 10pm, today not logged
+          msg = streak > 0
+            ? `🔥 ${streak}-day streak at risk — you haven't logged today's GIFD yet.`
+            : `📋 Almost midnight — log tonight's GIFD before the day's gone.`;
+        } else if (hour < 12 && !gifdLoggedFor(yesterdayStr)) {
+          // Morning, yesterday not logged
+          msg = `📋 Yesterday's GIFD is unlogged — go back and fill it in.`;
+        }
+
+        if (!msg) return;
+
+        const banner   = document.getElementById('gifd-reminder-banner');
+        const textEl   = document.getElementById('gifd-reminder-text');
+        const goBtn    = document.getElementById('gifd-reminder-go');
+        const dismissBtn = document.getElementById('gifd-reminder-dismiss');
+        if (!banner || !textEl) return;
+
+        textEl.textContent = msg;
+        banner.style.display = 'flex';
+
+        goBtn?.addEventListener('click', () => {
+          banner.style.display = 'none';
+          sessionStorage.setItem(DISMISS_KEY, '1');
+          document.querySelector('[data-section=life-os]')?.click();
+        });
+        dismissBtn?.addEventListener('click', () => {
+          banner.style.display = 'none';
+          sessionStorage.setItem(DISMISS_KEY, '1');
+        });
+      })();
+
     })();
 
     /* ══════════════════════════════
