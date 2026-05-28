@@ -3862,13 +3862,15 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
       const LS_HISTORY  = 'leon-nutr-history-v1';  // { [date]: { protein, calories } }
       const LS_PRESETS  = 'leon-nutr-presets-v1';  // [{ emoji, name, p }]
       const LS_WATER    = 'leon-nutr-water-v1';     // { date, glasses }
-      let nutrActiveDate = lDate(new Date());
+      // lDate is scoped inside the Life OS IIFE — define locally here
+      const fmtDate = d => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+      let nutrActiveDate = fmtDate(new Date());
       const WATER_GOAL  = 8;
 
       function renderNutrDateNav() {
         const el = document.getElementById('nutr-date-display');
         const nextBtn = document.getElementById('nutr-date-next');
-        const realToday = lDate(new Date());
+        const realToday = fmtDate(new Date());
         if (el) {
           const d = new Date(nutrActiveDate + 'T00:00:00');
           el.textContent = nutrActiveDate === realToday
@@ -4327,14 +4329,14 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
       document.getElementById('nutr-date-prev')?.addEventListener('click', () => {
         const d = new Date(nutrActiveDate + 'T00:00:00');
         d.setDate(d.getDate() - 1);
-        switchNutrDate(lDate(d));
+        switchNutrDate(fmtDate(d));
       });
       document.getElementById('nutr-date-next')?.addEventListener('click', () => {
-        const realToday = lDate(new Date());
+        const realToday = fmtDate(new Date());
         if (nutrActiveDate >= realToday) return;
         const d = new Date(nutrActiveDate + 'T00:00:00');
         d.setDate(d.getDate() + 1);
-        switchNutrDate(lDate(d));
+        switchNutrDate(fmtDate(d));
       });
 
       /* Init */
@@ -6038,4 +6040,13 @@ document.addEventListener('DOMContentLoaded', () => { if (document.getElementByI
       }
     });
   }
+
+  /* ── Push immediately when app goes to background (mobile close) ── */
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+      clearTimeout(autoPushTimer);
+      doSilentPush();
+    }
+  });
+
 })();
