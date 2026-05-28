@@ -197,11 +197,15 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
         const DISMISS_KEY = 'gifd-reminder-dismissed';
         if (sessionStorage.getItem(DISMISS_KEY)) return; // already dismissed this session
 
-        const now       = new Date();
-        const hour      = now.getHours();
-        const todayStr  = lDate(now);
-        const yest      = new Date(now); yest.setDate(yest.getDate() - 1);
-        const yesterdayStr = lDate(yest);
+        function fmtDate(d) {
+          return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+        }
+
+        const now          = new Date();
+        const hour         = now.getHours();
+        const todayStr     = fmtDate(now);
+        const yest         = new Date(now); yest.setDate(yest.getDate() - 1);
+        const yesterdayStr = fmtDate(yest);
 
         function gifdLoggedFor(dateStr) {
           try {
