@@ -227,16 +227,6 @@
         <!-- Day strip -->
         <div class="day-strip" id="today-day-strip"><!-- filled by JS --></div>
 
-        <!-- Category filter pills -->
-        <div class="today-cat-strip">
-          <button class="today-cat-pill active" data-cat="all">All</button>
-          <button class="today-cat-pill" data-cat="gifd">GIFD</button>
-          <button class="today-cat-pill" data-cat="workout">Workout</button>
-          <button class="today-cat-pill" data-cat="sleep">Sleep</button>
-          <button class="today-cat-pill" data-cat="nutrition">Nutrition</button>
-          <button class="today-cat-pill" data-cat="schedule">Schedule</button>
-        </div>
-
         <!-- Progress bar -->
         <div class="today-day-progress">
           <div class="tdp-header">
@@ -256,6 +246,39 @@
             </div>
             <div class="today-score-sub" id="today-score-sub">Start logging to build your score.</div>
           </div>
+        </div>
+
+        <!-- Notes + To-Do widgets -->
+        <div class="today-widgets-row">
+
+          <!-- Notes notebook -->
+          <div class="today-widget-card" id="today-notes-card">
+            <div class="today-card-header">
+              <span class="today-card-label">📝 Notes</span>
+              <div class="notes-nav">
+                <button class="notes-nav-btn" id="notes-prev">&#8592;</button>
+                <span class="notes-page-counter" id="notes-counter">1 / 1</span>
+                <button class="notes-nav-btn" id="notes-next">&#8594;</button>
+                <button class="notes-nav-btn notes-add-btn" id="notes-add" title="New page">+</button>
+                <button class="notes-nav-btn notes-del-btn" id="notes-delete" title="Delete page">&#10005;</button>
+              </div>
+            </div>
+            <input class="notes-title-input" id="notes-title" type="text" placeholder="Page title…" maxlength="60" />
+            <textarea class="notes-textarea" id="notes-body" placeholder="Write anything…"></textarea>
+          </div>
+
+          <!-- Checkpoint To-Do -->
+          <div class="today-widget-card" id="today-todo-card">
+            <div class="today-card-header">
+              <span class="today-card-label">&#10003; To-Do</span>
+            </div>
+            <div class="todo-list" id="todo-list"></div>
+            <div class="todo-add-row">
+              <input class="todo-input" id="todo-input" type="text" placeholder="Add task…" maxlength="120" />
+              <button class="todo-add-btn" id="todo-add-btn">+</button>
+            </div>
+          </div>
+
         </div>
 
         <!-- 4 quadrant cards -->
@@ -1430,5 +1453,18 @@
     </div>
   </nav>
 
-<script src="dashboard.js"></script></body>
+<script src="js/shared-init.js"></script>
+<script src="js/gamification.js"></script>
+<script src="js/time-os.js"></script>
+<script src="js/skills-school.js"></script>
+<script src="js/life-os.js"></script>
+<script src="js/life-goals.js"></script>
+<script src="js/movement.js"></script>
+<script src="js/nutrition.js"></script>
+<script src="js/today-dashboard.js"></script>
+<script src="js/money.js"></script>
+<script src="js/side-projects.js"></script>
+<script src="js/chicos.js"></script>
+<script src="js/gist-sync.js"></script>
+</body>
 </html>

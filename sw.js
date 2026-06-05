@@ -1,5 +1,21 @@
-const CACHE_NAME = 'leon-os-v5'; // bump version to bust old cache
-const STATIC = ['./dashboard.html', './dashboard.css', './dashboard.js'];
+const CACHE_NAME = 'leon-os-v6'; // bumped: split JS into 13 files
+const STATIC = [
+  './dashboard.html',
+  './dashboard.css',
+  './js/shared-init.js',
+  './js/gamification.js',
+  './js/time-os.js',
+  './js/skills-school.js',
+  './js/life-os.js',
+  './js/life-goals.js',
+  './js/movement.js',
+  './js/nutrition.js',
+  './js/today-dashboard.js',
+  './js/money.js',
+  './js/side-projects.js',
+  './js/chicos.js',
+  './js/gist-sync.js',
+];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(STATIC)));

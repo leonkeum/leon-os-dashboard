@@ -3440,20 +3440,20 @@
     .today-card {
       background: var(--surface1);
       border: 1px solid var(--border);
-      border-radius: var(--radius-md);
+      border-radius: 12px;
       padding: 18px 20px;
       display: flex;
       flex-direction: column;
       gap: 10px;
       cursor: pointer;
-      transition: border-color 0.15s, background 0.12s;
+      transition: border-color 0.15s, background 0.12s, box-shadow 0.15s;
       position: relative;
       overflow: hidden;
       text-decoration: none;
       color: inherit;
     }
 
-    .today-card:hover { border-color: #272727; background: #131313; }
+    .today-card:hover { border-color: #272727; background: #131313; box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
 
     .today-card-header {
       display: flex;
@@ -3507,7 +3507,7 @@
     .today-score-bar {
       background: var(--surface1);
       border: 1px solid var(--border);
-      border-radius: var(--radius-md);
+      border-radius: 12px;
       padding: 16px 20px;
       margin-bottom: 14px;
       display: flex;
@@ -3780,19 +3780,96 @@
     .day-dot.done { background:var(--green); }
     .day-dot.partial { background:var(--amber); }
 
-    /* Today category pills */
-    .today-cat-strip { display:flex; gap:6px; margin-bottom:16px; overflow-x:auto; scrollbar-width:none; }
-    .today-cat-strip::-webkit-scrollbar { display:none; }
-    .today-cat-pill {
-      padding:5px 14px; border-radius:20px; font-size:11px; font-weight:600;
-      border:1px solid #222; color:#555; cursor:pointer;
-      white-space:nowrap; flex-shrink:0; background:transparent; transition:all 0.15s; letter-spacing:.03em;
+    /* Notes + To-Do widget row */
+    .today-widgets-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 14px;
     }
-    .today-cat-pill:hover { color:#bbb; border-color:#333; }
-    .today-cat-pill.active { background:var(--blue); color:#fff; border-color:var(--blue); }
-    body.light .today-cat-pill { border-color:#e5ddd0; color:#a09888; }
-    body.light .today-cat-pill:hover { color:#5a564f; border-color:#c8bfb0; }
-    body.light .today-cat-pill.active { background:var(--blue); color:#fff; border-color:var(--blue); }
+    .today-widget-card {
+      background: var(--surface1);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 160px;
+    }
+
+    /* Notes */
+    .notes-nav { display:flex; align-items:center; gap:4px; }
+    .notes-page-counter { font-size:10px; color:#555; min-width:32px; text-align:center; }
+    .notes-nav-btn {
+      background: none; border: 1px solid #222; color: #555; border-radius: 5px;
+      width: 22px; height: 22px; font-size: 12px; cursor: pointer; display:flex;
+      align-items:center; justify-content:center; transition: color 0.15s, border-color 0.15s;
+      padding: 0;
+    }
+    .notes-nav-btn:hover { color: #bbb; border-color: #444; }
+    .notes-add-btn { font-size: 16px; width: 26px; }
+    .notes-del-btn { font-size: 11px; }
+    .notes-title-input {
+      background: transparent; border: none; border-bottom: 1px solid #1e1e1e;
+      color: #ccc; font-size: 12px; font-weight: 600; padding: 2px 0 6px;
+      outline: none; width: 100%; font-family: inherit; letter-spacing: 0.02em;
+    }
+    .notes-title-input::placeholder { color: #333; }
+    .notes-textarea {
+      background: transparent; border: none; color: #aaa; font-size: 12px;
+      line-height: 1.6; resize: none; outline: none; flex: 1; min-height: 90px;
+      font-family: inherit; width: 100%;
+    }
+    .notes-textarea::placeholder { color: #2e2e2e; }
+    body.light .notes-title-input { color:#2c2a27; border-bottom-color:#e5ddd0; }
+    body.light .notes-title-input::placeholder { color:#c8bfb0; }
+    body.light .notes-textarea { color:#5a564f; }
+    body.light .notes-textarea::placeholder { color:#c8bfb0; }
+    body.light .notes-nav-btn { border-color:#e5ddd0; color:#a09888; }
+    body.light .notes-page-counter { color:#a09888; }
+
+    /* To-Do */
+    .todo-list { display:flex; flex-direction:column; gap:4px; flex:1; overflow-y:auto; max-height:120px; }
+    .todo-item {
+      display:flex; align-items:center; gap:8px; padding:4px 0;
+      font-size:12px; color:#bbb; border-bottom:1px solid #111;
+    }
+    .todo-item:last-child { border-bottom:none; }
+    .todo-item.done .todo-text { text-decoration:line-through; color:#444; }
+    .todo-check {
+      width:15px; height:15px; border-radius:3px; border:1px solid #2e2e2e;
+      cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center;
+      font-size:10px; color:transparent; transition:all 0.15s; background:transparent;
+    }
+    .todo-item.done .todo-check { background:var(--green); border-color:var(--green); color:#fff; }
+    .todo-text { flex:1; cursor:pointer; }
+    .todo-del {
+      background:none; border:none; color:#2e2e2e; cursor:pointer; font-size:14px;
+      padding:0 2px; line-height:1; transition:color 0.15s; flex-shrink:0;
+    }
+    .todo-del:hover { color:#c94f4f; }
+    .todo-add-row { display:flex; gap:6px; margin-top:2px; }
+    .todo-input {
+      flex:1; background:transparent; border:1px solid #1e1e1e; border-radius:6px;
+      color:#bbb; font-size:12px; padding:5px 10px; outline:none; font-family:inherit;
+      transition:border-color 0.15s;
+    }
+    .todo-input:focus { border-color:#333; }
+    .todo-input::placeholder { color:#2e2e2e; }
+    .todo-add-btn {
+      background:none; border:1px solid #222; border-radius:6px; color:#555;
+      cursor:pointer; font-size:18px; width:30px; height:30px; display:flex;
+      align-items:center; justify-content:center; transition:all 0.15s; padding:0;
+    }
+    .todo-add-btn:hover { color:#bbb; border-color:#444; }
+    body.light .todo-item { color:#5a564f; border-bottom-color:#f0ebe3; }
+    body.light .todo-item.done .todo-text { color:#c8bfb0; }
+    body.light .todo-check { border-color:#c8bfb0; }
+    body.light .todo-input { border-color:#e5ddd0; color:#5a564f; }
+    body.light .todo-input::placeholder { color:#c8bfb0; }
+    body.light .todo-add-btn { border-color:#e5ddd0; color:#a09888; }
+    body.light .today-widget-card { background:#fff; border-color:#e5ddd0; }
 
     /* Today day progress bar */
     .today-day-progress { margin-bottom:20px; }
@@ -4328,6 +4405,7 @@
 
   /* ── Today section ── */
   .today-grid { grid-template-columns: 1fr; gap: 10px; }
+  .today-widgets-row { grid-template-columns: 1fr; }
   .day-strip  { gap: 6px; }
   .today-card { padding: 14px 16px; }
   .today-score-bar { padding: 14px 16px; gap: 14px; }
