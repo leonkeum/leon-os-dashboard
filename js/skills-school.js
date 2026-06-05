@@ -1,6 +1,4 @@
-﻿       MOVEMENT — calisthenics skills (dynamic + persisted)
-    ══════════════════════════════ */
-    try { (function () {
+﻿    try { (function () {
       const LS_KEY        = 'leon-cali-skills';
       const STATUS_CYCLE  = ['not-started', 'drilling', 'almost', 'unlocked'];
       const STATUS_LABELS = { 'not-started': 'Not started', drilling: 'Drilling', almost: 'Almost', unlocked: 'Unlocked' };

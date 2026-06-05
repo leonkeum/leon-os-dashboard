@@ -451,5 +451,3 @@
       const sec = document.getElementById('section-movement');
       /* workout logger removed — no init needed; sleep chart renders via tryRenderSleepChart */
     })(); } catch(e) { console.error('[Movement]', e); }
-
-    /* ══════════════════════════════

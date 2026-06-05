@@ -1,6 +1,4 @@
-﻿       TIME OS — DYNAMIC CALENDAR + GABY UPLOAD
-    ══════════════════════════════ */
-    try { (function () {
+﻿    try { (function () {
       const CAL_KEY = 'leon-calendar-v2';
       const DAYS    = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 
@@ -738,5 +736,3 @@
         gabFile.value = '';
       });
     })(); } catch(e) { console.error('[Time OS]', e); }
-
-    /* ══════════════════════════════

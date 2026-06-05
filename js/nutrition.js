@@ -1,6 +1,4 @@
-﻿       NUTRITION
-    ══════════════════════════════ */
-    try { (function () {
+﻿    try { (function () {
       const LS_KEY      = 'leon-nutrition-v2';
       const LS_HISTORY  = 'leon-nutr-history-v1';  // { [date]: { protein, calories } }
       const LS_PRESETS  = 'leon-nutr-presets-v1';  // [{ emoji, name, p }]

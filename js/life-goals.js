@@ -1,6 +1,4 @@
-﻿       LIFE GOALS
-    ══════════════════════════════ */
-    try { (function () {
+﻿    try { (function () {
       const LS_KEY    = 'leon-life-goals';
       const LS_STREAK = 'leon-first-opened';
 
