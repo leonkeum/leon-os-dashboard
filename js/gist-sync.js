@@ -214,3 +214,52 @@
   });
 
 })();
+
+
+/* ══════════════════════════════
+   RESTORE FROM BACKUP FILE
+══════════════════════════════ */
+(function () {
+  const input     = document.getElementById('sync-restore-input');
+  const statusEl  = document.getElementById('sync-restore-status');
+
+  if (!input) return;
+
+  function setStatus(msg, ok) {
+    if (!statusEl) return;
+    statusEl.textContent = msg;
+    statusEl.style.color = ok ? '#4daa7d' : '#c94f4f';
+  }
+
+  input.addEventListener('change', () => {
+    const file = input.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const data = JSON.parse(e.target.result);
+        const SKIP = new Set(['_exported', '_version']);
+        let count = 0;
+
+        Object.entries(data).forEach(([key, value]) => {
+          if (SKIP.has(key)) return;
+          try {
+            localStorage.setItem(key, typeof value === 'string' ? value : JSON.stringify(value));
+            count++;
+          } catch(_) {}
+        });
+
+        setStatus(`✓ Restored ${count} keys — reloading…`, true);
+        setTimeout(() => location.reload(), 1200);
+      } catch(err) {
+        setStatus('✗ Invalid JSON file: ' + err.message, false);
+      }
+    };
+    reader.onerror = () => setStatus('✗ Could not read file.', false);
+    reader.readAsText(file);
+
+    // Reset so same file can be chosen again
+    input.value = '';
+  });
+})();

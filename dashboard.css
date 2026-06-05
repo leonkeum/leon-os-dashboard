@@ -4572,7 +4572,10 @@
 .sync-action-btn:active { transform: scale(0.97); }
 .sync-push-btn { background: #4f7ec9; color: #fff; }
 .sync-pull-btn { background: #4daa7d; color: #fff; }
+.sync-restore-btn { background: #2a2a2a; color: #bbb; border: 1px solid #333; width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.sync-restore-btn:hover { background: #333; color: #fff; }
 .sync-action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .sync-status { font-size: 11px; color: #888; min-height: 16px; text-align: center; }
 .sync-status.ok   { color: #4daa7d; }
 .sync-status.err  { color: #c94f4f; }
+.sync-divider { border: none; border-top: 1px solid #1e1e1e; margin: 14px 0 10px; }

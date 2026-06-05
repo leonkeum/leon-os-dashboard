@@ -216,6 +216,16 @@
           <button class="sync-action-btn sync-pull-btn" id="sync-pull-btn">↓ Pull</button>
         </div>
         <div class="sync-status" id="sync-status"></div>
+        <div class="sync-divider"></div>
+        <label class="sync-label">Restore from backup file</label>
+        <p class="sync-modal-desc" style="margin-top:0">Load a <code style="font-size:10px;color:#666">leon-os-backup-*.json</code> file exported from this dashboard.</p>
+        <div class="sync-actions">
+          <label class="sync-action-btn sync-restore-btn" id="sync-restore-label" style="cursor:pointer;text-align:center">
+            📂 Choose file
+            <input type="file" id="sync-restore-input" accept=".json" style="display:none"/>
+          </label>
+        </div>
+        <div class="sync-status" id="sync-restore-status"></div>
       </div>
     </div>
 
