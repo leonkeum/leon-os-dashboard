@@ -49,7 +49,7 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
     /* ══════════════════════════════
        GAMIFICATION — DAILY SCORE + STREAKS + RINGS
     ══════════════════════════════ */
-    (function () {
+    try { (function () {
       const TODAY      = new Date().toISOString().slice(0, 10);
       const LS_STREAKS = 'leon-streaks-v1';
       const CIRC       = 50.27; // 2π × r(8)
@@ -73,15 +73,22 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
 
       function sleepLogged() {
         try {
+          const d2 = JSON.parse(localStorage.getItem('leon-sleep-v2') || '{"entries":[]}');
+          const entry = d2.entries.find(e => e.date === TODAY);
+          if (entry && entry.actual > 0) return true;
+        } catch(_) {}
+        try {
           const d = JSON.parse(localStorage.getItem('leon-sleep-v1') || '{}');
           return d.date === TODAY && d.hours > 0;
         } catch(_) { return false; }
+        return false;
       }
 
       function nutritionLogged() {
         try {
           const d = JSON.parse(localStorage.getItem('leon-nutrition-v2') || '{}');
-          return d.date === TODAY && d.meals && d.meals.length > 0;
+          const todayData = d[TODAY];
+          return !!(todayData && todayData.meals && todayData.meals.length > 0);
         } catch(_) { return false; }
       }
 
@@ -258,12 +265,12 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
         });
       })();
 
-    })();
+    })(); } catch(e) { console.error('[Gamification]', e); }
 
     /* ══════════════════════════════
        TIME OS — DYNAMIC CALENDAR + GABY UPLOAD
     ══════════════════════════════ */
-    (function () {
+    try { (function () {
       const CAL_KEY = 'leon-calendar-v2';
       const DAYS    = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 
@@ -1000,12 +1007,12 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
         }
         gabFile.value = '';
       });
-    })();
+    })(); } catch(e) { console.error('[Time OS]', e); }
 
     /* ══════════════════════════════
        MOVEMENT — calisthenics skills (dynamic + persisted)
     ══════════════════════════════ */
-    (function () {
+    try { (function () {
       const LS_KEY        = 'leon-cali-skills';
       const STATUS_CYCLE  = ['not-started', 'drilling', 'almost', 'unlocked'];
       const STATUS_LABELS = { 'not-started': 'Not started', drilling: 'Drilling', almost: 'Almost', unlocked: 'Unlocked' };
@@ -1129,7 +1136,7 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
       });
 
       render();
-    })();
+    })(); } catch(e) { console.error('[Calisthenics Skills]', e); }
 
     /* ── Log session (calisthenics practice — persisted) ── */
     const LS_SESSIONS  = 'leon-skill-sessions';
@@ -1212,7 +1219,7 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
     /* ══════════════════════════════
        SCHOOL
     ══════════════════════════════ */
-    (function () {
+    try { (function () {
       const LS_KEY = 'leon-school-v2';
 
       const DEFAULTS = [
@@ -1345,7 +1352,7 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
       });
 
       render();
-    })();
+    })(); } catch(e) { console.error('[School]', e); }
 
     /* ══════════════════════════════
        @2.CHICOS  (handled by initChicosSection at bottom of file)
@@ -1826,7 +1833,7 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
     /* ══════════════════════════════
        LIFE OS
     ══════════════════════════════ */
-    (function () {
+    try { (function () {
       /* shared utils */
       const lDate = d => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
       function loadChartLOS(cb) {
@@ -3158,12 +3165,12 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
         if(losSec.classList.contains('active')){losInited=true;initLOS();}
       }
 
-    })(); /* end Life OS IIFE */
+    })(); } catch(e) { console.error('[Life OS]', e); } /* end Life OS IIFE */
 
     /* ══════════════════════════════
        LIFE GOALS
     ══════════════════════════════ */
-    (function () {
+    try { (function () {
       const LS_KEY    = 'leon-life-goals';
       const LS_STREAK = 'leon-first-opened';
 
@@ -3402,12 +3409,12 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
         }).observe(sec, { attributes: true, attributeFilter: ['class'] });
         if (sec.classList.contains('active')) { inited = true; render(); }
       }
-    })();
+    })(); } catch(e) { console.error('[Life Goals]', e); }
 
     /* ══════════════════════════════
        MOVEMENT — WORKOUT + SLEEP
     ══════════════════════════════ */
-    (function () {
+    try { (function () {
       const LS_WO    = 'leon-workout-v3';
       const LS_SLEEP = 'leon-sleep-v1';
       const TODAY    = new Date().toISOString().slice(0, 10);
@@ -3855,12 +3862,12 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
       /* ── Init (lazy) ── */
       const sec = document.getElementById('section-movement');
       /* workout logger removed — no init needed; sleep chart renders via tryRenderSleepChart */
-    })();
+    })(); } catch(e) { console.error('[Movement]', e); }
 
     /* ══════════════════════════════
        NUTRITION
     ══════════════════════════════ */
-    (function () {
+    try { (function () {
       const LS_KEY      = 'leon-nutrition-v2';
       const LS_HISTORY  = 'leon-nutr-history-v1';  // { [date]: { protein, calories } }
       const LS_PRESETS  = 'leon-nutr-presets-v1';  // [{ emoji, name, p }]
@@ -4350,12 +4357,12 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
       renderPresets();
       renderWater();
       renderWeekBars();
-    })();
+    })(); } catch(e) { console.error('[Nutrition]', e); }
 
     /* ══════════════════════════════
        TODAY DASHBOARD
     ══════════════════════════════ */
-    (function () {
+    try { (function () {
       const TODAY = new Date().toISOString().slice(0, 10);
 
       /* ── Helpers: read each section's data ── */
@@ -4389,7 +4396,7 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
       function getNutrition() {
         try {
           const d = JSON.parse(localStorage.getItem('leon-nutrition-v2') || '{}');
-          return d.date === TODAY ? d : null;
+          return d[TODAY] || null;
         } catch(_) { return null; }
       }
 
@@ -4806,13 +4813,13 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
         buildStrip();
       };
       setTimeout(window.syncTodayProgress, 800);
-    })();
+    })(); } catch(e) { console.error('[Today Dashboard]', e); }
 
 
     /* ══════════════════════════════
        MONEY SECTION
     ══════════════════════════════ */
-    (function () {
+    try { (function () {
       const LS_TX    = 'leon-money-tx-v1';
       const LS_GOALS = 'leon-money-goals-v1';
       const LS_ACCT  = 'leon-money-acct-v1';
@@ -5140,12 +5147,12 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
         new MutationObserver(() => { if (sec.classList.contains('active')) render(); }).observe(sec, { attributes:true, attributeFilter:['class'] });
         if (sec.classList.contains('active')) render();
       }
-    })();
+    })(); } catch(e) { console.error('[Money]', e); }
 
     /* ══════════════════════════════
        SIDE PROJECTS — TIMER + REPORTS
     ══════════════════════════════ */
-    (function () {
+    try { (function () {
       const LS_SESSIONS = 'leon-sp-sessions-v1';
       const COLORS = ['#4f7ec9','#4daa7d','#c9a032','#c94f4f','#9b7ac9','#4fc9c9','#c94fa0','#7ac94f'];
 
@@ -5361,9 +5368,9 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').ca
       // Also hook into existing project render — update timer list when projects change
       const origSpRender = window.renderSPGrid;
       window.renderTimerList = renderTimerList;
-    })();
+    })(); } catch(e) { console.error('[Side Projects]', e); }
 
-  
+
 function initChicosSection() {
 const stored = JSON.parse(localStorage.getItem('twochicos_weekly') || '[]');
 const latest = stored[stored.length-1] || {};
