@@ -1,4 +1,4 @@
-const CACHE_NAME = 'leon-os-v6'; // bumped: split JS into 13 files
+const CACHE_NAME = 'leon-os-v7'; // bumped: insights page, weekly review, notifications
 const STATIC = [
   './dashboard.html',
   './dashboard.css',
@@ -15,6 +15,9 @@ const STATIC = [
   './js/side-projects.js',
   './js/chicos.js',
   './js/gist-sync.js',
+  './js/weekly-review.js',
+  './js/insights.js',
+  './js/notifications.js',
 ];
 
 self.addEventListener('install', event => {
@@ -29,6 +32,16 @@ self.addEventListener('activate', event => {
     )
   );
   self.clients.claim();
+});
+
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
+      for (const c of list) { if ('focus' in c) { c.focus(); return; } }
+      clients.openWindow('./dashboard.html');
+    })
+  );
 });
 
 self.addEventListener('fetch', event => {

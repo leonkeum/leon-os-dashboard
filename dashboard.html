@@ -106,6 +106,16 @@
       </div>
     </nav>
 
+    <div class="nav-section-label">ANALYTICS</div>
+    <nav class="nav">
+      <div class="nav-item" data-section="insights">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M2 13l3-5 3 3 3-6 3 2"/>
+        </svg>
+        <span class="nav-item-text">Insights</span>
+      </div>
+    </nav>
+
     <!-- Export + streaks -->
     <div style="padding:4px 7px 0;overflow:hidden;white-space:nowrap">
       <button onclick="window.exportLeonData?.()" style="
@@ -195,6 +205,40 @@
       </div>
     </div>
 
+    <!-- ══ Weekly Review Banner ══ -->
+    <div id="weekly-review-banner" class="wr-banner collapsed" style="display:none">
+      <div class="wr-banner-head" id="wr-banner-head">
+        <span class="wr-week-label" id="wr-week-label">Week — · Tap to review</span>
+        <span class="wr-chevron">▾</span>
+      </div>
+      <div class="wr-banner-body" id="wr-banner-body">
+        <div class="wr-stats-row">
+          <div class="wr-stat"><span class="wr-stat-val" id="wr-avg-sleep">—</span><span class="wr-stat-lbl">avg sleep</span></div>
+          <div class="wr-stat"><span class="wr-stat-val" id="wr-workout-days">—</span><span class="wr-stat-lbl">workout days</span></div>
+          <div class="wr-stat"><span class="wr-stat-val" id="wr-avg-protein">—</span><span class="wr-stat-lbl">avg protein</span></div>
+          <div class="wr-stat"><span class="wr-stat-val" id="wr-avg-score">—</span><span class="wr-stat-lbl">avg GIFD score</span></div>
+        </div>
+        <div class="wr-field-row">
+          <span class="wr-field-lbl">Rate the week</span>
+          <div class="wr-stars" id="wr-stars">
+            <button class="wr-star" data-v="1">⭐</button>
+            <button class="wr-star" data-v="2">⭐</button>
+            <button class="wr-star" data-v="3">⭐</button>
+            <button class="wr-star" data-v="4">⭐</button>
+            <button class="wr-star" data-v="5">⭐</button>
+          </div>
+        </div>
+        <input class="wr-input" id="wr-best"   type="text" placeholder="Best moment of the week…" maxlength="120" />
+        <input class="wr-input" id="wr-lesson" type="text" placeholder="Main lesson…" maxlength="120" />
+        <input class="wr-input" id="wr-focus"  type="text" placeholder="Next week focus…" maxlength="120" />
+        <div class="wr-actions">
+          <button class="wr-save-btn" id="wr-save-btn">Save review</button>
+          <button class="wr-skip-btn" id="wr-skip-btn">Later</button>
+        </div>
+        <div class="wr-saved-msg" id="wr-saved-msg"></div>
+      </div>
+    </div>
+
     <!-- ══ Sync Modal ══ -->
     <div class="sync-modal-overlay" id="sync-overlay" style="display:none" onclick="if(event.target===this)document.getElementById('sync-overlay').style.display='none'">
       <div class="sync-modal">
@@ -226,6 +270,13 @@
           </label>
         </div>
         <div class="sync-status" id="sync-restore-status"></div>
+        <div class="sync-divider"></div>
+        <label class="sync-label">Push Notifications</label>
+        <p class="sync-modal-desc" style="margin-top:0">Reminders to log meals, workout, GIFD and sleep.</p>
+        <div class="sync-actions">
+          <button class="sync-action-btn" id="notif-enable-btn">Enable Notifications</button>
+        </div>
+        <div class="sync-status" id="notif-status-notif"></div>
       </div>
     </div>
 
@@ -1423,6 +1474,26 @@
 
       </div>
 
+      <!-- ══ INSIGHTS ══ -->
+      <div id="section-insights" class="section">
+        <div class="ins-effects-row">
+          <div class="ins-card">
+            <div class="ins-card-title">Active Buffs</div>
+            <div id="ins-buff-list"><div class="ins-empty">No active buffs — earn them through habits.</div></div>
+          </div>
+          <div class="ins-card">
+            <div class="ins-card-title">Active Debuffs</div>
+            <div id="ins-debuff-list"><div class="ins-empty">✅ No debuffs — clean week.</div></div>
+          </div>
+        </div>
+        <div class="ins-card"><div class="ins-card-title">Sleep — 14 days</div><div style="height:180px;position:relative"><canvas id="ins-sleep-chart"></canvas></div></div>
+        <div class="ins-card"><div class="ins-card-title">Workout frequency — 4 weeks</div><div style="height:160px;position:relative"><canvas id="ins-workout-chart"></canvas></div></div>
+        <div class="ins-card"><div class="ins-card-title">Protein — 14 days</div><div style="height:160px;position:relative"><canvas id="ins-protein-chart"></canvas></div></div>
+        <div class="ins-card"><div class="ins-card-title">Day Score — 14 days</div><div style="height:160px;position:relative"><canvas id="ins-score-chart"></canvas></div></div>
+        <div class="ins-card"><div class="ins-card-title">Mana by hour (avg)</div><div style="height:160px;position:relative"><canvas id="ins-mana-chart"></canvas></div></div>
+        <div class="ins-card"><div class="ins-card-title">GIFD Happiness — 14 days</div><div style="height:160px;position:relative"><canvas id="ins-happy-chart"></canvas></div></div>
+      </div>
+
     </main>
   </div>
 
@@ -1461,6 +1532,10 @@
       <svg class="mob-nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="14" height="9" rx="1.5"/><path d="M1 7.5h14M5.5 11.5h1M8.5 11.5h2"/></svg>
       <span>Money</span>
     </div>
+    <div class="mob-nav-item" data-section="insights">
+      <svg class="mob-nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 13l3-5 3 3 3-6 3 2"/></svg>
+      <span>Insights</span>
+    </div>
   </nav>
 
 <script src="js/shared-init.js"></script>
@@ -1476,5 +1551,8 @@
 <script src="js/side-projects.js"></script>
 <script src="js/chicos.js"></script>
 <script src="js/gist-sync.js"></script>
+<script src="js/weekly-review.js"></script>
+<script src="js/insights.js"></script>
+<script src="js/notifications.js"></script>
 </body>
 </html>

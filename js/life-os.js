@@ -464,49 +464,139 @@
         {id:'d3',name:'Dark Cloud',desc:'High stats but zero current Main Quest. Feeling over-leveled with nothing to aim at.',resolved:false},
       ];
 
-      /* ── Live debuff rules — scan last 7 days of GIFD ── */
+      /* ── Live effect rules — debuffs (negative) + buffs (positive) ── */
       const LIVE_DEBUFF_RULES = [
-        { id:'ld-weed',   check: (counts) => counts.bad.weed   >= 3, name:'Clouded Mind',      desc:'Weed 3+ days this week.',          mods:{int:-1,luk:-1} },
-        { id:'ld-porn',   check: (counts) => counts.bad.porn   >= 3, name:'Dopamine Drain',    desc:'Porn 3+ days this week.',          mods:{cha:-1,str:-1} },
-        { id:'ld-scroll', check: (counts) => counts.bad.scroll >= 4, name:'Attention Scatter', desc:'Scroll +1h on 4+ days this week.', mods:{int:-1,dex:-1} },
-        { id:'ld-junk',   check: (counts) => counts.bad.junk   >= 4, name:'Low Fuel',          desc:'Junk food 4+ days this week.',     mods:{str:-1} },
-        { id:'ld-smoke',  check: (counts) => counts.bad.smoked >= 2, name:'Lung Debuff',       desc:'Smoked 2+ days this week.',        mods:{str:-1,dex:-1} },
-        { id:'ld-post',   check: (counts) => counts.good.posted < 2, name:'Creator Ghost',     desc:'Posted fewer than 2× this week.',  mods:{cha:-1} },
-        { id:'ld-train',  check: (counts) => counts.good.trained < 2,name:'Untrained',         desc:'Trained fewer than 2× this week.', mods:{str:-1} },
-        { id:'ld-med',    check: (counts) => counts.good.meditate === 0, name:'Uncalibrated',  desc:'No meditation this week.',         mods:{int:-1} },
+        // ── DEBUFFS ──
+        { id:'ld-weed',        type:'debuff', check: ctx => ctx.counts.bad.weed      >= 3,
+          name:'Clouded Mind',      desc:'Weed 3+ days this week.',                    mods:{int:-1,luk:-1} },
+        { id:'ld-weed-heavy',  type:'debuff', check: ctx => ctx.counts.bad.weed      >= 5,
+          name:'Chronic Fog',       desc:'Weed 5+ days — deep INT/LUK drain.',        mods:{int:-2,luk:-2} },
+        { id:'ld-combo-cloud', type:'debuff', check: ctx => ctx.counts.bad.weed >= 3 && ctx.counts.bad.latesleep >= 3,
+          name:'Clouded & Late',    desc:'Weed 3+ AND late sleep 3+ — double hit. −20% Mana capacity.', mods:{int:-2,luk:-1}, manaEffect:-0.2 },
+        { id:'ld-nopor',       type:'debuff', check: ctx => ctx.counts.bad.nopor     >= 3,
+          name:'Dopamine Drain',    desc:'Porn 3+ days this week.',                    mods:{cha:-1,str:-1} },
+        { id:'ld-scroll',      type:'debuff', check: ctx => ctx.counts.bad.scroll    >= 4,
+          name:'Attention Scatter', desc:'Scroll 4+ days this week.',                  mods:{int:-1,dex:-1} },
+        { id:'ld-scroll-heavy',type:'debuff', check: ctx => ctx.counts.bad.scroll    >= 6,
+          name:'Digital Fog',       desc:'Scroll every single day — severe INT loss.', mods:{int:-2,dex:-2} },
+        { id:'ld-junk',        type:'debuff', check: ctx => ctx.counts.bad.junk      >= 4,
+          name:'Low Fuel',          desc:'Junk food 4+ days this week.',               mods:{str:-1} },
+        { id:'ld-latesleep',   type:'debuff', check: ctx => ctx.counts.bad.latesleep >= 4,
+          name:'Night Crawler',     desc:'Late sleep 4+ days — circadian wrecked.',    mods:{int:-1,luk:-1} },
+        { id:'ld-impulse',     type:'debuff', check: ctx => ctx.counts.bad.impulse   >= 3,
+          name:'Impulse Mode',      desc:'Impulsive 3+ days this week.',               mods:{luk:-2} },
+        { id:'ld-ghost',       type:'debuff', check: ctx => ctx.counts.good.posted   <  2,
+          name:'Creator Ghost',     desc:'Posted fewer than 2× this week.',            mods:{cha:-1} },
+        { id:'ld-untrained',   type:'debuff', check: ctx => ctx.counts.good.gym      <  2,
+          name:'Untrained',         desc:'Hit the gym fewer than 2× this week.',       mods:{str:-1} },
+        { id:'ld-sleepdebt',   type:'debuff', check: ctx => ctx.avgSleep7 > 0 && ctx.avgSleep7 < 6,
+          name:'Sleep Debt',        desc:'Avg sleep under 6h — body and mind drained.',mods:{int:-1,cha:-1,str:-1} },
+        { id:'ld-sedentary',   type:'debuff', check: ctx => ctx.workoutDays7 === 0,
+          name:'Sedentary',         desc:'Zero workouts this week.',                   mods:{str:-2,dex:-1} },
+
+        // ── BUFFS ──
+        { id:'lb-study',     type:'buff', check: ctx => ctx.counts.good.studied  >= 5,
+          name:'Big Brain',         desc:'Studied 5+ days this week.',                 mods:{int:+2} },
+        { id:'lb-gym',       type:'buff', check: ctx => ctx.workoutDays7          >= 5,
+          name:'Iron Will',         desc:'Gym 5+ days — peak physical output.',        mods:{str:+2,dex:+1} },
+        { id:'lb-clean',     type:'buff', check: ctx => ['weed','nopor','scroll','junk','latesleep','impulse'].every(k=>ctx.counts.bad[k]===0),
+          name:'Pure Run',          desc:'Zero bad habits all week — perfect discipline.', mods:{int:+1,cha:+1,str:+1,dex:+1,luk:+2} },
+        { id:'lb-sleep',     type:'buff', check: ctx => ctx.avgSleep7             >= 7.5,
+          name:'Well Rested',       desc:'Avg sleep 7.5h+ — peak cognitive recovery.', mods:{int:+1,luk:+1} },
+        { id:'lb-post',      type:'buff', check: ctx => ctx.counts.good.posted    >= 5,
+          name:'Social King',       desc:'Posted 5+ days — CHA in overdrive.',         mods:{cha:+2} },
+        { id:'lb-read',      type:'buff', check: ctx => ctx.counts.good.read      >= 5,
+          name:'Scholar Mode',      desc:'Read 5+ days this week.',                    mods:{int:+1,luk:+1} },
+        { id:'lb-nophone',   type:'buff', check: ctx => ctx.counts.good.nophone   >= 5,
+          name:'Ghost Protocol',    desc:'No-phone 5+ days — razor focus unlocked.',   mods:{int:+1,dex:+2} },
+        { id:'lb-plan',      type:'buff', check: ctx => ctx.counts.good.planned   >= 5,
+          name:'Prepared Mind',     desc:'Planned every day this week.',               mods:{int:+1,luk:+1} },
+        { id:'lb-cleandiet', type:'buff', check: ctx => ctx.counts.bad.junk       === 0,
+          name:'Clean Fuel',        desc:'Zero junk food all week.',                   mods:{str:+1,dex:+1} },
+        { id:'lb-noscroll',  type:'buff', check: ctx => ctx.counts.bad.scroll     === 0,
+          name:'Deep Focus',        desc:'Zero scroll this week — mind fully present.', mods:{int:+1,dex:+1} },
+        { id:'lb-monk',      type:'buff', check: ctx => ctx.counts.bad.weed===0 && ctx.counts.bad.scroll===0 && ctx.counts.good.nophone>=5,
+          name:'The Monk',          desc:'No weed, no scroll, no-phone 5+ days — peak clarity.', mods:{int:+3,dex:+1} },
+        { id:'lb-grind',     type:'buff', check: ctx => ctx.workoutDays7 >= 4 && ctx.counts.good.studied >= 4,
+          name:'The Grind',         desc:'Body AND mind trained 4+ days — double output.', mods:{int:+1,str:+1,dex:+1} },
       ];
 
-      function computeLiveDebuffs() {
+      function computeLiveEffects() {
         try {
           const allEntries = JSON.parse(localStorage.getItem('los-gifd-current') || '[]');
           const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 7);
           const cutoffStr = lDate(cutoff);
           const recent = allEntries.filter(e => e.date >= cutoffStr);
-          const counts = { bad:{weed:0,porn:0,scroll:0,junk:0,smoked:0}, good:{posted:0,trained:0,meditate:0} };
+
+          const counts = {
+            bad:  { weed:0, nopor:0, scroll:0, junk:0, latesleep:0, impulse:0 },
+            good: { posted:0, gym:0, slept:0, read:0, clean:0, studied:0, nophone:0, planned:0 },
+          };
           recent.forEach(e => {
-            ['weed','porn','scroll','junk','smoked'].forEach(k=>{ if((e.bad||{})[k]) counts.bad[k]++; });
-            ['posted','trained','meditate'].forEach(k=>{ if((e.good||{})[k]) counts.good[k]++; });
+            ['weed','nopor','scroll','junk','latesleep','impulse'].forEach(k => { if((e.bad||{})[k]) counts.bad[k]++; });
+            ['posted','gym','slept','read','clean','studied','nophone','planned'].forEach(k => { if((e.good||{})[k]) counts.good[k]++; });
           });
-          return LIVE_DEBUFF_RULES.filter(r => r.check(counts));
-        } catch(_) { return []; }
+
+          // Avg sleep last 7 days
+          let avgSleep7 = 0;
+          try {
+            const sleepData = JSON.parse(localStorage.getItem('leon-sleep-v2') || 'null');
+            const sleepEntries = (sleepData?.entries || []).filter(e => e.date >= cutoffStr);
+            if (sleepEntries.length) avgSleep7 = sleepEntries.reduce((a, e) => a + (e.actual || 0), 0) / sleepEntries.length;
+          } catch(_) {}
+
+          // Workout days last 7 days
+          let workoutDays7 = 0;
+          try {
+            const woData = JSON.parse(localStorage.getItem('leon-workout-v3') || 'null');
+            const sessions = (woData?.sessions || []).filter(s => s.date >= cutoffStr && (s.sets||[]).length > 0);
+            workoutDays7 = new Set(sessions.map(s => s.date)).size;
+          } catch(_) {}
+
+          const ctx = { counts, avgSleep7, workoutDays7 };
+          const matched = LIVE_DEBUFF_RULES.filter(r => r.check(ctx));
+          return {
+            buffs:   matched.filter(r => r.type === 'buff'),
+            debuffs: matched.filter(r => r.type === 'debuff'),
+          };
+        } catch(_) { return { buffs:[], debuffs:[] }; }
       }
+
+      // backward-compat wrapper
+      function computeLiveDebuffs() { return computeLiveEffects().debuffs; }
+      window.computeLiveEffects = computeLiveEffects;
 
       function getDebuffs(){const s=lsLoad(LS_DEBUFFS);return s&&s.length?s:DEF_DEBUFFS.map(d=>({...d}));}
 
       function renderDebuffs(){
         const el=document.getElementById('debuff-cards'); if(!el) return;
-        const liveDebuffs = computeLiveDebuffs();
+        const { buffs, debuffs } = computeLiveEffects();
         const manualDebuffs=getDebuffs();
         el.innerHTML='';
         function addEl(html){const t=document.createElement('div');t.innerHTML=html;el.appendChild(t.firstChild);}
+        function modsStr(mods,isBuffColor){
+          return Object.entries(mods).map(([k,v])=>`<span style="color:${v>0?'#4daa7d':'#c94f4f'}">${v>0?'+':''}${v} ${k.toUpperCase()}</span>`).join(' ');
+        }
 
-        // Live debuffs section
-        addEl(`<div style="font-size:10px;color:#555;margin-bottom:6px;letter-spacing:0.5px;text-transform:uppercase">Auto — this week's GIFD</div>`);
-        if (liveDebuffs.length) {
-          liveDebuffs.forEach(df=>{
-            const modsStr = Object.entries(df.mods).map(([k,v])=>`${v>0?'+':''}${v} ${k.toUpperCase()}`).join(', ');
+        // Active buffs
+        addEl(`<div style="font-size:10px;color:#555;margin-bottom:6px;letter-spacing:0.5px;text-transform:uppercase">Active Buffs</div>`);
+        if (buffs.length) {
+          buffs.forEach(bf=>{
+            const c=document.createElement('div'); c.className='debuff-card buff-card';
+            c.innerHTML=`<div style="flex:1"><div class="debuff-name buff-name">${bf.name} <span style="font-size:10px;font-weight:400;margin-left:4px">${modsStr(bf.mods)}</span></div><div class="debuff-desc">${bf.desc}</div></div>`;
+            el.appendChild(c);
+          });
+        } else {
+          addEl(`<div style="font-size:11px;color:#2e2e2e;padding:4px 0 8px">No active buffs — earn them through good habits.</div>`);
+        }
+        addEl(`<div style="height:1px;background:#1e1e1e;margin:10px 0"></div>`);
+
+        // Active debuffs
+        addEl(`<div style="font-size:10px;color:#555;margin-bottom:6px;letter-spacing:0.5px;text-transform:uppercase">Active Debuffs</div>`);
+        if (debuffs.length) {
+          debuffs.forEach(df=>{
             const c=document.createElement('div'); c.className='debuff-card live-debuff';
-            c.innerHTML=`<div style="flex:1"><div class="debuff-name">${df.name} <span style="font-size:10px;font-weight:400;color:#c94f4f;margin-left:4px">${modsStr}</span></div><div class="debuff-desc">${df.desc}</div></div>`;
+            c.innerHTML=`<div style="flex:1"><div class="debuff-name">${df.name} <span style="font-size:10px;font-weight:400;margin-left:4px">${modsStr(df.mods)}</span></div><div class="debuff-desc">${df.desc}${df.manaEffect?` <em style="color:#9b7ac9">(${Math.round(df.manaEffect*100)}% Mana)</em>`:''}</div></div>`;
             el.appendChild(c);
           });
         } else {
@@ -534,27 +624,32 @@
         const canvas=document.getElementById('radar-chart'); if(!canvas) return;
         if(radarChart){radarChart.destroy();radarChart=null;}
 
-        // Compute effective stats by applying live debuff mods
-        const liveDebuffs = computeLiveDebuffs();
+        // Compute effective stats by applying live buff + debuff mods
+        const { buffs: liveBuffs, debuffs: liveDebuffs } = computeLiveEffects();
         const baseStats = R_KEYS.map(k=>latest.stats[k]||0);
         const effectiveMods = {}; R_KEYS.forEach(k=>effectiveMods[k]=0);
-        liveDebuffs.forEach(df=>{ Object.entries(df.mods).forEach(([k,v])=>{ if(effectiveMods[k]!==undefined) effectiveMods[k]+=v; }); });
+        [...liveBuffs, ...liveDebuffs].forEach(ef=>{ Object.entries(ef.mods).forEach(([k,v])=>{ if(effectiveMods[k]!==undefined) effectiveMods[k]+=v; }); });
         const effectiveStats = R_KEYS.map((k,i)=>Math.max(0,Math.min(10,baseStats[i]+(effectiveMods[k]||0))));
-        const hasDebuffs = liveDebuffs.length > 0;
+        const hasEffects = liveBuffs.length > 0 || liveDebuffs.length > 0;
+        const netDelta = R_KEYS.reduce((sum,k)=>sum+(effectiveMods[k]||0), 0);
+        const effectIsPositive = netDelta >= 0;
 
         const datasets = [{
           data:baseStats,backgroundColor:'rgba(79,126,201,0.15)',
           borderColor:'#4f7ec9',borderWidth:1.5,pointRadius:3,pointBackgroundColor:'#4f7ec9',
           label:'Base'
         }];
-        if (hasDebuffs) datasets.push({
-          data:effectiveStats,backgroundColor:'rgba(201,79,79,0.12)',
-          borderColor:'rgba(201,79,79,0.8)',borderWidth:1.5,pointRadius:3,pointBackgroundColor:'#c94f4f',
+        if (hasEffects) datasets.push({
+          data:effectiveStats,
+          backgroundColor: effectIsPositive ? 'rgba(77,170,125,0.12)' : 'rgba(201,79,79,0.12)',
+          borderColor:     effectIsPositive ? 'rgba(77,170,125,0.8)'  : 'rgba(201,79,79,0.8)',
+          borderWidth:1.5,pointRadius:3,
+          pointBackgroundColor: effectIsPositive ? '#4daa7d' : '#c94f4f',
           borderDash:[4,3],label:'Effective'
         });
 
         radarChart=new Chart(canvas.getContext('2d'),{type:'radar',data:{labels:R_AXES,datasets},
-          options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:hasDebuffs,labels:{color:'#555',font:{size:10}}}},
+          options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:hasEffects,labels:{color:'#555',font:{size:10}}}},
             scales:{r:{min:0,max:10,ticks:{display:false},grid:{color:'#1e1e1e'},angleLines:{color:'#1e1e1e'},
                       pointLabels:{color:'#666',font:{family:'Inter',size:11}}}}}});
         const st=document.getElementById('radar-date-stamp');if(st)st.textContent='Last updated: '+latest.date;
