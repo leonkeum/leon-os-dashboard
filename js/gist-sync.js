@@ -69,7 +69,7 @@
   }
   function scheduleAutoPush() {
     clearTimeout(autoPushTimer);
-    autoPushTimer = setTimeout(doSilentPush, 4000);
+    autoPushTimer = setTimeout(doSilentPush, 1000);
   }
 
   /* ── Intercept localStorage writes to trigger auto-push ── */
