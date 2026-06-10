@@ -55,7 +55,7 @@
         const yestStr = lDate(yest);
         const sorted = [...gifdEntries]
           .filter(e => e.date < todayStr)    // past only (not today)
-          .sort((a,b) => b.date < a.date ? -1 : 1); // newest first
+          .sort((a,b) => a.date < b.date ? 1 : a.date > b.date ? -1 : 0); // newest first
         let streak = 0;
         // Walk backward from yesterday — missing day breaks streak
         let expectDate = yestStr;
@@ -159,7 +159,7 @@
             const btn = document.createElement('button');
             btn.className = 'gifd-habit-chip bad' + (todayBad[k] ? ' active' : '');
             btn.dataset.k = k;
-            btn.innerHTML = `<span class="chip-icon">✗</span>${label}${streak >= 2 ? `<span class="chip-streak">${streak}d</span>` : ''}`;
+            btn.innerHTML = `<span class="chip-icon">✗</span>${label}${streak >= 1 ? `<span class="chip-streak">${streak}d</span>` : ''}`;
             btn.addEventListener('click', () => {
               todayBad[k] = !todayBad[k];
               btn.classList.toggle('active', todayBad[k]);
@@ -169,7 +169,7 @@
               // Update streak badge live
               const s = getHabitStreak(k, false);
               let badge = btn.querySelector('.chip-streak');
-              if (s >= 2) { if (badge) badge.textContent = s + 'd'; else { badge = document.createElement('span'); badge.className = 'chip-streak'; badge.textContent = s + 'd'; btn.appendChild(badge); } }
+              if (s >= 1) { if (badge) badge.textContent = s + 'd'; else { badge = document.createElement('span'); badge.className = 'chip-streak'; badge.textContent = s + 'd'; btn.appendChild(badge); } }
               else if (badge) badge.remove();
             });
             badList.appendChild(btn);
@@ -185,7 +185,7 @@
             const btn = document.createElement('button');
             btn.className = 'gifd-habit-chip good' + (todayGood[k] ? ' active' : '');
             btn.dataset.k = k;
-            btn.innerHTML = `<span class="chip-icon">✓</span>${label}${streak >= 2 ? `<span class="chip-streak">${streak}d</span>` : ''}`;
+            btn.innerHTML = `<span class="chip-icon">✓</span>${label}${streak >= 1 ? `<span class="chip-streak">${streak}d</span>` : ''}`;
             btn.addEventListener('click', () => {
               todayGood[k] = !todayGood[k];
               btn.classList.toggle('active', todayGood[k]);
@@ -195,7 +195,7 @@
               // Update streak badge live
               const s = getHabitStreak(k, true);
               let badge = btn.querySelector('.chip-streak');
-              if (s >= 2) { if (badge) badge.textContent = s + 'd'; else { badge = document.createElement('span'); badge.className = 'chip-streak'; badge.textContent = s + 'd'; btn.appendChild(badge); } }
+              if (s >= 1) { if (badge) badge.textContent = s + 'd'; else { badge = document.createElement('span'); badge.className = 'chip-streak'; badge.textContent = s + 'd'; btn.appendChild(badge); } }
               else if (badge) badge.remove();
             });
             goodList.appendChild(btn);

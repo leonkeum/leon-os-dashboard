@@ -1,4 +1,4 @@
-const CACHE_NAME = 'leon-os-v7'; // bumped: insights page, weekly review, notifications
+const CACHE_NAME = 'leon-os-v8'; // bumped: habit streak fix
 const STATIC = [
   './dashboard.html',
   './dashboard.css',
