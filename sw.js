@@ -1,4 +1,4 @@
-const CACHE_NAME = 'leon-os-v8'; // bumped: habit streak fix
+const CACHE_NAME = 'leon-os-v9'; // bumped: gist auth Bearer fix
 const STATIC = [
   './dashboard.html',
   './dashboard.css',

@@ -94,7 +94,7 @@
     const resp = await fetch('https://api.github.com' + path, {
       method,
       headers: {
-        'Authorization': 'token ' + pat,
+        'Authorization': 'Bearer ' + pat,
         'Accept':        'application/vnd.github+json',
         'Content-Type':  'application/json',
       },
