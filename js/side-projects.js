@@ -149,8 +149,6 @@
       }
     })();
 
-       SIDE PROJECTS — TIMER + REPORTS
-    ══════════════════════════════ */
     try { (function () {
       const LS_SESSIONS = 'leon-sp-sessions-v1';
       const COLORS = ['#4f7ec9','#4daa7d','#c9a032','#c94f4f','#9b7ac9','#4fc9c9','#c94fa0','#7ac94f'];

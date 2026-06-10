@@ -332,5 +332,3 @@
         if (sec.classList.contains('active')) render();
       }
     })(); } catch(e) { console.error('[Money]', e); }
-
-    /* ══════════════════════════════
