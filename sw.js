@@ -1,4 +1,4 @@
-const CACHE_NAME = 'leon-os-v9'; // bumped: gist auth Bearer fix
+const CACHE_NAME = 'leon-os-v10'; // bumped: download backup button
 const STATIC = [
   './dashboard.html',
   './dashboard.css',

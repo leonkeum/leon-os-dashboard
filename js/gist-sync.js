@@ -217,6 +217,31 @@
 
 
 /* ══════════════════════════════
+   EXPORT / DOWNLOAD BACKUP
+══════════════════════════════ */
+(function () {
+  const btn = document.getElementById('sync-export-btn');
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    const SKIP = new Set(['sync-pat','sync-gist-id','sync-auto','sync-last-push']);
+    const data = { _exported: new Date().toISOString(), _version: 1 };
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (!SKIP.has(k)) {
+        try { data[k] = JSON.parse(localStorage.getItem(k)); } catch(_) { data[k] = localStorage.getItem(k); }
+      }
+    }
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `leon-os-backup-${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+})();
+
+/* ══════════════════════════════
    RESTORE FROM BACKUP FILE
 ══════════════════════════════ */
 (function () {
