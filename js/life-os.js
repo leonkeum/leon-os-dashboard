@@ -911,7 +911,7 @@
       }
 
       function initCodex(){
-        renderCodex();
+        try { renderCodex(); } catch(e) { console.error('[Codex]', e); }
         document.getElementById('codex-add-btn')?.addEventListener('click',()=>document.getElementById('codex-form')?.classList.toggle('open'));
         document.getElementById('codex-save')?.addEventListener('click',()=>{
           const t=document.getElementById('codex-input')?.value.trim();if(!t)return;
@@ -1490,7 +1490,7 @@
 
       /* ── Init ── */
       function initLOS(){
-        initTabs(); initGIFD(); initSkills(); initRadar(); initMana(); initCodex(); initMap();
+        initTabs(); initGIFD(); initCodex(); initMap();
         loadChartLOS(()=>{renderGIFDCharts();});
       }
 
