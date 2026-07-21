@@ -800,39 +800,114 @@
       /* ════ CODEX ════ */
       const LS_CODEX='los-codex-custom';
       const CODEX=[
-        [1,"If you don't choose your main quest the system assigns the default: Study→9-5→Marriage→Mortgage→Retire at 70. Most people don't customise. You can."],
-        [2,"Random spawn point. Some people start with more resources or higher intelligence. It's RNG. Don't waste time complaining about your spawn."],
-        [3,"Base stats are locked with slight adjustments. Any build is viable but don't force a build that fights your natural fit."],
-        [4,"Customisable build. Base stats mostly fixed but your build isn't. Experiment and design your playstyle throughout the years."],
-        [5,"You level up through reps not talent. Ability is malleable. Grinding the boring stuff beats natural talent every time."],
-        [6,"Time is the most OP currency. Early XP compounds. Late grinding is harder and less forgiving."],
-        [7,"You can change classes mid-game. You're not locked into your first career, identity or role. Switching feels scary but staying costs more XP."],
-        [8,"Single player game with multiplayer modes. Guilds, partners and allies can massively boost your stats."],
-        [9,"Status items don't help you beat the game. Shiny gear looks good (+Aura) but often slows progression. Freedom builds quietly not visibly."],
-        [10,"You decide your win condition. Retire early. Build something meaningful. Do nothing. Go all in. The game doesn't judge, only you do."],
-        [11,"Rest mechanic is not optional. Skipping the save cycle leads to Burnout debuff which applies -X% multiplier on productivity and charisma stats."],
-        [12,"High tier loot is gated by cringe. Growth, success, love are hidden behind quests that are awkward or risky. If a quest makes you nervous the XP payout is greater."],
-        [13,"Environment is a passive buff. Your home base and guild provide stat modifiers. Toxic party = constant drain on mana. Clean base = +10 on focus."],
-        [14,"Staying in the starter base stops your XP gain. To level up you have to enter uncharted territory where mobs are tougher. Comfort is a level cap."],
-        [15,"Manage your inventory. You have limited slots for habits and commitments. Drop low-tier junk to make room for legendary opportunities."],
-        [16,"Difficulty scales with levels. You get better at the controls but level 40 requires a more refined strategy than level 20."],
-        [17,"You can't control your spawn but can influence the drop rate of good luck by increasing your surface area: meeting new people, sharing your work, staying curious."],
-        [18,"Failure is a reload with kept XP. Unless it's Game Over every failure is just a boss fight. Analyse the death recap then respawn and try again."],
-        [19,"Invisible UI. No on-screen health bar. You have to manually check your character sheet before your stats hit zero."],
-        [20,"Protect HP. No HP no game."],
-        [21,"Early game is beta. Use your first 25 levels to test different builds and biomes."],
-        [22,"Avoid gold sinks. Instant dopamine micro-transactions drain long-term XP."],
+        {n:1,  cat:'sys', text:"If you don't choose your main quest the system assigns the default: Study→9-5→Marriage→Mortgage→Retire at 70. Most people don't customise. You can."},
+        {n:2,  cat:'sys', text:"Random spawn point. Some people start with more resources or higher intelligence. It's RNG. Don't waste time complaining about your spawn."},
+        {n:3,  cat:'sys', text:"Base stats are locked with slight adjustments. Any build is viable but don't force a build that fights your natural fit."},
+        {n:4,  cat:'sys', text:"Customisable build. Base stats mostly fixed but your build isn't. Experiment and design your playstyle throughout the years."},
+        {n:5,  cat:'doc', text:"You level up through reps not talent. Ability is malleable. Grinding the boring stuff beats natural talent every time."},
+        {n:6,  cat:'doc', text:"Time is the most OP currency. Early XP compounds. Late grinding is harder and less forgiving."},
+        {n:7,  cat:'sys', text:"You can change classes mid-game. You're not locked into your first career, identity or role. Switching feels scary but staying costs more XP."},
+        {n:8,  cat:'doc', text:"Single player game with multiplayer modes. Guilds, partners and allies can massively boost your stats."},
+        {n:9,  cat:'doc', text:"Status items don't help you beat the game. Shiny gear looks good (+Aura) but often slows progression. Freedom builds quietly not visibly."},
+        {n:10, cat:'sys', text:"You decide your win condition. Retire early. Build something meaningful. Do nothing. Go all in. The game doesn't judge, only you do."},
+        {n:11, cat:'doc', text:"Rest mechanic is not optional. Skipping the save cycle leads to Burnout debuff which applies -X% multiplier on productivity and charisma stats."},
+        {n:12, cat:'doc', text:"High tier loot is gated by cringe. Growth, success, love are hidden behind quests that are awkward or risky. If a quest makes you nervous the XP payout is greater."},
+        {n:13, cat:'doc', text:"Environment is a passive buff. Your home base and guild provide stat modifiers. Toxic party = constant drain on mana. Clean base = +10 on focus."},
+        {n:14, cat:'sys', text:"Staying in the starter base stops your XP gain. To level up you have to enter uncharted territory where mobs are tougher. Comfort is a level cap."},
+        {n:15, cat:'doc', text:"Manage your inventory. You have limited slots for habits and commitments. Drop low-tier junk to make room for legendary opportunities."},
+        {n:16, cat:'sys', text:"Difficulty scales with levels. You get better at the controls but level 40 requires a more refined strategy than level 20."},
+        {n:17, cat:'doc', text:"You can't control your spawn but can influence the drop rate of good luck by increasing your surface area: meeting new people, sharing your work, staying curious."},
+        {n:18, cat:'doc', text:"Failure is a reload with kept XP. Unless it's Game Over every failure is just a boss fight. Analyse the death recap then respawn and try again."},
+        {n:19, cat:'sys', text:"Invisible UI. No on-screen health bar. You have to manually check your character sheet before your stats hit zero."},
+        {n:20, cat:'doc', text:"Protect HP. No HP no game."},
+        {n:21, cat:'sys', text:"Early game is beta. Use your first 25 levels to test different builds and biomes."},
+        {n:22, cat:'doc', text:"Avoid gold sinks. Instant dopamine micro-transactions drain long-term XP."},
+        // Locked entries — unlock at Power Level threshold
+        {n:23, cat:'doc', locked:70,  text:"The grind is the point. Most players focus on the destination. The rare ones realise the daily session IS the game. They always win."},
+        {n:24, cat:'sys', locked:70,  text:"16,000 observers are spectating your playthrough. They paused their own game to watch yours. Every day you don't publish is a chapter they're waiting on."},
+        {n:25, cat:'doc', locked:85,  text:"Legacy mode unlocks after enough consecutive sessions. The players who show up daily regardless of the score — those are the ones history remembers."},
       ];
 
+      function getCodexState(){
+        const TODAY=new Date().toISOString().slice(0,10);
+        function chk(fn){try{return fn();}catch(_){return false;}}
+        const gl=chk(()=>{const e=(JSON.parse(localStorage.getItem('los-gifd-current')||'[]')).find(x=>x.date===TODAY);return !!(e&&(e.desc||Object.values(e.good||{}).some(Boolean)));});
+        const wl=chk(()=>{const d=JSON.parse(localStorage.getItem('leon-workout-v3')||'{}');const s=(d.sessions||[]).find(x=>x.date===TODAY);return !!(s&&s.sets&&s.sets.length);});
+        const sl=chk(()=>{const d=JSON.parse(localStorage.getItem('leon-sleep-v2')||'{"entries":[]}');return !!(d.entries||[]).find(e=>e.date===TODAY&&e.actual>0);});
+        const nl=chk(()=>{const d=JSON.parse(localStorage.getItem('leon-nutrition-v2')||'{}');const t=d[TODAY];return !!(t&&t.meals&&t.meals.length);});
+        const gh=chk(()=>{const e=(JSON.parse(localStorage.getItem('los-gifd-current')||'[]')).find(x=>x.date===TODAY);if(!e)return{good:0,bad:0};return{good:Object.values(e.good||{}).filter(Boolean).length,bad:Object.values(e.bad||{}).filter(Boolean).length};})||{good:0,bad:0};
+        let score=0;
+        if(gl)score+=25;if(wl)score+=25;if(sl)score+=15;if(nl)score+=15;
+        score+=gh.good*4;score-=gh.bad*4;
+        return {score:Math.max(0,Math.round(score)),gl,wl,sl,nl};
+      }
+
       function renderCodex(){
+        const TODAY=new Date().toISOString().slice(0,10);
+        const {score,gl,wl,sl,nl}=getCodexState();
+        const cls=score>=85?'Legend':score>=70?'Champion':score>=51?'Adventurer':score>=26?'Initiate':'Wanderer';
+
+        /* ── Character Sheet ── */
+        const csSlot=document.getElementById('codex-char-sheet-slot');
+        if(csSlot){
+          const quests=[{label:'GIFD',done:gl},{label:'WORKOUT',done:wl},{label:'SLEEP',done:sl},{label:'FOOD',done:nl}];
+          csSlot.innerHTML=`<div class="codex-char-sheet">
+            <div class="codex-cs-top">
+              <div><div class="codex-cs-name">⚔ Leon</div><div class="codex-cs-class">${cls} · Content Creator</div></div>
+              <div class="codex-cs-power"><div class="codex-cs-score">${score}</div><div class="codex-cs-score-label">Power Level</div></div>
+            </div>
+            <div class="codex-cs-divider"></div>
+            <div class="codex-cs-quests">${quests.map(q=>`<div class="codex-quest ${q.done?'done':'pending'}">${q.done?'✓':'○'} ${q.label}</div>`).join('')}</div>
+          </div>`;
+        }
+
+        /* ── Daily Lore ── */
+        const loreSlot=document.getElementById('codex-daily-lore-slot');
+        if(loreSlot){
+          const unlockable=CODEX.filter(e=>!e.locked||score>=e.locked);
+          const d=new Date(TODAY);
+          const seed=d.getFullYear()*10000+d.getMonth()*100+d.getDate();
+          const lore=unlockable[seed%unlockable.length];
+          loreSlot.innerHTML=`<div class="codex-daily-lore">
+            <div class="codex-lore-eyebrow">— Daily Lore · ${TODAY} —</div>
+            <div class="codex-lore-text"><span class="codex-lore-num">[${String(lore.n).padStart(2,'0')}]</span>${lore.text}</div>
+          </div>`;
+        }
+
+        /* ── Rules list ── */
         const el=document.getElementById('codex-rules');if(!el)return;
         const custom=lsLoad(LS_CODEX)||[];
-        const all=[...CODEX,...custom.map((t,i)=>[23+i,t])];
-        el.innerHTML=all.map(([n,text])=>`<div class="codex-item${n>=23?' codex-custom':''}">
-          <div class="codex-header"><span class="codex-num">${String(n).padStart(2,'0')}</span>
-            <span class="codex-title">${text.split('.')[0]}.</span><span class="codex-arrow">▶</span></div>
-          <div class="codex-body">${text}</div></div>`).join('');
-        el.querySelectorAll('.codex-header').forEach(h=>h.addEventListener('click',()=>h.closest('.codex-item').classList.toggle('open')));
+        const customEntries=custom.map((t,i)=>({n:100+i,cat:'fld',text:t}));
+        const all=[...CODEX,...customEntries];
+        const LABEL={sys:'SYSTEM',doc:'DOCTRINE',fld:'FIELD'};
+
+        el.innerHTML=all.map(entry=>{
+          const isLocked=entry.locked&&score<entry.locked;
+          if(isLocked){
+            return `<div class="codex-item locked-entry">
+              <div class="codex-header">
+                <span class="codex-tag doc">LOCKED</span>
+                <span class="codex-num">${String(entry.n).padStart(2,'0')}</span>
+                <span class="codex-title">████ ██████ ████ ████ ███ ████</span>
+              </div>
+              <div class="codex-unlock-hint">Unlocks at Power Level ${entry.locked}</div>
+            </div>`;
+          }
+          const shortTitle=entry.text.indexOf('.')>0?entry.text.slice(0,entry.text.indexOf('.')+1):entry.text;
+          return `<div class="codex-item ${entry.cat}">
+            <div class="codex-header">
+              <span class="codex-tag ${entry.cat}">${LABEL[entry.cat]||'FIELD'}</span>
+              <span class="codex-num">${String(entry.n).padStart(2,'0')}</span>
+              <span class="codex-title">${shortTitle}</span>
+              <span class="codex-arrow">▶</span>
+            </div>
+            <div class="codex-body">${entry.text}</div>
+          </div>`;
+        }).join('');
+
+        el.querySelectorAll('.codex-item:not(.locked-entry) .codex-header').forEach(h=>
+          h.addEventListener('click',()=>h.closest('.codex-item').classList.toggle('open'))
+        );
       }
 
       function initCodex(){
