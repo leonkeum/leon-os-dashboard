@@ -6,12 +6,8 @@ function saveWeek() {
 const entry = {
 timestamp: Date.now(),
 date: new Date().toISOString().split('T')[0],
-followers: parseInt(document.getElementById('chicos-followers')?.value) || 0,
+account: document.getElementById('chicos-account')?.value.trim() || '',
 posts: selectedPosts,
-bestViews: parseInt(document.getElementById('chicos-best-views')?.value) || 0,
-dmsSent: parseInt(document.getElementById('chicos-dms-sent')?.value) || 0,
-dmsReplied: parseInt(document.getElementById('chicos-dms-replied')?.value) || 0,
-higgsfieldExpiry: document.getElementById('chicos-higgsfield-expiry')?.value || '',
 lastPostDate: document.getElementById('chicos-last-post')?.value || ''
 };
 /* Overwrite today's entry if one already exists, otherwise append */
@@ -51,27 +47,17 @@ function updateCountdownBadge() {
 function renderChicosMetrics() {
 const data = JSON.parse(localStorage.getItem('twochicos_weekly') || '[]');
 const latest = data[data.length-1] || {};
-const prev = data[data.length-2] || {};
 const lastPostDate = latest.lastPostDate ? new Date(latest.lastPostDate) : null;
 const daysSince = lastPostDate ? Math.floor((Date.now() - lastPostDate) / 86400000) : null;
-const followerChange = latest.followers && prev.followers ? latest.followers - prev.followers : null;
 const last3 = data.slice(-3);
-const avgPosts = last3.length ? last3.reduce((s,e) => s+e.posts, 0) / last3.length : 0;
-const consistency = avgPosts ? Math.round((latest.posts / avgPosts) * 100) : 0;
-const dmConversion = latest.dmsSent ? Math.round((latest.dmsReplied / latest.dmsSent) * 100) : 0;
-const higgsfieldDays = latest.higgsfieldExpiry ? Math.ceil((new Date(latest.higgsfieldExpiry) - Date.now()) / 86400000) : null;
-const monthPosts = data.filter(e => e.date && e.date.startsWith(new Date().toISOString().slice(0,7))).reduce((s,e) => s+e.posts, 0);
+const avgPosts = last3.length ? last3.reduce((s,e) => s+(e.posts||0), 0) / last3.length : 0;
+const consistency = avgPosts ? Math.round(((latest.posts||0) / avgPosts) * 100) : 0;
+const monthPosts = data.filter(e => e.date && e.date.startsWith(new Date().toISOString().slice(0,7))).reduce((s,e) => s+(e.posts||0), 0);
 
 const daysEl = document.getElementById('chicos-days-since');
-if (daysEl && daysSince !== null) {
-  daysEl.textContent = daysSince;
+if (daysEl) {
+  daysEl.textContent = daysSince !== null ? daysSince : '—';
   daysEl.className = 'days-counter ' + (daysSince >= 14 ? 'days-red pulse' : daysSince >= 7 ? 'days-orange' : '');
-}
-
-const fcEl = document.getElementById('chicos-follower-change');
-if (fcEl && followerChange !== null) {
-  fcEl.textContent = (followerChange >= 0 ? '▲ +' : '▼ ') + followerChange;
-  fcEl.style.color = followerChange >= 0 ? '#22c55e' : '#ef4444';
 }
 
 const consEl = document.getElementById('chicos-consistency');
@@ -80,41 +66,19 @@ if (consEl) {
   consEl.style.color = consistency >= 75 ? '#22c55e' : consistency >= 50 ? '#f59e0b' : '#ef4444';
 }
 
-const dmEl = document.getElementById('chicos-dm-rate');
-if (dmEl) dmEl.textContent = dmConversion + '%';
-
-const hEl = document.getElementById('chicos-higgsfield-days');
-if (hEl && higgsfieldDays !== null) {
-  hEl.textContent = higgsfieldDays <= 0 ? '🚨 USE NOW' : higgsfieldDays + ' days';
-  hEl.className = 'chicos-metric-value ' + (higgsfieldDays <= 0 ? 'days-red pulse' : higgsfieldDays <= 1 ? 'days-red' : higgsfieldDays <= 3 ? 'days-orange' : '');
-}
-
 const monthEl = document.getElementById('chicos-month-posts');
 if (monthEl) {
-  const monthTarget = 12;
   monthEl.textContent = monthPosts + '/12-16';
   monthEl.style.color = monthPosts >= 16 ? '#22c55e' : monthPosts >= 12 ? '#4ade80' : monthPosts >= 8 ? '#f59e0b' : monthPosts >= 4 ? '#f97316' : '';
 }
 
 const alertsEl = document.getElementById('chicos-alerts');
 if (alertsEl) {
+  if (!data.length) { alertsEl.innerHTML = ''; return; }
   let html = '';
-  if (!data.length) { alertsEl.innerHTML = ''; return; } /* no data yet — suppress all alerts */
-  if (daysSince !== null && daysSince > 14) html += '<div class="chicos-alert chicos-alert-red">🔴 ' + daysSince + ' DAYS WITHOUT POSTING — @2.chicos is bleeding followers</div>';
-  if (data.length > 0 && latest.posts === 0 && new Date().getDay() >= 4) html += '<div class="chicos-alert chicos-alert-amber">⚠️ No post this week yet — window closing</div>';
-  if (followerChange !== null && followerChange < 0) html += '<div class="chicos-alert chicos-alert-amber">📉 Lost ' + Math.abs(followerChange) + ' followers this week — post something this weekend</div>';
-  if (latest.dmsSent > 0 && latest.dmsReplied === 0) html += '<div class="chicos-alert chicos-alert-blue">💬 Sent DMs but no replies — follow up or try new brands</div>';
-  if (higgsfieldDays !== null && higgsfieldDays <= 3) html += '<div class="chicos-alert chicos-alert-red">🎬 Higgsfield expires in ' + higgsfieldDays + ' days — generate content NOW</div>';
+  if (daysSince !== null && daysSince > 14) html += '<div class="chicos-alert chicos-alert-red">🔴 ' + daysSince + ' days without posting — your audience is waiting</div>';
+  if (latest.posts === 0 && new Date().getDay() >= 4) html += '<div class="chicos-alert chicos-alert-amber">⚠️ No post this week yet — window closing</div>';
   alertsEl.innerHTML = html;
-}
-
-if (window.chicosChart) {
-  window.chicosChart.data.labels = data.map(e => e.date);
-  window.chicosChart.data.datasets[0].data = data.map(e => e.followers);
-  window.chicosChart.data.datasets[1].data = data.map(() => 20000);
-  window.chicosChart.update();
-} else if (window.Chart) {
-  buildChicosChart();
 }
 }
 document.getElementById('chicos-save-btn')?.addEventListener('click', saveWeek);
@@ -135,69 +99,6 @@ document.querySelectorAll('.chicos-post-btn').forEach(b => b.classList.remove('a
 btn.classList.add('active');
 });
 });
-/* ── Growth chart (lazy-load Chart.js if not already present) ── */
-function buildChicosChart() {
-  if (!window.Chart) return;
-  const chartEl = document.getElementById('chicos-growth-chart');
-  if (!chartEl) return;
-  if (window.chicosChart) { window.chicosChart.destroy(); window.chicosChart = null; }
-  const data = JSON.parse(localStorage.getItem('twochicos_weekly') || '[]');
-  const ctx = chartEl.getContext('2d');
-  const grad = ctx.createLinearGradient(0, 0, 0, 180);
-  grad.addColorStop(0, 'rgba(59,130,246,0.18)');
-  grad.addColorStop(1, 'rgba(59,130,246,0)');
-  window.chicosChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: data.map(e => e.date),
-      datasets: [{
-        label: 'Followers',
-        data: data.map(e => e.followers),
-        borderColor: '#3b82f6',
-        backgroundColor: grad,
-        borderWidth: 1.5,
-        tension: 0.4,
-        fill: true,
-        pointRadius: 3,
-        pointBackgroundColor: '#3b82f6',
-        pointBorderColor: 'transparent'
-      }, {
-        label: '20k goal',
-        data: data.map(() => 20000),
-        borderColor: '#f59e0b',
-        borderDash: [5, 5],
-        borderWidth: 1,
-        pointRadius: 0
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: '#111',
-          borderColor: '#2a2a2a',
-          borderWidth: 1,
-          titleColor: '#555',
-          bodyColor: '#ddd',
-          padding: 8
-        }
-      },
-      scales: {
-        y: { grid: { color: '#1a1a1a' }, ticks: { color: '#555' }, border: { color: '#1e1e1e' } },
-        x: { grid: { color: '#1a1a1a' }, ticks: { color: '#555' }, border: { color: '#1e1e1e' } }
-      }
-    }
-  });
-}
-(function loadChicosChartJS() {
-  if (window.Chart) { buildChicosChart(); return; }
-  const s = document.createElement('script');
-  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
-  s.onload = buildChicosChart;
-  document.head.appendChild(s);
-})();
 /* ── Chicos Kanban ── */
 (function () {
   const COLS = ['idea', 'filming', 'editing', 'published'];
@@ -451,17 +352,13 @@ function buildChicosChart() {
 if (window._renderChicosKanban) window._renderChicosKanban();
 renderChicosMetrics();
 updateCountdownBadge();
-if (latest.followers)       document.getElementById('chicos-followers').value         = latest.followers;
-if (latest.bestViews)       document.getElementById('chicos-best-views').value        = latest.bestViews;
-if (latest.dmsSent)         document.getElementById('chicos-dms-sent').value          = latest.dmsSent;
-if (latest.dmsReplied)      document.getElementById('chicos-dms-replied').value       = latest.dmsReplied;
-if (latest.higgsfieldExpiry) document.getElementById('chicos-higgsfield-expiry').value = latest.higgsfieldExpiry;
-if (latest.lastPostDate)    document.getElementById('chicos-last-post').value         = latest.lastPostDate;
+if (latest.account)      document.getElementById('chicos-account').value    = latest.account;
+if (latest.lastPostDate) document.getElementById('chicos-last-post').value  = latest.lastPostDate;
 document.querySelectorAll('.chicos-post-btn').forEach(btn => {
 if (parseInt(btn.dataset.val) === selectedPosts) btn.classList.add('active');
 });
 }
-document.addEventListener('DOMContentLoaded', () => { if (document.getElementById('chicos-followers')) initChicosSection(); });
+document.addEventListener('DOMContentLoaded', () => { if (document.getElementById('chicos-save-btn')) initChicosSection(); });
 
 /* ══════════════════════════════════════════════════════════════
    GIST SYNC — push/pull all Leon OS data to a private GitHub Gist

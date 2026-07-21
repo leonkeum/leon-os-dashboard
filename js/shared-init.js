@@ -43,5 +43,48 @@
     });
 
     document.querySelectorAll('.mob-nav-item').forEach(item => {
-      item.addEventListener('click', () => switchSection(item.dataset.section));
+      item.addEventListener('click', () => {
+        switchSection(item.dataset.section);
+        // Close more tray when a section is selected
+        const tray = document.getElementById('mob-more-tray');
+        if (tray) tray.style.display = 'none';
+      });
     });
+
+    // Sidebar extras toggle
+    (function () {
+      const extras = document.getElementById('sidebar-extras');
+      const btn    = document.getElementById('sidebar-more-btn');
+      const icon   = document.getElementById('sidebar-more-icon');
+      if (!extras || !btn) return;
+      let expanded = localStorage.getItem('leon-sidebar-expanded') === '1';
+      function applyState() {
+        extras.style.display = expanded ? '' : 'none';
+        if (icon) icon.textContent = expanded ? '↑' : '⋯';
+      }
+      applyState();
+      btn.addEventListener('click', () => {
+        expanded = !expanded;
+        localStorage.setItem('leon-sidebar-expanded', expanded ? '1' : '0');
+        applyState();
+      });
+    })();
+
+    // Mobile more tray toggle
+    (function () {
+      const moreBtn = document.getElementById('mob-more-btn');
+      const tray    = document.getElementById('mob-more-tray');
+      if (!moreBtn || !tray) return;
+      moreBtn.addEventListener('click', () => {
+        const open = tray.style.display === 'flex';
+        tray.style.display = open ? 'none' : 'flex';
+        moreBtn.style.color = open ? '' : '#4f7ec9';
+      });
+      // Close tray when tapping outside
+      document.addEventListener('click', e => {
+        if (!tray.contains(e.target) && e.target !== moreBtn && !moreBtn.contains(e.target)) {
+          tray.style.display = 'none';
+          moreBtn.style.color = '';
+        }
+      });
+    })();

@@ -21,8 +21,6 @@
             tab.classList.add('active');
             const pane = document.getElementById(`los-${tab.dataset.losTab}`);
             if (pane) pane.classList.add('active');
-            if (tab.dataset.losTab === 'radar') { initRadarChart(); renderDebuffs(); }
-            if (tab.dataset.losTab === 'mana')  initManaChart();
             if (tab.dataset.losTab === 'gifd')  renderGIFDCharts();
           });
         });

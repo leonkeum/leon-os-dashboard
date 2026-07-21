@@ -38,12 +38,6 @@
         </svg>
         <span class="nav-item-text">GIFD</span>
       </div>
-      <div class="nav-item" data-section="nutrition">
-        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M5 1v5a3 3 0 006 0V1M8 9v6M5 15h6"/>
-        </svg>
-        <span class="nav-item-text">Nutrition</span>
-      </div>
       <div class="nav-item" data-section="money">
         <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
           <rect x="1" y="4" width="14" height="9" rx="1.5"/>
@@ -61,60 +55,70 @@
         </svg>
         <span class="nav-item-text">Time OS</span>
       </div>
-      <div class="nav-item" data-section="school">
-        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M8 2L2 5l6 3 6-3-6-3z"/><path d="M2 5v5m6 1v3m-4-2.5a6 6 0 008 0"/>
-        </svg>
-        <span class="nav-item-text">School</span>
-      </div>
     </nav>
 
-    <div class="nav-section-label">FITNESS</div>
-    <nav class="nav">
-      <div class="nav-item" data-section="movement">
-        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M1 8h2m10 0h2M3 8l1-2h8l1 2M4 6V4m8 2V4M5 4h6"/>
-        </svg>
-        <span class="nav-item-text">Movement</span>
-      </div>
-    </nav>
+    <div id="sidebar-extras" style="display:none">
+      <div class="nav-section-label">FITNESS</div>
+      <nav class="nav">
+        <div class="nav-item" data-section="nutrition">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M5 1v5a3 3 0 006 0V1M8 9v6M5 15h6"/>
+          </svg>
+          <span class="nav-item-text">Nutrition</span>
+        </div>
+        <div class="nav-item" data-section="movement">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M1 8h2m10 0h2M3 8l1-2h8l1 2M4 6V4m8 2V4M5 4h6"/>
+          </svg>
+          <span class="nav-item-text">Movement</span>
+        </div>
+      </nav>
 
-    <div class="nav-section-label">PROJECTS</div>
-    <nav class="nav">
-      <div class="nav-item" data-section="chicos">
-        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-          <circle cx="8" cy="5" r="2.5"/><path d="M3 14c0-3 2-5 5-5s5 2 5 5"/>
-        </svg>
-        <span class="nav-item-text">@2.chicos</span>
-      </div>
-      <div class="nav-item" data-section="side-projects">
-        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M2 4h12M2 8h8M2 12h5"/><circle cx="13" cy="10" r="2.5"/>
-        </svg>
-        <span class="nav-item-text">Side Projects</span>
-      </div>
-    </nav>
+      <div class="nav-section-label">SCHOOL</div>
+      <nav class="nav">
+        <div class="nav-item" data-section="school">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M8 2L2 5l6 3 6-3-6-3z"/><path d="M2 5v5m6 1v3m-4-2.5a6 6 0 008 0"/>
+          </svg>
+          <span class="nav-item-text">School</span>
+        </div>
+      </nav>
 
-    <div class="nav-section-label">GOALS</div>
-    <nav class="nav">
-      <div class="nav-item" data-section="life-goals">
-        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-          <circle cx="8" cy="8" r="6"/><circle cx="8" cy="8" r="2.5"/>
-          <path d="M8 2v1.5M8 12.5V14M2 8h1.5M12.5 8H14"/>
-        </svg>
-        <span class="nav-item-text">Life Goals</span>
-      </div>
-    </nav>
+      <div class="nav-section-label">SOCIAL</div>
+      <nav class="nav">
+        <div class="nav-item" data-section="chicos">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="8" cy="5" r="2.5"/><path d="M3 14c0-3 2-5 5-5s5 2 5 5"/>
+          </svg>
+          <span class="nav-item-text">Social Media</span>
+        </div>
+      </nav>
 
-    <div class="nav-section-label">ANALYTICS</div>
-    <nav class="nav">
-      <div class="nav-item" data-section="insights">
-        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M2 13l3-5 3 3 3-6 3 2"/>
-        </svg>
-        <span class="nav-item-text">Insights</span>
-      </div>
-    </nav>
+      <div class="nav-section-label">ANALYTICS</div>
+      <nav class="nav">
+        <div class="nav-item" data-section="insights">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M2 13l3-5 3 3 3-6 3 2"/>
+          </svg>
+          <span class="nav-item-text">Insights</span>
+        </div>
+      </nav>
+    </div>
+
+    <div style="padding:4px 7px 0;overflow:hidden;white-space:nowrap">
+      <button id="sidebar-more-btn" style="
+        width:100%;height:28px;border-radius:6px;border:1px solid #1e1e1e;
+        background:transparent;color:#444;font-family:Inter,sans-serif;
+        font-size:10px;font-weight:600;letter-spacing:0.05em;cursor:pointer;
+        display:flex;align-items:center;gap:8px;padding:0 8px;
+        transition:border-color 0.15s,color 0.15s;
+        text-transform:uppercase;
+      " onmouseover="this.style.borderColor='#333';this.style.color='#777'"
+         onmouseout="this.style.borderColor='#1e1e1e';this.style.color='#444'">
+        <span id="sidebar-more-icon">⋯</span>
+        <span class="nav-item-text">More sections</span>
+      </button>
+    </div>
 
     <!-- Export + streaks -->
     <div style="padding:4px 7px 0;overflow:hidden;white-space:nowrap">
@@ -682,10 +686,6 @@
 
         <div class="los-tabs">
           <button class="los-tab active" data-los-tab="gifd">GIFD</button>
-          <button class="los-tab" data-los-tab="skills">Skills</button>
-          <button class="los-tab" data-los-tab="radar">Radar</button>
-          <button class="los-tab" data-los-tab="mana">Mana</button>
-          <button class="los-tab" data-los-tab="map">Map</button>
           <button class="los-tab" data-los-tab="codex">Codex</button>
         </div>
 
@@ -764,171 +764,7 @@
 
         </div>
 
-        <!-- ── TAB 2: Skills ── -->
-        <div class="los-pane" id="los-skills">
-          <div class="los-xp-bars" id="skills-xp-bars"></div>
-          <div class="los-card" style="margin-top:12px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-              <span class="los-card-title" style="margin-bottom:0">Session Log</span>
-              <button class="add-assign-btn" id="skills-log-btn">+ Log session</button>
-            </div>
-            <div class="add-assign-form" id="skills-form" style="border-top:none;padding:0">
-              <div class="form-row">
-                <div class="form-field">
-                  <label class="form-label">Date</label>
-                  <input type="date" class="form-input" id="sk-date">
-                </div>
-                <div class="form-field">
-                  <label class="form-label">Skill</label>
-                  <select class="form-select" id="sk-skill">
-                    <option value="SOC">SOC — Social</option>
-                    <option value="STR">STR — Strength</option>
-                    <option value="WOK">WOK — Work</option>
-                    <option value="INT">INT/WIS — Intelligence</option>
-                  </select>
-                </div>
-              </div>
-              <div class="los-slider-row">
-                <label class="form-label">D — Effort &nbsp;<span id="sk-d-val" style="color:#4daa7d">0</span></label>
-                <input type="range" min="0" max="5" value="0" class="goal-progress" id="sk-d">
-              </div>
-              <div class="los-slider-row">
-                <label class="form-label">I — Discomfort &nbsp;<span id="sk-i-val" style="color:#4f7ec9">0</span></label>
-                <input type="range" min="0" max="5" value="0" class="goal-progress" id="sk-i">
-              </div>
-              <div class="los-slider-row">
-                <label class="form-label">C — Completion &nbsp;<span id="sk-c-val" style="color:#c9a032">0</span></label>
-                <input type="range" min="0" max="5" value="0" class="goal-progress" id="sk-c">
-              </div>
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">
-                <span style="font-size:12px;color:#666">Total XP: <strong id="sk-total" style="color:#e0e0e0">0</strong></span>
-                <button class="form-submit" id="sk-save">Log</button>
-              </div>
-            </div>
-          </div>
-          <div class="los-card" style="margin-top:10px">
-            <div class="los-card-title">History</div>
-            <div id="skills-history"></div>
-          </div>
-        </div>
-
-        <!-- ── TAB 3: Radar ── -->
-        <div class="los-pane" id="los-radar">
-          <div class="los-card">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-              <span class="los-card-title" style="margin-bottom:0">Life Stats Radar</span>
-              <button class="add-assign-btn" id="radar-update-btn">Update Stats</button>
-            </div>
-            <div style="height:280px;position:relative"><canvas id="radar-chart"></canvas></div>
-            <div style="font-size:10px;color:#2e2e2e;margin-top:8px;text-align:right" id="radar-date-stamp"></div>
-          </div>
-          <div class="los-card" id="radar-form-card" style="margin-top:10px;display:none">
-            <div class="los-card-title">Update Stats</div>
-            <div id="radar-sliders"></div>
-            <div style="display:flex;justify-content:flex-end;margin-top:10px">
-              <button class="form-submit" id="radar-save">Save Snapshot</button>
-            </div>
-          </div>
-          <div class="los-card" style="margin-top:10px">
-            <div class="los-card-title">Recent Snapshots</div>
-            <div id="radar-history"></div>
-          </div>
-          <div class="los-card" style="margin-top:10px">
-            <div class="los-card-title">⚠ Current Debuffs</div>
-            <div id="debuff-cards"></div>
-          </div>
-        </div>
-
-        <!-- ── TAB 4: Mana ── -->
-        <div class="los-pane" id="los-mana">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-            <div class="los-card">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-                <span class="los-card-title" style="margin-bottom:0">🧹 Cleanse Streak</span>
-                <span class="los-streak-count" id="cleanse-count">0</span>
-              </div>
-              <div class="los-circles" id="cleanse-circles"></div>
-            </div>
-            <div class="los-card">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-                <span class="los-card-title" style="margin-bottom:0">📲 Post Streak</span>
-                <span class="los-streak-count" id="post-count">0</span>
-              </div>
-              <div class="los-circles" id="post-circles"></div>
-            </div>
-          </div>
-          <div class="los-card">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-              <span class="los-card-title" style="margin-bottom:0">Mana — Today</span>
-              <button class="add-assign-btn" id="mana-log-btn">+ Log Mana</button>
-            </div>
-            <div class="add-assign-form" id="mana-form" style="border-top:none;padding:0 0 12px">
-              <div class="form-row">
-                <div class="form-field">
-                  <label class="form-label">Hour (0–23)</label>
-                  <input type="number" class="form-input" id="mana-hour" min="0" max="23" placeholder="e.g. 14">
-                </div>
-                <div class="form-field">
-                  <label class="form-label">Energy (0–10)</label>
-                  <input type="number" class="form-input" id="mana-energy" min="0" max="10" placeholder="0–10">
-                </div>
-              </div>
-              <button class="form-submit" id="mana-save">Log</button>
-            </div>
-            <div style="height:200px;position:relative"><canvas id="mana-chart"></canvas></div>
-          </div>
-          <div class="los-card" style="margin-top:10px">
-            <div class="los-card-title">Today's Log</div>
-            <div id="mana-log-list"></div>
-          </div>
-          <div class="los-card mana-insights-card" id="mana-insights-card" style="margin-top:10px;display:none">
-            <div class="los-card-title">⚡ Energy Patterns</div>
-            <div id="mana-insights"></div>
-          </div>
-        </div>
-
-        <!-- ── TAB 4.5: Map ── -->
-        <div class="los-pane" id="los-map">
-          <div class="map-stale-banner" id="map-stale-banner">⚠ MAP GOING STATIC — explore a new tile</div>
-          <div class="map-canvas-wrap">
-            <canvas id="fog-map-canvas" width="900" height="700"></canvas>
-            <button class="map-explore-btn" id="map-explore-btn">⚔ EXPLORE</button>
-            <div class="map-dice-overlay" id="map-dice-overlay">
-              <div class="map-dice-num" id="map-dice-num">?</div>
-              <div class="map-dice-result" id="map-dice-result"></div>
-            </div>
-          </div>
-          <div class="map-tooltip" id="map-tooltip"></div>
-          <div class="map-explore-form" id="map-explore-form">
-            <div class="form-row">
-              <div class="form-field">
-                <label class="form-label">Location name</label>
-                <input type="text" class="form-input" id="map-loc-name" placeholder="e.g. Montjuïc">
-              </div>
-              <div class="form-field">
-                <label class="form-label">Tile</label>
-                <select class="form-select" id="map-tile-sel"></select>
-              </div>
-            </div>
-            <div class="form-field">
-              <label class="form-label">Notes</label>
-              <input type="text" class="form-input" id="map-notes" placeholder="What happened here?">
-            </div>
-            <div style="display:flex;justify-content:space-between;align-items:center">
-              <button class="add-assign-btn" id="map-explore-cancel">Cancel</button>
-              <button class="form-submit" id="map-explore-submit">Explore &amp; Roll</button>
-            </div>
-          </div>
-          <div class="map-log-wrap">
-            <div class="map-log-header">
-              <span>Explored Locations</span>
-              <span id="map-total-count" style="color:#c8860a;font-family:'Press Start 2P',monospace;font-size:9px">0 tiles</span>
-            </div>
-            <div id="map-log-list"></div>
-          </div>
-        </div>
-
-        <!-- ── TAB 5: Codex ── -->
+        <!-- ── TAB 2: Codex ── -->
         <div class="los-pane" id="los-codex">
           <div class="los-card">
             <div class="los-card-title">Life Gamified — Codex</div>
@@ -1019,7 +855,7 @@
 
       </div>
 
-      <!-- ══ @2.CHICOS ══ -->
+      <!-- ══ SOCIAL MEDIA ══ -->
       <div id="section-chicos" class="section">
 
         <div class="chicos-weekly-form">
@@ -1029,13 +865,13 @@
     <svg class="chicos-toggle-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </button>
   <div class="chicos-form-body" id="chicos-form-body">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;margin-top:1rem">
-      <div><label style="font-size:11px;color:#666;display:block;margin-bottom:4px">FOLLOWERS</label><input id="chicos-followers" type="number" placeholder="15988" style="width:100%;background:#0a0a0a;border:1px solid #1e1e1e;border-radius:8px;padding:8px 12px;color:#fff;font-size:16px;box-sizing:border-box"></div>
-      <div><label style="font-size:11px;color:#666;display:block;margin-bottom:4px">BEST POST VIEWS</label><input id="chicos-best-views" type="number" placeholder="0" style="width:100%;background:#0a0a0a;border:1px solid #1e1e1e;border-radius:8px;padding:8px 12px;color:#fff;font-size:16px;box-sizing:border-box"></div>
-      <div><label style="font-size:11px;color:#666;display:block;margin-bottom:4px">DMs SENT</label><input id="chicos-dms-sent" type="number" placeholder="0" style="width:100%;background:#0a0a0a;border:1px solid #1e1e1e;border-radius:8px;padding:8px 12px;color:#fff;font-size:16px;box-sizing:border-box"></div>
-      <div><label style="font-size:11px;color:#666;display:block;margin-bottom:4px">DMs REPLIED</label><input id="chicos-dms-replied" type="number" placeholder="0" style="width:100%;background:#0a0a0a;border:1px solid #1e1e1e;border-radius:8px;padding:8px 12px;color:#fff;font-size:16px;box-sizing:border-box"></div>
-      <div><label style="font-size:11px;color:#666;display:block;margin-bottom:4px">HIGGSFIELD EXPIRY</label><input id="chicos-higgsfield-expiry" type="date" style="width:100%;background:#0a0a0a;border:1px solid #1e1e1e;border-radius:8px;padding:8px 12px;color:#fff;font-size:14px;box-sizing:border-box"></div>
-      <div><label style="font-size:11px;color:#666;display:block;margin-bottom:4px">LAST POST DATE</label><input id="chicos-last-post" type="date" style="width:100%;background:#0a0a0a;border:1px solid #1e1e1e;border-radius:8px;padding:8px 12px;color:#fff;font-size:14px;box-sizing:border-box"></div>
+    <div style="margin-bottom:1rem;margin-top:1rem">
+      <label style="font-size:11px;color:#666;display:block;margin-bottom:4px">ACCOUNT</label>
+      <input id="chicos-account" type="text" placeholder="@2.chicos" style="width:100%;background:#0a0a0a;border:1px solid #1e1e1e;border-radius:8px;padding:8px 12px;color:#fff;font-size:14px;box-sizing:border-box">
+    </div>
+    <div style="margin-bottom:1rem">
+      <label style="font-size:11px;color:#666;display:block;margin-bottom:4px">LAST POST DATE</label>
+      <input id="chicos-last-post" type="date" style="width:100%;background:#0a0a0a;border:1px solid #1e1e1e;border-radius:8px;padding:8px 12px;color:#fff;font-size:14px;box-sizing:border-box">
     </div>
     <div style="margin-bottom:1rem"><label style="font-size:11px;color:#666;display:block;margin-bottom:8px">POSTS THIS WEEK</label><div class="chicos-post-selector"><button class="chicos-post-btn" data-val="0">0</button><button class="chicos-post-btn" data-val="1">1</button><button class="chicos-post-btn" data-val="2">2</button><button class="chicos-post-btn" data-val="3">3</button><button class="chicos-post-btn" data-val="4">4</button><button class="chicos-post-btn" data-val="5">5</button><button class="chicos-post-btn" data-val="6">6</button><button class="chicos-post-btn" data-val="7">7</button></div></div>
     <button id="chicos-save-btn" style="width:100%;background:#3b82f6;border:none;border-radius:8px;padding:12px;color:#fff;font-size:14px;font-weight:600;cursor:pointer">Save Week →</button>
@@ -1044,180 +880,15 @@
 <div id="chicos-alerts" style="margin-bottom:1rem"></div>
 <div class="chicos-metric-cards">
 <div class="chicos-metric"><div class="chicos-metric-label">Days since last post</div><div id="chicos-days-since" class="days-counter">—</div></div>
-<div class="chicos-metric"><div class="chicos-metric-label">Follower change</div><div id="chicos-follower-change" class="chicos-metric-value">—</div></div>
 <div class="chicos-metric"><div class="chicos-metric-label">Posting consistency</div><div id="chicos-consistency" class="chicos-metric-value">—</div></div>
-<div class="chicos-metric"><div class="chicos-metric-label">DM conversion</div><div id="chicos-dm-rate" class="chicos-metric-value">—</div></div>
 <div class="chicos-metric"><div class="chicos-metric-label">Month posts</div><div id="chicos-month-posts" class="chicos-metric-value">—</div></div>
-<div class="chicos-metric"><div class="chicos-metric-label">Higgsfield</div><div id="chicos-higgsfield-days" class="chicos-metric-value">—</div></div>
 </div>
-<div style="background:#111111;border:1px solid #1e1e1e;border-radius:12px;padding:1rem;margin-bottom:1rem"><canvas id="chicos-growth-chart" height="120"></canvas></div>
 <div class="chicos-kanban">
 <div class="chicos-kanban-col"><h4>💡 Idea</h4><div id="kanban-idea"></div></div>
-<div class="chicos-kanban-col"><h4>🎬 Filming</h4><div id="kanban-filming"></div></div>
-<div class="chicos-kanban-col"><h4>✂️ Editing</h4><div id="kanban-editing"></div></div>
-<div class="chicos-kanban-col"><h4>✅ Published</h4><div id="kanban-published"></div></div>
+<div class="chicos-kanban-col"><h4>🎬 Film</h4><div id="kanban-filming"></div></div>
+<div class="chicos-kanban-col"><h4>✂️ Edit</h4><div id="kanban-editing"></div></div>
+<div class="chicos-kanban-col"><h4>✅ Posted</h4><div id="kanban-published"></div></div>
 </div>
-
-      </div>
-
-      <!-- ══ SIDE PROJECTS ══ -->
-      <div id="section-side-projects" class="section">
-
-        <!-- Section tabs -->
-        <div class="sp-section-tabs">
-          <button class="sp-section-tab active" data-sp-tab="projects">▶ Projects</button>
-          <button class="sp-section-tab" data-sp-tab="reports">📊 Reports</button>
-        </div>
-
-        <!-- Projects pane: timer list + idea cards -->
-        <div class="sp-pane active" id="sp-pane-projects">
-          <!-- Timer project list (rendered by JS) -->
-          <div id="sp-timer-list"></div>
-          <!-- Project idea cards (existing) -->
-          <div class="sp-grid" id="sp-grid"></div>
-        </div>
-
-        <!-- Reports pane -->
-        <div class="sp-pane" id="sp-pane-reports">
-          <div class="sp-report-row">
-            <div class="sp-stat-card">
-              <div class="sp-stat-num" id="sp-total-hours">0h</div>
-              <div class="sp-stat-lbl">Total tracked</div>
-            </div>
-            <div class="sp-stat-card">
-              <div class="sp-stat-num" id="sp-today-hours">0h</div>
-              <div class="sp-stat-lbl">Today</div>
-            </div>
-            <div class="sp-stat-card">
-              <div class="sp-stat-num" id="sp-proj-count">0</div>
-              <div class="sp-stat-lbl">Projects</div>
-            </div>
-          </div>
-          <div class="sp-bar-chart-card">
-            <div class="sp-chart-lbl">
-              <span>Duration per day (last 7 days)</span>
-              <div style="display:flex;gap:6px">
-                <button class="money-card-btn sp-period-btn active" data-period="week">Week</button>
-                <button class="money-card-btn sp-period-btn" data-period="month">Month</button>
-              </div>
-            </div>
-            <div class="sp-bar-row" id="sp-bar-row"><!-- JS --></div>
-          </div>
-          <div class="sp-donut-card">
-            <svg class="sp-donut-svg" viewBox="0 0 110 110" id="sp-donut-svg">
-              <circle cx="55" cy="55" r="40" fill="none" stroke="#1e1e1e" stroke-width="18"/>
-              <text x="55" y="60" text-anchor="middle" fill="#888" font-size="11" font-weight="600" id="sp-donut-center-text">0h</text>
-            </svg>
-            <div class="sp-donut-legend" id="sp-donut-legend">
-              <div class="sp-no-sessions">No sessions yet.<br>Start a timer to track time.</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Add project panel -->
-        <div class="sp-add-wrap">
-          <div class="sp-add-header">
-            <span class="sp-add-lbl">Project ideas</span>
-            <button class="sp-add-btn" id="sp-toggle">+ New project idea</button>
-          </div>
-          <div class="sp-form" id="sp-form">
-            <div class="form-row">
-              <div class="form-field">
-                <label class="form-label">Project name</label>
-                <input type="text" class="form-input" id="sp-name" placeholder="e.g. Clothing Brand">
-              </div>
-              <div class="form-field">
-                <label class="form-label">Concept (one line)</label>
-                <input type="text" class="form-input" id="sp-concept" placeholder="Brief description">
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-field">
-                <label class="form-label">Startup cost</label>
-                <input type="text" class="form-input" id="sp-cost" placeholder="e.g. €500 – 1,000">
-              </div>
-              <div class="form-field">
-                <label class="form-label">Revenue model</label>
-                <input type="text" class="form-input" id="sp-model" placeholder="e.g. Freemium subscription">
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-field">
-                <label class="form-label">Monthly potential</label>
-                <input type="text" class="form-input" id="sp-revenue" placeholder="e.g. €1,000 – 4,000">
-              </div>
-              <div class="form-field">
-                <label class="form-label">Time to first profit</label>
-                <input type="text" class="form-input" id="sp-time" placeholder="e.g. 3 – 6 months">
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-field">
-                <label class="form-label">Viability score (1–10)</label>
-                <input type="number" class="form-input sp-score-input" id="sp-viability"
-                  min="1" max="10" placeholder="7">
-              </div>
-              <div class="form-field" style="justify-content:flex-end;flex-direction:row;align-items:flex-end">
-                <button class="form-submit" id="sp-submit">Add project</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- ══ LIFE GOALS ══ -->
-      <div id="section-life-goals" class="section">
-
-        <!-- Streak (reuses Movement streak classes) -->
-        <div class="streak-row">
-          <span class="streak-icon">📅</span>
-          <span class="streak-number" id="lg-streak">0</span>
-          <div class="streak-meta">
-            <span class="streak-label">days since you started tracking</span>
-            <span class="streak-sub">Keep showing up</span>
-          </div>
-        </div>
-
-        <!-- Goal cards (rendered by JS) -->
-        <div class="goals-grid" id="goals-grid"></div>
-
-        <!-- Add goal panel -->
-        <div class="lg-add-wrap">
-          <div class="lg-add-header">
-            <span class="lg-add-lbl">Goals</span>
-            <button class="lg-add-btn" id="lg-toggle">+ Add goal</button>
-          </div>
-          <div class="lg-form" id="lg-form">
-            <div class="form-row">
-              <div class="form-field">
-                <label class="form-label">Goal title</label>
-                <input type="text" class="form-input" id="lg-title" placeholder="e.g. Run a marathon">
-              </div>
-              <div class="form-field">
-                <label class="form-label">Category</label>
-                <select class="form-select" id="lg-category">
-                  <option value="Money">Money</option>
-                  <option value="Health">Health</option>
-                  <option value="Career">Career</option>
-                  <option value="Personal">Personal</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-field">
-                <label class="form-label">Target date</label>
-                <input type="date" class="form-input" id="lg-date">
-              </div>
-              <div class="form-field">
-                <label class="form-label">Starting progress (%)</label>
-                <input type="number" class="form-input" id="lg-progress"
-                  min="0" max="100" placeholder="0">
-              </div>
-            </div>
-            <button class="form-submit" id="lg-submit">Add goal</button>
-          </div>
-        </div>
 
       </div>
 
@@ -1508,8 +1179,36 @@
 
   
 
+  <!-- Mobile more tray (shown above nav when ⋯ is tapped) -->
+  <div id="mob-more-tray" style="display:none;position:fixed;bottom:60px;left:0;right:0;background:#0f0f0f;border-top:1px solid #1e1e1e;z-index:99;padding:6px 0;flex-wrap:wrap;justify-content:space-around">
+    <div class="mob-nav-item" data-section="movement" style="flex:1;min-width:60px">
+      <svg class="mob-nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 8h2m10 0h2M3 8l1-2h8l1 2M4 6V4m8 2V4M5 4h6"/></svg>
+      <span>Move</span>
+    </div>
+    <div class="mob-nav-item" data-section="nutrition" style="flex:1;min-width:60px">
+      <svg class="mob-nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 1v5a3 3 0 006 0V1M8 9v6M5 15h6"/></svg>
+      <span>Food</span>
+    </div>
+    <div class="mob-nav-item" data-section="chicos" style="flex:1;min-width:60px">
+      <svg class="mob-nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5" r="2.5"/><path d="M3 14c0-3 2-5 5-5s5 2 5 5"/></svg>
+      <span>Social</span>
+    </div>
+    <div class="mob-nav-item" data-section="insights" style="flex:1;min-width:60px">
+      <svg class="mob-nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 13l3-5 3 3 3-6 3 2"/></svg>
+      <span>Insights</span>
+    </div>
+    <div class="mob-nav-item" data-section="school" style="flex:1;min-width:60px">
+      <svg class="mob-nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2L2 5l6 3 6-3-6-3z"/><path d="M2 5v5m6 1v3m-4-2.5a6 6 0 008 0"/></svg>
+      <span>School</span>
+    </div>
+  </div>
+
   <!-- Mobile bottom nav (hidden on desktop via CSS) -->
   <nav class="mobile-nav" id="mobile-nav">
+    <div class="mob-nav-item mob-nav-home active" data-section="today">
+      <svg class="mob-nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1.5L9.8 5.2l4.2.6-3 3 .7 4.2L8 11l-3.7 2 .7-4.2-3-3 4.2-.6z"/></svg>
+      <span>Today</span>
+    </div>
     <div class="mob-nav-item" data-section="life-os">
       <svg class="mob-nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2h10a1 1 0 011 1v10a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M5 6h6M5 9h4"/></svg>
       <span>GIFD</span>
@@ -1518,30 +1217,14 @@
       <svg class="mob-nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M5 1v4M11 1v4M2 7h12"/></svg>
       <span>Time</span>
     </div>
-    <div class="mob-nav-item" data-section="chicos">
-      <svg class="mob-nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5" r="2.5"/><path d="M3 14c0-3 2-5 5-5s5 2 5 5"/></svg>
-      <span>2.chicos</span>
-    </div>
-    <div class="mob-nav-item mob-nav-home active" data-section="today">
-      <svg class="mob-nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1.5L9.8 5.2l4.2.6-3 3 .7 4.2L8 11l-3.7 2 .7-4.2-3-3 4.2-.6z"/></svg>
-      <span>Today</span>
-    </div>
-    <div class="mob-nav-item" data-section="movement">
-      <svg class="mob-nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 8h2m10 0h2M3 8l1-2h8l1 2M4 6V4m8 2V4M5 4h6"/></svg>
-      <span>Move</span>
-    </div>
-    <div class="mob-nav-item" data-section="nutrition">
-      <svg class="mob-nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 1v5a3 3 0 006 0V1M8 9v6M5 15h6"/></svg>
-      <span>Food</span>
-    </div>
     <div class="mob-nav-item" data-section="money">
       <svg class="mob-nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="14" height="9" rx="1.5"/><path d="M1 7.5h14M5.5 11.5h1M8.5 11.5h2"/></svg>
       <span>Money</span>
     </div>
-    <div class="mob-nav-item" data-section="insights">
-      <svg class="mob-nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 13l3-5 3 3 3-6 3 2"/></svg>
-      <span>Insights</span>
-    </div>
+    <button id="mob-more-btn" style="flex:1;background:none;border:none;color:#555;font-size:10px;font-family:Inter,sans-serif;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 0">
+      <span style="font-size:18px;line-height:1">⋯</span>
+      <span>More</span>
+    </button>
   </nav>
 
 <script src="js/shared-init.js"></script>

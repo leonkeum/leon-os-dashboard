@@ -63,10 +63,19 @@
       await gistRequest('PATCH', '/gists/' + cfg.gistId, { [GIST_FILE]: { content } }, cfg.pat);
       const ts = new Date().toISOString();
       _origSetItem.call(localStorage, 'sync-last-push', ts);
-    } catch(_) { /* silent — user can manually push if needed */ }
+    } catch(_) {
+      _origSetItem.call(localStorage, 'leon-sync-pending', '1');
+    }
     autoPushing = false;
     syncBtn.classList.remove('syncing');
   }
+
+  window.addEventListener('online', () => {
+    if (localStorage.getItem('leon-sync-pending') === '1') {
+      _origSetItem.call(localStorage, 'leon-sync-pending', '0');
+      doSilentPush();
+    }
+  });
   function scheduleAutoPush() {
     clearTimeout(autoPushTimer);
     autoPushTimer = setTimeout(doSilentPush, 1000);
