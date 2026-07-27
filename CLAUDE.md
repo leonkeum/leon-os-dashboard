@@ -5,7 +5,7 @@ A personal life dashboard PWA. Vanilla JS, no framework, no build step. Open `da
 
 ## Daily Essentials (always visible in sidebar)
 - **Today** (`#section-today`) — home screen with score, cards, notes, todo
-- **GIFD** (`#section-life-os`) — daily journal + habit scoring
+- **GIFD** (`#section-life-os`) — daily journal + habit scoring; also hosts the **Habits** tab (`js/habits.js`), an Aura-style streak tracker
 - **Time OS** (`#section-time-os`) — weekly calendar grid
 - **Money** (`#section-money`) — accounts, transactions, goals
 
@@ -16,12 +16,15 @@ Everything else (Movement, Nutrition, School, @2.chicos, Projects, Goals, Insigh
 - Data: `localStorage` only (all keys prefixed `leon-*` or `los-*`)
 - Cloud sync: GitHub Gist API (`js/gist-sync.js`) — auto-pushes 1 second after any data write
 - Charts: Chart.js loaded from CDN on demand
-- PWA: `manifest.json` + `sw.js` service worker (cache key: `leon-os-v10`)
+- PWA: `manifest.json` + `sw.js` service worker (cache key: `leon-os-v12`)
 
 ## localStorage Key Schema
 | Prefix | Module | Notes |
 |--------|--------|-------|
 | `los-gifd-current` | life-os.js | Array of `{date, desc, good, bad, happiness}` |
+| `los-habits-defs` | habits.js | Array of `{id, name, icon, color, type, unit?, dailyTarget?, timerGoal?, startDate?, createdAt}` — `type` is one of `activity`/`timer`/`streak`/`daysSince` |
+| `los-habits-logs` | habits.js | Array of `{id, habitId, date, value}` — one entry per habit per date, upserted |
+| `los-habits-timer` | habits.js | `{habitId, startedAt}` or `null` — the currently-running Timer-type session |
 | `leon-workout-v3` | movement.js | `{sessions:[{date, sets:[{exercise,kg,reps}]}]}` |
 | `leon-sleep-v2` | movement.js | `{entries:[{date,actual,quality,bedtime,waketime}]}` |
 | `leon-nutrition-v2` | nutrition.js | `{YYYY-MM-DD:{meals:[],totals:{protein,calories}}}` |
@@ -39,6 +42,7 @@ Everything else (Movement, Nutrition, School, @2.chicos, Projects, Goals, Insigh
 | `js/shared-init.js` | Service worker, clock, section switching, sidebar toggle, mobile tray |
 | `js/today-dashboard.js` | Today section render, notes, todo, day strip, data export |
 | `js/life-os.js` | GIFD journal, Codex rules |
+| `js/habits.js` | Habits tab: Activity/Timer/Streak/Days-Since tracker, best streak/month, calendar, trend chart |
 | `js/time-os.js` | Calendar grid, event add/edit |
 | `js/money.js` | Accounts, transactions, cash flow, money goals |
 | `js/movement.js` | Workout log, calisthenics skills, Sleep OS |

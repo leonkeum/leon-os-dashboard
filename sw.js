@@ -1,4 +1,4 @@
-const CACHE_NAME = 'leon-os-v10'; // bumped: download backup button
+const CACHE_NAME = 'leon-os-v12'; // bumped: added Habits tracker
 const STATIC = [
   './dashboard.html',
   './dashboard.css',
@@ -7,12 +7,11 @@ const STATIC = [
   './js/time-os.js',
   './js/skills-school.js',
   './js/life-os.js',
-  './js/life-goals.js',
+  './js/habits.js',
   './js/movement.js',
   './js/nutrition.js',
   './js/today-dashboard.js',
   './js/money.js',
-  './js/side-projects.js',
   './js/chicos.js',
   './js/gist-sync.js',
   './js/weekly-review.js',

@@ -290,6 +290,55 @@
       </div>
     </div>
 
+    <!-- ══ Habit Detail Modal ══ -->
+    <div class="habit-detail-overlay" id="habit-detail-overlay" style="display:none" onclick="if(event.target===this)document.getElementById('habit-detail-overlay').style.display='none'">
+      <div class="habit-detail-panel" id="habit-detail-panel">
+        <div class="habit-detail-top">
+          <button class="habit-detail-close" id="habit-detail-close">✕</button>
+          <button class="habit-detail-delete" id="habit-detail-delete">Delete</button>
+        </div>
+
+        <div class="habit-detail-icon" id="habit-detail-icon"></div>
+        <div class="habit-detail-name" id="habit-detail-name"></div>
+        <div class="habit-detail-sub" id="habit-detail-sub"></div>
+
+        <button class="habit-detail-primary-btn" id="habit-detail-primary-btn"></button>
+        <div class="habit-detail-input-row" id="habit-detail-input-row" style="display:none">
+          <input type="number" class="form-input" id="habit-detail-amount" step="any" min="0" style="text-align:center">
+          <button class="form-submit" id="habit-detail-amount-save">Log</button>
+        </div>
+
+        <div class="habit-badge-row" id="habit-badge-row"></div>
+
+        <div class="los-card" id="habit-totals-card">
+          <div class="los-card-title">Period Totals</div>
+          <div class="habit-stat-row" id="habit-stat-row"></div>
+        </div>
+
+        <div class="los-card" id="habit-compare-card">
+          <div class="los-card-title">Comparison</div>
+          <div class="habit-compare-row" id="habit-compare-row"></div>
+        </div>
+
+        <div class="los-card" id="habit-chart-card">
+          <div class="los-card-title">Trend</div>
+          <div class="habit-chart-wrap"><canvas id="habit-trend-chart"></canvas></div>
+        </div>
+
+        <div class="los-card">
+          <div class="habit-cal-header">
+            <button class="habit-cal-nav" id="habit-cal-prev">‹</button>
+            <span id="habit-cal-label"></span>
+            <button class="habit-cal-nav" id="habit-cal-next">›</button>
+          </div>
+          <div class="habit-cal-dow">
+            <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
+          </div>
+          <div class="habit-cal-grid" id="habit-cal-grid"></div>
+        </div>
+      </div>
+    </div>
+
     <main class="content">
 
       <!-- ══ TODAY DASHBOARD ══ -->
@@ -686,6 +735,7 @@
 
         <div class="los-tabs">
           <button class="los-tab active" data-los-tab="gifd">GIFD</button>
+          <button class="los-tab" data-los-tab="habits">Habits</button>
           <button class="los-tab" data-los-tab="codex">Codex</button>
         </div>
 
@@ -761,6 +811,78 @@
               <button class="add-assign-btn" id="gifd-close-month">Close Month &amp; Archive</button>
             </div>
           </div>
+
+        </div>
+
+        <!-- ── TAB: Habits ── -->
+        <div class="los-pane" id="los-habits">
+
+          <div class="habits-toolbar">
+            <div class="habits-toolbar-title">Track any streak — check-ins, timers, counts, or days since.</div>
+            <button class="add-assign-btn" id="habit-add-btn">+ New Habit</button>
+          </div>
+
+          <div class="add-assign-form" id="habit-form" style="margin-bottom:16px">
+            <div class="habit-type-selector" id="habit-type-selector">
+              <button type="button" class="habit-type-btn active" data-type="activity"><span class="htb-icon">⚡</span>Activity</button>
+              <button type="button" class="habit-type-btn" data-type="timer"><span class="htb-icon">⏱</span>Timer</button>
+              <button type="button" class="habit-type-btn" data-type="streak"><span class="htb-icon">🔥</span>Streak</button>
+              <button type="button" class="habit-type-btn" data-type="daysSince"><span class="htb-icon">📅</span>Days Since</button>
+            </div>
+            <div class="habit-type-hint" id="habit-type-hint">One-off activities you don't do every day — a run, a hike, a gym trip.</div>
+
+            <div class="form-field">
+              <label class="form-label">Name</label>
+              <input type="text" class="form-input" id="habit-name" placeholder="e.g. Run, Guitar, Sober">
+            </div>
+
+            <div style="display:flex;gap:10px">
+              <div class="form-field" style="flex:0 0 76px">
+                <label class="form-label">Icon</label>
+                <input type="text" class="form-input" id="habit-icon" placeholder="🔥" maxlength="4" style="text-align:center">
+              </div>
+              <div class="form-field" style="flex:1">
+                <label class="form-label">Colour</label>
+                <div class="habit-color-selector" id="habit-color-selector">
+                  <button type="button" class="habit-color-btn orange active" data-color="orange" title="Orange"></button>
+                  <button type="button" class="habit-color-btn cyan" data-color="cyan" title="Cyan"></button>
+                </div>
+              </div>
+            </div>
+
+            <div id="habit-fields-activity" style="display:flex;gap:10px">
+              <div class="form-field" style="flex:1">
+                <label class="form-label">Unit</label>
+                <input type="text" class="form-input" id="habit-unit" placeholder="times, km, pages…">
+              </div>
+              <div class="form-field" style="flex:1">
+                <label class="form-label">Daily target (optional)</label>
+                <input type="number" class="form-input" id="habit-target" placeholder="e.g. 8" min="0" step="any">
+              </div>
+            </div>
+
+            <div id="habit-fields-timer" style="display:none">
+              <div class="form-field">
+                <label class="form-label">Goal minutes (optional — leave blank for open-ended)</label>
+                <input type="number" class="form-input" id="habit-timer-goal" placeholder="e.g. 30" min="0" step="1">
+              </div>
+            </div>
+
+            <div id="habit-fields-dayssince" style="display:none">
+              <div class="form-field">
+                <label class="form-label">Start date</label>
+                <input type="date" class="form-input" id="habit-start-date">
+              </div>
+            </div>
+
+            <div style="display:flex;gap:8px;justify-content:flex-end">
+              <button type="button" class="log-btn" id="habit-form-cancel">Cancel</button>
+              <button type="button" class="form-submit" id="habit-save-btn">Save Habit</button>
+            </div>
+          </div>
+
+          <div class="habit-grid" id="habit-grid"></div>
+          <div class="habit-empty" id="habit-empty" style="display:none">No habits yet — add your first one above.</div>
 
         </div>
 
@@ -1234,6 +1356,7 @@
 <script src="js/time-os.js"></script>
 <script src="js/skills-school.js"></script>
 <script src="js/life-os.js"></script>
+<script src="js/habits.js"></script>
 <script src="js/movement.js"></script>
 <script src="js/nutrition.js"></script>
 <script src="js/today-dashboard.js"></script>

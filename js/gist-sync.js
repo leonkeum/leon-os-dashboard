@@ -1,5 +1,5 @@
 ﻿(function initGistSync() {
-  const SKIP_KEYS = new Set(['sync-pat','sync-gist-id','sync-auto','sync-last-push']);
+  const SKIP_KEYS = new Set(['sync-pat','sync-gist-id','sync-auto','sync-last-push','sync-last-error']);
   const GIST_FILE = 'leon-os-data.json';
 
   const overlay   = document.getElementById('sync-overlay');
@@ -63,12 +63,38 @@
       await gistRequest('PATCH', '/gists/' + cfg.gistId, { [GIST_FILE]: { content } }, cfg.pat);
       const ts = new Date().toISOString();
       _origSetItem.call(localStorage, 'sync-last-push', ts);
+      _origSetItem.call(localStorage, 'sync-last-error', '');
     } catch(_) {
       _origSetItem.call(localStorage, 'leon-sync-pending', '1');
+      _origSetItem.call(localStorage, 'sync-last-error', new Date().toISOString());
     }
     autoPushing = false;
     syncBtn.classList.remove('syncing');
+    updateSyncIndicator();
   }
+
+  /* ── Health badge on the ☁ topbar button ── */
+  const STALE_MS = 15 * 60 * 1000;
+  function updateSyncIndicator() {
+    const cfg = getCfg();
+    syncBtn.classList.remove('sync-err', 'sync-stale');
+    if (!cfg.pat || !cfg.gistId) return; // not configured — no badge
+
+    const lastPush  = localStorage.getItem('sync-last-push');
+    const lastError = localStorage.getItem('sync-last-error');
+
+    if (lastError && (!lastPush || new Date(lastError) > new Date(lastPush))) {
+      syncBtn.classList.add('sync-err');
+      return;
+    }
+    if (cfg.auto && (!lastPush || (Date.now() - new Date(lastPush).getTime()) > STALE_MS)) {
+      syncBtn.classList.add('sync-stale');
+    }
+  }
+  updateSyncIndicator();
+  setInterval(() => {
+    if (document.visibilityState === 'visible') updateSyncIndicator();
+  }, 60000);
 
   window.addEventListener('online', () => {
     if (localStorage.getItem('leon-sync-pending') === '1') {
@@ -144,10 +170,13 @@
 
       const ts = new Date().toISOString();
       _origSetItem.call(localStorage, 'sync-last-push', ts);
+      _origSetItem.call(localStorage, 'sync-last-error', '');
       setStatus('✓ Pushed at ' + new Date(ts).toLocaleTimeString(), 'ok');
     } catch(e) {
+      _origSetItem.call(localStorage, 'sync-last-error', new Date().toISOString());
       setStatus('Push failed: ' + e.message, 'err');
     }
+    updateSyncIndicator();
     setBusy(false);
   });
 
@@ -232,7 +261,7 @@
   const btn = document.getElementById('sync-export-btn');
   if (!btn) return;
   btn.addEventListener('click', () => {
-    const SKIP = new Set(['sync-pat','sync-gist-id','sync-auto','sync-last-push']);
+    const SKIP = new Set(['sync-pat','sync-gist-id','sync-auto','sync-last-push','sync-last-error']);
     const data = { _exported: new Date().toISOString(), _version: 1 };
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i);
