@@ -16,7 +16,9 @@ Everything else (Movement, Nutrition, School, @2.chicos, Projects, Goals, Insigh
 - Data: `localStorage` only (all keys prefixed `leon-*` or `los-*`)
 - Cloud sync: GitHub Gist API (`js/gist-sync.js`) — auto-pushes 1 second after any data write
 - Charts: Chart.js loaded from CDN on demand
-- PWA: `manifest.json` + `sw.js` service worker (cache key: `leon-os-v12`)
+- PWA: `manifest.json` + `sw.js` service worker (cache key: `leon-os-v13`)
+- Deploy: push to `master` on GitHub → auto-published to GitHub Pages (`leonkeum.github.io/leon-os-dashboard`). No CI/build step — files are served as-is.
+- **Cache-busting**: `dashboard.css` and every `js/*.js` are referenced from `dashboard.html` with a `?v=N` query string (currently `13`), mirrored in `sw.js`'s `STATIC` array and `CACHE_NAME`. GitHub Pages sends `Cache-Control: max-age=600` on every file, so without a version bump a browser can keep serving a stale cached CSS/JS file for up to 10 minutes after a deploy even though the HTML re-fetches (this actually happened — new HTML rendered with old, unstyled CSS). **On any change to `dashboard.css` or a `js/*.js` file, bump `?v=N` everywhere in `dashboard.html` + `sw.js`'s `STATIC` list + `CACHE_NAME` together**, or the update won't reliably reach already-loaded phones/PWAs.
 
 ## localStorage Key Schema
 | Prefix | Module | Notes |
