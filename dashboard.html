@@ -12,7 +12,7 @@
   <link rel="apple-touch-icon" href="icon-192.png">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Press+Start+2P&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="dashboard.css?v=13">
+  <link rel="stylesheet" href="dashboard.css?v=15">
 </head>
 <body>
 
@@ -197,6 +197,7 @@
         </div>
         <span class="topbar-badge" id="daily-score-badge" style="display:none"></span>
         <button class="sync-btn" id="sync-btn" title="Cloud Sync">☁</button>
+        <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle light/dark theme">☀️</button>
       </div>
     </header>
 
@@ -501,10 +502,10 @@
             <div class="sc-sub">Fri 22 · Sat 23</div>
             <div class="sc-track"><div class="sc-fill"></div></div>
           </div>
-          <div class="stat-card blue">
-            <div class="sc-label">Euroaula</div>
-            <div class="sc-hours">11.5h</div>
-            <div class="sc-sub">Mon–Thu · new schedule</div>
+          <div class="stat-card sleep">
+            <div class="sc-label">Avg Sleep</div>
+            <div class="sc-hours">—</div>
+            <div class="sc-sub">Log a night in Sleep OS</div>
             <div class="sc-track"><div class="sc-fill"></div></div>
           </div>
           <div class="stat-card green">
@@ -530,8 +531,8 @@
 
         <!-- Weekly grid — JS rendered -->
         <div class="week-grid-wrap" id="week-grid-wrap">
-          <div class="week-header" id="cal-header" style="display:grid;grid-template-columns:48px repeat(7,1fr);border-bottom:1px solid #1a1a1a"></div>
-          <div class="week-body" id="cal-body" style="display:grid;grid-template-columns:48px repeat(7,1fr);height:714px">
+          <div class="week-header" id="cal-header"></div>
+          <div class="week-body" id="cal-body">
             <!-- JS fills this -->
           </div>
           <div class="add-block-row" id="add-block-row"></div>
@@ -736,7 +737,7 @@
         <div class="los-tabs">
           <button class="los-tab active" data-los-tab="gifd">GIFD</button>
           <button class="los-tab" data-los-tab="habits">Habits</button>
-          <button class="los-tab" data-los-tab="codex">Codex</button>
+          <button class="los-tab" data-los-tab="missions">Missions</button>
         </div>
 
         <!-- ── TAB 1: GIFD ── -->
@@ -886,23 +887,26 @@
 
         </div>
 
-        <!-- ── TAB 2: Codex ── -->
-        <div class="los-pane" id="los-codex">
-          <div id="codex-char-sheet-slot"></div>
-          <div id="codex-daily-lore-slot"></div>
-          <div class="los-card">
-            <div class="los-card-title">Codex</div>
-            <div id="codex-rules"></div>
-          </div>
-          <div style="display:flex;gap:8px;align-items:center;margin-top:12px;justify-content:flex-end">
-            <button class="add-assign-btn" id="codex-add-btn">+ Add Rule</button>
-          </div>
-          <div class="add-assign-form" id="codex-form" style="margin-top:8px;border-top:none;padding:0">
-            <div class="form-field">
-              <label class="form-label">Custom Rule</label>
-              <input type="text" class="form-input" id="codex-input" placeholder="Write your own rule…">
+        <!-- ── TAB 2: Side Missions ── -->
+        <div class="los-pane" id="los-missions">
+          <div class="missions-header">
+            <div class="missions-title-row">
+              <div class="missions-title">🎯 Today's Side Missions</div>
+              <div class="missions-streak" id="missions-streak">🔥 0</div>
             </div>
-            <button class="form-submit" id="codex-save">Add to Codex</button>
+            <div class="missions-progress-track"><div class="missions-progress-fill" id="missions-progress-fill"></div></div>
+          </div>
+          <div id="missions-list"></div>
+          <div style="display:flex;gap:8px;align-items:center;margin-top:12px;justify-content:flex-end">
+            <button class="log-btn" id="missions-reroll-btn">🔀 New missions</button>
+            <button class="add-assign-btn" id="missions-add-btn">+ Add custom</button>
+          </div>
+          <div class="add-assign-form" id="missions-form" style="margin-top:8px;border-top:none;padding:0">
+            <div class="form-field">
+              <label class="form-label">Custom mission</label>
+              <input type="text" class="form-input" id="missions-input" placeholder="e.g., Call mom">
+            </div>
+            <button class="form-submit" id="missions-save">Add to pool</button>
           </div>
         </div>
 
@@ -1298,13 +1302,10 @@
     </main>
   </div>
 
-  <!-- Theme toggle button -->
-  <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle light/dark theme">☀️</button>
 
-  
 
   <!-- Mobile more tray (shown above nav when ⋯ is tapped) -->
-  <div id="mob-more-tray" style="display:none;position:fixed;bottom:60px;left:0;right:0;background:#0f0f0f;border-top:1px solid #1e1e1e;z-index:99;padding:6px 0;flex-wrap:wrap;justify-content:space-around">
+  <div id="mob-more-tray" style="display:none;position:fixed;bottom:80px;left:10px;right:10px;background:rgba(24,24,24,0.96);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid #262626;border-radius:16px;box-shadow:0 8px 28px rgba(0,0,0,0.4);z-index:9001;padding:10px 4px;flex-wrap:wrap;justify-content:space-around">
     <div class="mob-nav-item" data-section="movement" style="flex:1;min-width:60px">
       <svg class="mob-nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 8h2m10 0h2M3 8l1-2h8l1 2M4 6V4m8 2V4M5 4h6"/></svg>
       <span>Move</span>
@@ -1351,20 +1352,20 @@
     </button>
   </nav>
 
-<script src="js/shared-init.js?v=13"></script>
-<script src="js/gamification.js?v=13"></script>
-<script src="js/time-os.js?v=13"></script>
-<script src="js/skills-school.js?v=13"></script>
-<script src="js/life-os.js?v=13"></script>
-<script src="js/habits.js?v=13"></script>
-<script src="js/movement.js?v=13"></script>
-<script src="js/nutrition.js?v=13"></script>
-<script src="js/today-dashboard.js?v=13"></script>
-<script src="js/money.js?v=13"></script>
-<script src="js/chicos.js?v=13"></script>
-<script src="js/gist-sync.js?v=13"></script>
-<script src="js/weekly-review.js?v=13"></script>
-<script src="js/insights.js?v=13"></script>
-<script src="js/notifications.js?v=13"></script>
+<script src="js/shared-init.js?v=15"></script>
+<script src="js/gamification.js?v=15"></script>
+<script src="js/time-os.js?v=15"></script>
+<script src="js/skills-school.js?v=15"></script>
+<script src="js/life-os.js?v=15"></script>
+<script src="js/habits.js?v=15"></script>
+<script src="js/movement.js?v=15"></script>
+<script src="js/nutrition.js?v=15"></script>
+<script src="js/today-dashboard.js?v=15"></script>
+<script src="js/money.js?v=15"></script>
+<script src="js/chicos.js?v=15"></script>
+<script src="js/gist-sync.js?v=15"></script>
+<script src="js/weekly-review.js?v=15"></script>
+<script src="js/insights.js?v=15"></script>
+<script src="js/notifications.js?v=15"></script>
 </body>
 </html>

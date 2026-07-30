@@ -797,126 +797,193 @@
         });
       }
 
-      /* ════ CODEX ════ */
-      const LS_CODEX='los-codex-custom';
-      const CODEX=[
-        {n:1,  cat:'sys', text:"If you don't choose your main quest the system assigns the default: Study→9-5→Marriage→Mortgage→Retire at 70. Most people don't customise. You can."},
-        {n:2,  cat:'sys', text:"Random spawn point. Some people start with more resources or higher intelligence. It's RNG. Don't waste time complaining about your spawn."},
-        {n:3,  cat:'sys', text:"Base stats are locked with slight adjustments. Any build is viable but don't force a build that fights your natural fit."},
-        {n:4,  cat:'sys', text:"Customisable build. Base stats mostly fixed but your build isn't. Experiment and design your playstyle throughout the years."},
-        {n:5,  cat:'doc', text:"You level up through reps not talent. Ability is malleable. Grinding the boring stuff beats natural talent every time."},
-        {n:6,  cat:'doc', text:"Time is the most OP currency. Early XP compounds. Late grinding is harder and less forgiving."},
-        {n:7,  cat:'sys', text:"You can change classes mid-game. You're not locked into your first career, identity or role. Switching feels scary but staying costs more XP."},
-        {n:8,  cat:'doc', text:"Single player game with multiplayer modes. Guilds, partners and allies can massively boost your stats."},
-        {n:9,  cat:'doc', text:"Status items don't help you beat the game. Shiny gear looks good (+Aura) but often slows progression. Freedom builds quietly not visibly."},
-        {n:10, cat:'sys', text:"You decide your win condition. Retire early. Build something meaningful. Do nothing. Go all in. The game doesn't judge, only you do."},
-        {n:11, cat:'doc', text:"Rest mechanic is not optional. Skipping the save cycle leads to Burnout debuff which applies -X% multiplier on productivity and charisma stats."},
-        {n:12, cat:'doc', text:"High tier loot is gated by cringe. Growth, success, love are hidden behind quests that are awkward or risky. If a quest makes you nervous the XP payout is greater."},
-        {n:13, cat:'doc', text:"Environment is a passive buff. Your home base and guild provide stat modifiers. Toxic party = constant drain on mana. Clean base = +10 on focus."},
-        {n:14, cat:'sys', text:"Staying in the starter base stops your XP gain. To level up you have to enter uncharted territory where mobs are tougher. Comfort is a level cap."},
-        {n:15, cat:'doc', text:"Manage your inventory. You have limited slots for habits and commitments. Drop low-tier junk to make room for legendary opportunities."},
-        {n:16, cat:'sys', text:"Difficulty scales with levels. You get better at the controls but level 40 requires a more refined strategy than level 20."},
-        {n:17, cat:'doc', text:"You can't control your spawn but can influence the drop rate of good luck by increasing your surface area: meeting new people, sharing your work, staying curious."},
-        {n:18, cat:'doc', text:"Failure is a reload with kept XP. Unless it's Game Over every failure is just a boss fight. Analyse the death recap then respawn and try again."},
-        {n:19, cat:'sys', text:"Invisible UI. No on-screen health bar. You have to manually check your character sheet before your stats hit zero."},
-        {n:20, cat:'doc', text:"Protect HP. No HP no game."},
-        {n:21, cat:'sys', text:"Early game is beta. Use your first 25 levels to test different builds and biomes."},
-        {n:22, cat:'doc', text:"Avoid gold sinks. Instant dopamine micro-transactions drain long-term XP."},
-        // Locked entries — unlock at Power Level threshold
-        {n:23, cat:'doc', locked:70,  text:"The grind is the point. Most players focus on the destination. The rare ones realise the daily session IS the game. They always win."},
-        {n:24, cat:'sys', locked:70,  text:"16,000 observers are spectating your playthrough. They paused their own game to watch yours. Every day you don't publish is a chapter they're waiting on."},
-        {n:25, cat:'doc', locked:85,  text:"Legacy mode unlocks after enough consecutive sessions. The players who show up daily regardless of the score — those are the ones history remembers."},
+      /* ════ SIDE MISSIONS ════
+         Replaces the old "Codex" — abstract rules nobody acted on daily.
+         This picks 3 concrete, doable tasks each day from a big pool
+         spanning fitness/mind/creativity/social/discipline/summer/content,
+         so there's always something fresh to do, especially in summer. */
+      const LS_MISSIONS_CUSTOM='los-missions-custom';
+      const LS_MISSIONS_LOG='los-missions-log';
+      const MISSION_COUNT=3;
+
+      const MISSIONS=[
+        // Fitness
+        {icon:'💪',text:'Do 50 pushups today, any split you want'},
+        {icon:'🏃',text:'20 minute walk or bike ride outside'},
+        {icon:'🤸',text:'Spend 10 minutes drilling a calisthenics skill'},
+        {icon:'🧘',text:'Stretch for 10 minutes before bed'},
+        {icon:'🏆',text:'Test your max pushups or pull-ups and beat your last score'},
+        {icon:'🚴',text:'Move your body outdoors for at least 30 minutes'},
+        // Mind & learning
+        {icon:'📚',text:'Read 25+ pages of a book'},
+        {icon:'🎥',text:'Watch one video that actually teaches you something'},
+        {icon:'🗣️',text:'Learn 5 words in a language you don\'t speak'},
+        {icon:'🗓️',text:'Spend 15 minutes planning next week'},
+        {icon:'🧩',text:'Learn one new fact and tell someone about it today'},
+        // Creativity
+        {icon:'🎸',text:'Play guitar for 15 minutes'},
+        {icon:'🎬',text:'Film one short clip just for fun, no pressure to post'},
+        {icon:'💡',text:'Write down one new idea for @2.chicos content'},
+        {icon:'✏️',text:'Doodle or sketch for 10 minutes'},
+        {icon:'🎵',text:'Make a 5-song playlist for how you feel right now'},
+        // Social
+        {icon:'📞',text:'Call or text a friend you haven\'t spoken to in a while'},
+        {icon:'💬',text:'Give someone a genuine, specific compliment'},
+        {icon:'🤝',text:'Make plans with someone for this week'},
+        {icon:'👀',text:'Have one real conversation today with phones away'},
+        {icon:'🎉',text:'Make a new friend or reconnect with an old one'},
+        // Discipline
+        {icon:'🧊',text:'Take a cold shower'},
+        {icon:'📵',text:'No phone for the first 30 minutes after waking up'},
+        {icon:'⏰',text:'Wake up before your alarm goes off'},
+        {icon:'✈️',text:'Go 1 hour with your phone on airplane mode'},
+        {icon:'🧹',text:'Spend 10 minutes tidying your space'},
+        // Summer / outdoor
+        {icon:'🌅',text:'Watch the sunrise or sunset — your call, night owl'},
+        {icon:'🏊',text:'Go for a swim'},
+        {icon:'🍽️',text:'Eat a meal outside today'},
+        {icon:'🗺️',text:'Explore a street or spot in the city you\'ve never been'},
+        {icon:'🌙',text:'Take a late-night walk while it\'s quiet outside'},
+        // Novelty / fun
+        {icon:'🍜',text:'Try a food you\'ve never had before'},
+        {icon:'📸',text:'Take one photo today that\'s actually worth keeping'},
+        {icon:'💿',text:'Listen to a full album front to back, no skipping'},
+        {icon:'🎲',text:'Do one thing today with zero plan'},
+        {icon:'🛹',text:'Try something today you\'re a total beginner at'},
+        // Reflection / growth
+        {icon:'🙏',text:'Write down 3 things you\'re grateful for'},
+        {icon:'📓',text:'Journal for 5 minutes about how today actually went'},
+        {icon:'🔋',text:'Name one thing draining your energy and fix it'},
+        {icon:'🚫',text:'Say no to something today that doesn\'t serve you'},
+        // Content / work
+        {icon:'📱',text:'Post or engage on @2.chicos'},
+        {icon:'📨',text:'Reach out to one potential collab or brand'},
+        {icon:'🗂️',text:'Batch-plan 3 content ideas for later'},
+        {icon:'✅',text:'Reply to every DM or comment you\'ve been putting off'},
       ];
 
-      function getCodexState(){
-        const TODAY=new Date().toISOString().slice(0,10);
-        function chk(fn){try{return fn();}catch(_){return false;}}
-        const gl=chk(()=>{const e=(JSON.parse(localStorage.getItem('los-gifd-current')||'[]')).find(x=>x.date===TODAY);return !!(e&&(e.desc||Object.values(e.good||{}).some(Boolean)));});
-        const wl=chk(()=>{const d=JSON.parse(localStorage.getItem('leon-workout-v3')||'{}');const s=(d.sessions||[]).find(x=>x.date===TODAY);return !!(s&&s.sets&&s.sets.length);});
-        const sl=chk(()=>{const d=JSON.parse(localStorage.getItem('leon-sleep-v2')||'{"entries":[]}');return !!(d.entries||[]).find(e=>e.date===TODAY&&e.actual>0);});
-        const nl=chk(()=>{const d=JSON.parse(localStorage.getItem('leon-nutrition-v2')||'{}');const t=d[TODAY];return !!(t&&t.meals&&t.meals.length);});
-        const gh=chk(()=>{const e=(JSON.parse(localStorage.getItem('los-gifd-current')||'[]')).find(x=>x.date===TODAY);if(!e)return{good:0,bad:0};return{good:Object.values(e.good||{}).filter(Boolean).length,bad:Object.values(e.bad||{}).filter(Boolean).length};})||{good:0,bad:0};
-        let score=0;
-        if(gl)score+=25;if(wl)score+=25;if(sl)score+=15;if(nl)score+=15;
-        score+=gh.good*4;score-=gh.bad*4;
-        return {score:Math.max(0,Math.round(score)),gl,wl,sl,nl};
+      // Deterministic seeded shuffle — same seed always gives the same order,
+      // so "today's" picks stay stable on refresh but change with a reroll.
+      function mulberry32(seed){
+        return function(){
+          seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+          let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+          t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+          return ((t ^ t >>> 14) >>> 0) / 4294967296;
+        };
+      }
+      function seededShuffle(seed, arr){
+        const rng = mulberry32(seed);
+        const out = arr.slice();
+        for (let i = out.length - 1; i > 0; i--) {
+          const j = Math.floor(rng() * (i + 1));
+          [out[i], out[j]] = [out[j], out[i]];
+        }
+        return out;
       }
 
-      function renderCodex(){
-        const TODAY=new Date().toISOString().slice(0,10);
-        const {score,gl,wl,sl,nl}=getCodexState();
-        const cls=score>=85?'Legend':score>=70?'Champion':score>=51?'Adventurer':score>=26?'Initiate':'Wanderer';
+      function fullMissionPool(){
+        const custom = (lsLoad(LS_MISSIONS_CUSTOM)||[]).map(text => ({icon:'✍️', text}));
+        return [...MISSIONS, ...custom];
+      }
 
-        /* ── Character Sheet ── */
-        const csSlot=document.getElementById('codex-char-sheet-slot');
-        if(csSlot){
-          const quests=[{label:'GIFD',done:gl},{label:'WORKOUT',done:wl},{label:'SLEEP',done:sl},{label:'FOOD',done:nl}];
-          csSlot.innerHTML=`<div class="codex-char-sheet">
-            <div class="codex-cs-top">
-              <div><div class="codex-cs-name">⚔ Leon</div><div class="codex-cs-class">${cls} · Content Creator</div></div>
-              <div class="codex-cs-power"><div class="codex-cs-score">${score}</div><div class="codex-cs-score-label">Power Level</div></div>
-            </div>
-            <div class="codex-cs-divider"></div>
-            <div class="codex-cs-quests">${quests.map(q=>`<div class="codex-quest ${q.done?'done':'pending'}">${q.done?'✓':'○'} ${q.label}</div>`).join('')}</div>
-          </div>`;
+      function loadMissionLog(){ try { return JSON.parse(localStorage.getItem(LS_MISSIONS_LOG)||'{}'); } catch(_) { return {}; } }
+      function saveMissionLog(log){
+        // Keep the last ~120 days only, so this doesn't grow forever
+        const keys = Object.keys(log).sort();
+        if (keys.length > 120) keys.slice(0, keys.length - 120).forEach(k => delete log[k]);
+        try { localStorage.setItem(LS_MISSIONS_LOG, JSON.stringify(log)); } catch(_) {}
+      }
+
+      // One-time migration: bring over any custom Codex rules as custom missions
+      (function migrateCodexCustom(){
+        const old = lsLoad('los-codex-custom');
+        if (old && old.length && !lsLoad(LS_MISSIONS_CUSTOM)) lsSave2(LS_MISSIONS_CUSTOM, old);
+      })();
+
+      // Today's picks are frozen into the log the first time they're computed
+      // (and re-frozen on reroll), so adding a custom mission mid-day can't
+      // silently reshuffle — and shift the meaning of — already-shown picks.
+      function todaysMissionState(){
+        const TODAY = new Date().toISOString().slice(0,10);
+        const log = loadMissionLog();
+        let day = log[TODAY];
+        if (!day || !day.picks) {
+          const reroll = day ? (day.reroll||0) : 0;
+          const dateNum = +TODAY.replace(/-/g,'');
+          const seed = dateNum + reroll * 7919; // large prime spread per reroll
+          const pool = fullMissionPool();
+          const picks = seededShuffle(seed, pool).slice(0, Math.min(MISSION_COUNT, pool.length));
+          day = { reroll, done: (day && day.done) || [], picks };
+          log[TODAY] = day;
+          saveMissionLog(log);
         }
+        return { TODAY, log, day, picks: day.picks };
+      }
 
-        /* ── Daily Lore ── */
-        const loreSlot=document.getElementById('codex-daily-lore-slot');
-        if(loreSlot){
-          const unlockable=CODEX.filter(e=>!e.locked||score>=e.locked);
-          const d=new Date(TODAY);
-          const seed=d.getFullYear()*10000+d.getMonth()*100+d.getDate();
-          const lore=unlockable[seed%unlockable.length];
-          loreSlot.innerHTML=`<div class="codex-daily-lore">
-            <div class="codex-lore-eyebrow">— Daily Lore · ${TODAY} —</div>
-            <div class="codex-lore-text"><span class="codex-lore-num">[${String(lore.n).padStart(2,'0')}]</span>${lore.text}</div>
-          </div>`;
-        }
+      function renderMissions(){
+        const { TODAY, log, day, picks } = todaysMissionState();
 
-        /* ── Rules list ── */
-        const el=document.getElementById('codex-rules');if(!el)return;
-        const custom=lsLoad(LS_CODEX)||[];
-        const customEntries=custom.map((t,i)=>({n:100+i,cat:'fld',text:t}));
-        const all=[...CODEX,...customEntries];
-        const LABEL={sys:'SYSTEM',doc:'DOCTRINE',fld:'FIELD'};
-
-        el.innerHTML=all.map(entry=>{
-          const isLocked=entry.locked&&score<entry.locked;
-          if(isLocked){
-            return `<div class="codex-item locked-entry">
-              <div class="codex-header">
-                <span class="codex-tag doc">LOCKED</span>
-                <span class="codex-num">${String(entry.n).padStart(2,'0')}</span>
-                <span class="codex-title">████ ██████ ████ ████ ███ ████</span>
-              </div>
-              <div class="codex-unlock-hint">Unlocks at Power Level ${entry.locked}</div>
+        const listEl = document.getElementById('missions-list');
+        if (listEl) {
+          listEl.innerHTML = picks.map((m, i) => {
+            const done = day.done.includes(i);
+            return `<div class="mission-card ${done?'done':''}" data-idx="${i}">
+              <button class="mission-check">${done?'✓':''}</button>
+              <span class="mission-icon">${m.icon}</span>
+              <span class="mission-text">${m.text}</span>
             </div>`;
-          }
-          const shortTitle=entry.text.indexOf('.')>0?entry.text.slice(0,entry.text.indexOf('.')+1):entry.text;
-          return `<div class="codex-item ${entry.cat}">
-            <div class="codex-header">
-              <span class="codex-tag ${entry.cat}">${LABEL[entry.cat]||'FIELD'}</span>
-              <span class="codex-num">${String(entry.n).padStart(2,'0')}</span>
-              <span class="codex-title">${shortTitle}</span>
-              <span class="codex-arrow">▶</span>
-            </div>
-            <div class="codex-body">${entry.text}</div>
-          </div>`;
-        }).join('');
+          }).join('');
+          listEl.querySelectorAll('.mission-card').forEach(card => {
+            card.addEventListener('click', () => {
+              const idx = +card.dataset.idx;
+              const { log: freshLog, day: freshDay } = todaysMissionState();
+              const at = freshDay.done.indexOf(idx);
+              if (at === -1) freshDay.done.push(idx); else freshDay.done.splice(at,1);
+              freshLog[TODAY] = freshDay;
+              saveMissionLog(freshLog);
+              renderMissions();
+              window.updateDailyScore?.();
+            });
+          });
+        }
 
-        el.querySelectorAll('.codex-item:not(.locked-entry) .codex-header').forEach(h=>
-          h.addEventListener('click',()=>h.closest('.codex-item').classList.toggle('open'))
-        );
+        const progressFill = document.getElementById('missions-progress-fill');
+        if (progressFill) progressFill.style.width = Math.round(day.done.length / picks.length * 100) + '%';
+
+        // Streak: consecutive days (walking back from today) with >=1 mission done
+        let streak = 0;
+        for (let i = 0; i < 90; i++) {
+          const d = new Date(TODAY); d.setDate(d.getDate() - i);
+          const key = d.toISOString().slice(0,10);
+          const entry = log[key];
+          if (i === 0) { if (entry && entry.done.length > 0) streak++; else break; }
+          else if (entry && entry.done.length > 0) streak++;
+          else break;
+        }
+        const streakEl = document.getElementById('missions-streak');
+        if (streakEl) streakEl.textContent = `🔥 ${streak}`;
       }
 
-      function initCodex(){
-        try { renderCodex(); } catch(e) { console.error('[Codex]', e); }
-        document.getElementById('codex-add-btn')?.addEventListener('click',()=>document.getElementById('codex-form')?.classList.toggle('open'));
-        document.getElementById('codex-save')?.addEventListener('click',()=>{
-          const t=document.getElementById('codex-input')?.value.trim();if(!t)return;
-          const c=lsLoad(LS_CODEX)||[];c.push(t);lsSave2(LS_CODEX,c);renderCodex();
-          document.getElementById('codex-input').value='';document.getElementById('codex-form').classList.remove('open');
+      function initMissions(){
+        try { renderMissions(); } catch(e) { console.error('[Missions]', e); }
+
+        document.getElementById('missions-reroll-btn')?.addEventListener('click', () => {
+          const { TODAY, log, day } = todaysMissionState();
+          log[TODAY] = { reroll: (day.reroll||0) + 1, done: [], picks: null };
+          saveMissionLog(log);
+          renderMissions();
+        });
+
+        document.getElementById('missions-add-btn')?.addEventListener('click', () =>
+          document.getElementById('missions-form')?.classList.toggle('open'));
+        document.getElementById('missions-save')?.addEventListener('click', () => {
+          const t = document.getElementById('missions-input')?.value.trim();
+          if (!t) return;
+          const c = lsLoad(LS_MISSIONS_CUSTOM) || [];
+          c.push(t); lsSave2(LS_MISSIONS_CUSTOM, c);
+          document.getElementById('missions-input').value = '';
+          document.getElementById('missions-form').classList.remove('open');
         });
       }
 
@@ -1490,7 +1557,7 @@
 
       /* ── Init ── */
       function initLOS(){
-        initTabs(); initGIFD(); initCodex(); initMap();
+        initTabs(); initGIFD(); initMissions(); initMap();
         loadChartLOS(()=>{renderGIFDCharts();});
       }
 

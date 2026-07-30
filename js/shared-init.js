@@ -36,6 +36,7 @@
       // Show FAB only on Time OS on mobile
       const fab = document.getElementById('mob-cal-fab');
       if (fab) fab.style.display = (sectionKey === 'time-os' && window.innerWidth <= 768) ? 'flex' : 'none';
+      if (sectionKey === 'time-os') window.scrollTimeOsToNow?.();
     }
 
     document.querySelectorAll('.nav-item').forEach(item => {
@@ -48,6 +49,8 @@
         // Close more tray when a section is selected
         const tray = document.getElementById('mob-more-tray');
         if (tray) tray.style.display = 'none';
+        const moreBtn = document.getElementById('mob-more-btn');
+        if (moreBtn) moreBtn.style.color = '';
       });
     });
 

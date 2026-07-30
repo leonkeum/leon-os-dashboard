@@ -4,28 +4,11 @@
 
       /* Default calendar blocks
          day  = recurring every week on that weekday
-         date = specific YYYY-MM-DD (overrides recurring for that day) */
-      const DEFAULT_BLOCKS = [
-        // ── Euroaula (recurring, updated schedule) ──
-        { id:'sch-mon', day:'Mon', label:'Euroaula',         start:'15:30', end:'20:00', color:'blue',  style:'solid' },
-        { id:'sch-tue', day:'Tue', label:'Euroaula',         start:'16:00', end:'19:00', color:'blue',  style:'solid' },
-        { id:'sch-wed', day:'Wed', label:'Digitalización',   start:'15:30', end:'16:00', color:'blue',  style:'dashed', note:'optional · 1h' },
-        { id:'sch-thu', day:'Thu', label:'Euroaula',         start:'15:30', end:'19:00', color:'blue',  style:'solid' },
-        { id:'sch-fri', day:'Fri', label:'Skip unless exam', start:'06:00', end:'00:00', color:'gray',  style:'dashed' },
-        // ── @2.chicos (recurring, mornings) ──
-        { id:'ch-mon', day:'Mon', label:'@2.chicos', start:'09:00', end:'14:30', color:'green', style:'solid' },
-        { id:'ch-tue', day:'Tue', label:'@2.chicos', start:'09:00', end:'15:00', color:'green', style:'solid' },
-        { id:'ch-wed', day:'Wed', label:'@2.chicos', start:'09:00', end:'14:30', color:'green', style:'solid' },
-        { id:'ch-thu', day:'Thu', label:'@2.chicos', start:'09:00', end:'14:30', color:'green', style:'solid' },
-        { id:'ch-sat', day:'Sat', label:'@2.chicos', start:'09:00', end:'16:00', color:'green', style:'solid' },
-        // ── Gaby shifts — week May 18-24 ──
-        { id:'gb-0522', date:'2026-05-22', label:"Gaby · sala",  start:'10:00', end:'16:00', color:'red', style:'solid' },
-        { id:'gb-0523', date:'2026-05-23', label:"Gaby's shift", start:'18:00', end:'00:00', color:'red', style:'solid' },
-        { id:'gb-0524', date:'2026-05-24', label:"Gaby's shift", start:'18:00', end:'00:00', color:'red', style:'solid' },
-        // ── Gaby shifts — week May 25-31 ──
-        { id:'gb-0529', date:'2026-05-29', label:"Gaby · sala",  start:'10:00', end:'16:00', color:'red', style:'solid' },
-        { id:'gb-0530', date:'2026-05-30', label:"Gaby · sala",  start:'18:30', end:'23:30', color:'red', style:'solid' },
-      ];
+         date = specific YYYY-MM-DD (overrides recurring for that day)
+         No recurring blocks are seeded by default — Euroaula (school) is done,
+         and both @2.chicos and Gaby's shifts vary week to week, so fixed
+         defaults just go stale. Add real events with the + button instead. */
+      const DEFAULT_BLOCKS = [];
 
       function loadCal() {
         try { const v = localStorage.getItem(CAL_KEY); return v ? JSON.parse(v) : JSON.parse(JSON.stringify(DEFAULT_BLOCKS)); }
@@ -35,10 +18,14 @@
 
       let calBlocks = loadCal();
 
-      // Migration: ensure gb-0524 exists
-      if (!calBlocks.find(b => b.id === 'gb-0524')) {
-        calBlocks.push({ id:'gb-0524', date:'2026-05-24', label:"Gaby's shift", start:'18:00', end:'00:00', color:'red', style:'solid' });
-        saveCal(calBlocks);
+      // One-time cleanup: strip the old hardcoded Euroaula/@2.chicos/Gaby
+      // seed blocks out of anyone's already-saved calendar. Schedules for
+      // school/chicos/Gaby always varied, so these stale fixed blocks were
+      // just clutter — real, current events should be added manually.
+      {
+        const before = calBlocks.length;
+        calBlocks = calBlocks.filter(b => !/^(sch-|ch-|gb-|gaby-upload-)/.test(b.id));
+        if (calBlocks.length !== before) saveCal(calBlocks);
       }
 
       function localDateStr(d) {
@@ -147,7 +134,7 @@
           const colRect = targetColEl ? targetColEl.getBoundingClientRect() : null;
           // Convert ghost's viewport-Y to column-relative px
           const newRelTop = colRect
-            ? Math.max(0, Math.min(714 - dragState.h0, ghostFixedTop - colRect.top))
+            ? Math.max(0, Math.min(816 - dragState.h0, ghostFixedTop - colRect.top))
             : 0;
 
           const block = calBlocks.find(b => b.id === dragState.id);
@@ -222,7 +209,7 @@
         const h  = n.getHours();
         const hr = h < 6 ? h + 24 : h; // 00–05 = post-midnight (24–29)
         const top = (hr - 6) * 34 + (n.getMinutes() / 60) * 34;
-        if (top < 0 || top > 714) { line.style.display = 'none'; return; }
+        if (top < 0 || top > 816) { line.style.display = 'none'; return; }
         line.style.display = 'block';
         line.style.top = top + 'px';
       }
@@ -245,6 +232,16 @@
         return mins > 0 ? `${hrs}h${mins}m` : `${hrs}h`;
       }
 
+      // Average hours slept over the last 7 logged nights (Movement → Sleep OS)
+      function avgSleepThisWeek() {
+        try {
+          const data = JSON.parse(localStorage.getItem('leon-sleep-v2') || '{"entries":[]}');
+          const last7 = (data.entries || []).slice(-7).filter(e => e.actual > 0);
+          if (!last7.length) return null;
+          return last7.reduce((sum, e) => sum + e.actual, 0) / last7.length;
+        } catch(_) { return null; }
+      }
+
       // Recompute and update the "This week" stat cards from calBlocks
       function updateStatCards() {
         const wDates = getWeekDates();
@@ -265,16 +262,24 @@
         const setHours = (sel, val) => { const el = q(sel); if (el) el.textContent = val; };
 
         setHours('.stat-card.red   .sc-hours', fmt(totals.red));
-        setHours('.stat-card.blue  .sc-hours', fmt(totals.blue));
         setHours('.stat-card.green .sc-hours', fmt(totals.green));
 
-        // Free time: 7 days × 18 waking hours minus committed
+        const avgSleep = avgSleepThisWeek();
+        setHours('.stat-card.sleep .sc-hours', avgSleep === null ? '—' : fmt(avgSleep));
+        const sleepSub = q('.stat-card.sleep .sc-sub');
+        if (sleepSub) sleepSub.textContent = avgSleep === null ? 'Log a night in Sleep OS' : (avgSleep >= 7 ? 'Solid — last 7 nights' : 'Below 7h — last 7 nights');
+        const sleepFill = q('.stat-card.sleep .sc-fill');
+        if (sleepFill) sleepFill.style.width = Math.min(100, Math.round((avgSleep || 0) / 9 * 100)) + '%';
+
+        // Free time: 7 days × 18 waking hours minus committed (calendar blocks only)
         const committed = totals.red + totals.blue + totals.green;
         setHours('.stat-card.muted .sc-hours', Math.round(Math.max(0, 7 * 18 - committed)) + 'h');
 
         // Update sub labels
         const redSub = q('.stat-card.red .sc-sub');
         if (redSub) redSub.textContent = totals.red > 0 ? 'This week' : 'No shifts this week';
+        const greenSub = q('.stat-card.green .sc-sub');
+        if (greenSub) greenSub.textContent = totals.green > 0 ? 'This week' : 'No shifts this week';
       }
 
       function renderCalendar() {
@@ -301,7 +306,7 @@
 
         // Time labels column
         let html = '<div class="time-labels">';
-        [6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,0,1,2,3].forEach(h =>
+        [6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,0,1,2,3,4,5].forEach(h =>
           html += `<div class="tl-hour">${String(h).padStart(2,'0')}</div>`
         );
         html += '</div>';
@@ -577,16 +582,13 @@
         }
         // Deselect any selected blocks when switching day
         document.querySelectorAll('.cal-block.mob-selected').forEach(b => b.classList.remove('mob-selected'));
-        // Scroll the day's column to ~current time
-        const activeCol = document.querySelector('#cal-body .day-col.mob-active');
-        if (activeCol) {
-          const body = document.getElementById('cal-body');
-          if (body) {
-            const nowH = new Date().getHours();
-            const scrollTo = Math.max(0, (nowH - 7) * 34 - 60);
-            body.scrollTop = scrollTo;
-          }
-        }
+      }
+
+      // The whole page scrolls now (the grid is a full 24h tall, not its own
+      // scroll container) — bring "now" into view within that page scroll.
+      function scrollToNow() {
+        const line = document.getElementById('time-now-line');
+        if (line) line.scrollIntoView({ block: 'center' });
       }
 
       function initMobCal() {
@@ -645,6 +647,8 @@
 
       renderCalendar();
       initMobCal();
+      window.scrollTimeOsToNow = () => setTimeout(scrollToNow, 60);
+      window.scrollTimeOsToNow();
       setInterval(positionNowLine, 60000); // update time line every minute
 
       /* ── Gaby schedule upload ── */
